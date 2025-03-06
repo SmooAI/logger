@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  GetParameterHistoryRequest,
+  GetParameterHistoryResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface GetParameterHistoryCommandInput
+  extends GetParameterHistoryRequest {}
+export interface GetParameterHistoryCommandOutput
+  extends GetParameterHistoryResult,
+    __MetadataBearer {}
+declare const GetParameterHistoryCommand_base: {
+  new (
+    input: GetParameterHistoryCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetParameterHistoryCommandInput,
+    GetParameterHistoryCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: GetParameterHistoryCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetParameterHistoryCommandInput,
+    GetParameterHistoryCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class GetParameterHistoryCommand extends GetParameterHistoryCommand_base {
+  protected static __types: {
+    api: {
+      input: GetParameterHistoryRequest;
+      output: GetParameterHistoryResult;
+    };
+    sdk: {
+      input: GetParameterHistoryCommandInput;
+      output: GetParameterHistoryCommandOutput;
+    };
+  };
+}

@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  UpdateDocumentMetadataRequest,
+  UpdateDocumentMetadataResponse,
+} from "../models/models_2";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface UpdateDocumentMetadataCommandInput
+  extends UpdateDocumentMetadataRequest {}
+export interface UpdateDocumentMetadataCommandOutput
+  extends UpdateDocumentMetadataResponse,
+    __MetadataBearer {}
+declare const UpdateDocumentMetadataCommand_base: {
+  new (
+    input: UpdateDocumentMetadataCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    UpdateDocumentMetadataCommandInput,
+    UpdateDocumentMetadataCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: UpdateDocumentMetadataCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    UpdateDocumentMetadataCommandInput,
+    UpdateDocumentMetadataCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class UpdateDocumentMetadataCommand extends UpdateDocumentMetadataCommand_base {
+  protected static __types: {
+    api: {
+      input: UpdateDocumentMetadataRequest;
+      output: {};
+    };
+    sdk: {
+      input: UpdateDocumentMetadataCommandInput;
+      output: UpdateDocumentMetadataCommandOutput;
+    };
+  };
+}

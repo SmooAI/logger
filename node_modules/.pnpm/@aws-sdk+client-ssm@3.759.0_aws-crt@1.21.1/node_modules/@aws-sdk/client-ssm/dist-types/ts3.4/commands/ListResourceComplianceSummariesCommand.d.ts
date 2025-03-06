@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  ListResourceComplianceSummariesRequest,
+  ListResourceComplianceSummariesResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface ListResourceComplianceSummariesCommandInput
+  extends ListResourceComplianceSummariesRequest {}
+export interface ListResourceComplianceSummariesCommandOutput
+  extends ListResourceComplianceSummariesResult,
+    __MetadataBearer {}
+declare const ListResourceComplianceSummariesCommand_base: {
+  new (
+    input: ListResourceComplianceSummariesCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListResourceComplianceSummariesCommandInput,
+    ListResourceComplianceSummariesCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    ...[input]: [] | [ListResourceComplianceSummariesCommandInput]
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListResourceComplianceSummariesCommandInput,
+    ListResourceComplianceSummariesCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class ListResourceComplianceSummariesCommand extends ListResourceComplianceSummariesCommand_base {
+  protected static __types: {
+    api: {
+      input: ListResourceComplianceSummariesRequest;
+      output: ListResourceComplianceSummariesResult;
+    };
+    sdk: {
+      input: ListResourceComplianceSummariesCommandInput;
+      output: ListResourceComplianceSummariesCommandOutput;
+    };
+  };
+}

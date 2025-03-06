@@ -1,0 +1,50 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DescribeOpsItemsRequest,
+  DescribeOpsItemsResponse,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DescribeOpsItemsCommandInput extends DescribeOpsItemsRequest {}
+export interface DescribeOpsItemsCommandOutput
+  extends DescribeOpsItemsResponse,
+    __MetadataBearer {}
+declare const DescribeOpsItemsCommand_base: {
+  new (
+    input: DescribeOpsItemsCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeOpsItemsCommandInput,
+    DescribeOpsItemsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    ...[input]: [] | [DescribeOpsItemsCommandInput]
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeOpsItemsCommandInput,
+    DescribeOpsItemsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DescribeOpsItemsCommand extends DescribeOpsItemsCommand_base {
+  protected static __types: {
+    api: {
+      input: DescribeOpsItemsRequest;
+      output: DescribeOpsItemsResponse;
+    };
+    sdk: {
+      input: DescribeOpsItemsCommandInput;
+      output: DescribeOpsItemsCommandOutput;
+    };
+  };
+}

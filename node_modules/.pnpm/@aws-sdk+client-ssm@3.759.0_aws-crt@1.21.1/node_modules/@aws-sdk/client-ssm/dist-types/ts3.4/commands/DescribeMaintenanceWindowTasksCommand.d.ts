@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DescribeMaintenanceWindowTasksRequest,
+  DescribeMaintenanceWindowTasksResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DescribeMaintenanceWindowTasksCommandInput
+  extends DescribeMaintenanceWindowTasksRequest {}
+export interface DescribeMaintenanceWindowTasksCommandOutput
+  extends DescribeMaintenanceWindowTasksResult,
+    __MetadataBearer {}
+declare const DescribeMaintenanceWindowTasksCommand_base: {
+  new (
+    input: DescribeMaintenanceWindowTasksCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeMaintenanceWindowTasksCommandInput,
+    DescribeMaintenanceWindowTasksCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: DescribeMaintenanceWindowTasksCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeMaintenanceWindowTasksCommandInput,
+    DescribeMaintenanceWindowTasksCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DescribeMaintenanceWindowTasksCommand extends DescribeMaintenanceWindowTasksCommand_base {
+  protected static __types: {
+    api: {
+      input: DescribeMaintenanceWindowTasksRequest;
+      output: DescribeMaintenanceWindowTasksResult;
+    };
+    sdk: {
+      input: DescribeMaintenanceWindowTasksCommandInput;
+      output: DescribeMaintenanceWindowTasksCommandOutput;
+    };
+  };
+}

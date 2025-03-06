@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  GetDefaultPatchBaselineRequest,
+  GetDefaultPatchBaselineResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface GetDefaultPatchBaselineCommandInput
+  extends GetDefaultPatchBaselineRequest {}
+export interface GetDefaultPatchBaselineCommandOutput
+  extends GetDefaultPatchBaselineResult,
+    __MetadataBearer {}
+declare const GetDefaultPatchBaselineCommand_base: {
+  new (
+    input: GetDefaultPatchBaselineCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetDefaultPatchBaselineCommandInput,
+    GetDefaultPatchBaselineCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    ...[input]: [] | [GetDefaultPatchBaselineCommandInput]
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetDefaultPatchBaselineCommandInput,
+    GetDefaultPatchBaselineCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class GetDefaultPatchBaselineCommand extends GetDefaultPatchBaselineCommand_base {
+  protected static __types: {
+    api: {
+      input: GetDefaultPatchBaselineRequest;
+      output: GetDefaultPatchBaselineResult;
+    };
+    sdk: {
+      input: GetDefaultPatchBaselineCommandInput;
+      output: GetDefaultPatchBaselineCommandOutput;
+    };
+  };
+}

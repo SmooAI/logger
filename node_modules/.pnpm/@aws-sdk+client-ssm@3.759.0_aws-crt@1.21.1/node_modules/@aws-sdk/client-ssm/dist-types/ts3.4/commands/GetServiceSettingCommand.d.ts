@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  GetServiceSettingRequest,
+  GetServiceSettingResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface GetServiceSettingCommandInput
+  extends GetServiceSettingRequest {}
+export interface GetServiceSettingCommandOutput
+  extends GetServiceSettingResult,
+    __MetadataBearer {}
+declare const GetServiceSettingCommand_base: {
+  new (
+    input: GetServiceSettingCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetServiceSettingCommandInput,
+    GetServiceSettingCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: GetServiceSettingCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetServiceSettingCommandInput,
+    GetServiceSettingCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class GetServiceSettingCommand extends GetServiceSettingCommand_base {
+  protected static __types: {
+    api: {
+      input: GetServiceSettingRequest;
+      output: GetServiceSettingResult;
+    };
+    sdk: {
+      input: GetServiceSettingCommandInput;
+      output: GetServiceSettingCommandOutput;
+    };
+  };
+}

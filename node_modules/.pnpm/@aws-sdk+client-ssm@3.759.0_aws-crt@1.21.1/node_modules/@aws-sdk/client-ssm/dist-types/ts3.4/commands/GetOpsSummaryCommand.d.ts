@@ -1,0 +1,48 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import { GetOpsSummaryResult } from "../models/models_1";
+import { GetOpsSummaryRequest } from "../models/models_2";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface GetOpsSummaryCommandInput extends GetOpsSummaryRequest {}
+export interface GetOpsSummaryCommandOutput
+  extends GetOpsSummaryResult,
+    __MetadataBearer {}
+declare const GetOpsSummaryCommand_base: {
+  new (
+    input: GetOpsSummaryCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetOpsSummaryCommandInput,
+    GetOpsSummaryCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    ...[input]: [] | [GetOpsSummaryCommandInput]
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetOpsSummaryCommandInput,
+    GetOpsSummaryCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class GetOpsSummaryCommand extends GetOpsSummaryCommand_base {
+  protected static __types: {
+    api: {
+      input: GetOpsSummaryRequest;
+      output: GetOpsSummaryResult;
+    };
+    sdk: {
+      input: GetOpsSummaryCommandInput;
+      output: GetOpsSummaryCommandOutput;
+    };
+  };
+}

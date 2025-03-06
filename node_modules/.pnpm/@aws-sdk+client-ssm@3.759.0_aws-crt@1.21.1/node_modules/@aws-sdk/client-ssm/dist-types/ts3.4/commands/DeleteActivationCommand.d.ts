@@ -1,0 +1,50 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DeleteActivationRequest,
+  DeleteActivationResult,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DeleteActivationCommandInput extends DeleteActivationRequest {}
+export interface DeleteActivationCommandOutput
+  extends DeleteActivationResult,
+    __MetadataBearer {}
+declare const DeleteActivationCommand_base: {
+  new (
+    input: DeleteActivationCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DeleteActivationCommandInput,
+    DeleteActivationCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: DeleteActivationCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DeleteActivationCommandInput,
+    DeleteActivationCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DeleteActivationCommand extends DeleteActivationCommand_base {
+  protected static __types: {
+    api: {
+      input: DeleteActivationRequest;
+      output: {};
+    };
+    sdk: {
+      input: DeleteActivationCommandInput;
+      output: DeleteActivationCommandOutput;
+    };
+  };
+}

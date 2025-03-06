@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  ListResourceDataSyncRequest,
+  ListResourceDataSyncResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface ListResourceDataSyncCommandInput
+  extends ListResourceDataSyncRequest {}
+export interface ListResourceDataSyncCommandOutput
+  extends ListResourceDataSyncResult,
+    __MetadataBearer {}
+declare const ListResourceDataSyncCommand_base: {
+  new (
+    input: ListResourceDataSyncCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListResourceDataSyncCommandInput,
+    ListResourceDataSyncCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    ...[input]: [] | [ListResourceDataSyncCommandInput]
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListResourceDataSyncCommandInput,
+    ListResourceDataSyncCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class ListResourceDataSyncCommand extends ListResourceDataSyncCommand_base {
+  protected static __types: {
+    api: {
+      input: ListResourceDataSyncRequest;
+      output: ListResourceDataSyncResult;
+    };
+    sdk: {
+      input: ListResourceDataSyncCommandInput;
+      output: ListResourceDataSyncCommandOutput;
+    };
+  };
+}

@@ -1,0 +1,22 @@
+import { getEndpointPlugin } from "@smithy/middleware-endpoint";
+import { getSerdePlugin } from "@smithy/middleware-serde";
+import { Command as $Command } from "@smithy/smithy-client";
+import { commonParams } from "../endpoint/EndpointParameters";
+import { de_GetInventoryCommand, se_GetInventoryCommand } from "../protocols/Aws_json1_1";
+export { $Command };
+export class GetInventoryCommand extends $Command
+    .classBuilder()
+    .ep(commonParams)
+    .m(function (Command, cs, config, o) {
+    return [
+        getSerdePlugin(config, this.serialize, this.deserialize),
+        getEndpointPlugin(config, Command.getEndpointParameterInstructions()),
+    ];
+})
+    .s("AmazonSSM", "GetInventory", {})
+    .n("SSMClient", "GetInventoryCommand")
+    .f(void 0, void 0)
+    .ser(se_GetInventoryCommand)
+    .de(de_GetInventoryCommand)
+    .build() {
+}

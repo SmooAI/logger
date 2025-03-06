@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DescribeEffectiveInstanceAssociationsRequest,
+  DescribeEffectiveInstanceAssociationsResult,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DescribeEffectiveInstanceAssociationsCommandInput
+  extends DescribeEffectiveInstanceAssociationsRequest {}
+export interface DescribeEffectiveInstanceAssociationsCommandOutput
+  extends DescribeEffectiveInstanceAssociationsResult,
+    __MetadataBearer {}
+declare const DescribeEffectiveInstanceAssociationsCommand_base: {
+  new (
+    input: DescribeEffectiveInstanceAssociationsCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeEffectiveInstanceAssociationsCommandInput,
+    DescribeEffectiveInstanceAssociationsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: DescribeEffectiveInstanceAssociationsCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeEffectiveInstanceAssociationsCommandInput,
+    DescribeEffectiveInstanceAssociationsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DescribeEffectiveInstanceAssociationsCommand extends DescribeEffectiveInstanceAssociationsCommand_base {
+  protected static __types: {
+    api: {
+      input: DescribeEffectiveInstanceAssociationsRequest;
+      output: DescribeEffectiveInstanceAssociationsResult;
+    };
+    sdk: {
+      input: DescribeEffectiveInstanceAssociationsCommandInput;
+      output: DescribeEffectiveInstanceAssociationsCommandOutput;
+    };
+  };
+}

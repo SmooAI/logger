@@ -1,0 +1,49 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import { ResetServiceSettingRequest } from "../models/models_1";
+import { ResetServiceSettingResult } from "../models/models_2";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface ResetServiceSettingCommandInput
+  extends ResetServiceSettingRequest {}
+export interface ResetServiceSettingCommandOutput
+  extends ResetServiceSettingResult,
+    __MetadataBearer {}
+declare const ResetServiceSettingCommand_base: {
+  new (
+    input: ResetServiceSettingCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    ResetServiceSettingCommandInput,
+    ResetServiceSettingCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: ResetServiceSettingCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    ResetServiceSettingCommandInput,
+    ResetServiceSettingCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class ResetServiceSettingCommand extends ResetServiceSettingCommand_base {
+  protected static __types: {
+    api: {
+      input: ResetServiceSettingRequest;
+      output: ResetServiceSettingResult;
+    };
+    sdk: {
+      input: ResetServiceSettingCommandInput;
+      output: ResetServiceSettingCommandOutput;
+    };
+  };
+}

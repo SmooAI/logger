@@ -1,0 +1,47 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import { CancelCommandRequest, CancelCommandResult } from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface CancelCommandCommandInput extends CancelCommandRequest {}
+export interface CancelCommandCommandOutput
+  extends CancelCommandResult,
+    __MetadataBearer {}
+declare const CancelCommandCommand_base: {
+  new (
+    input: CancelCommandCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    CancelCommandCommandInput,
+    CancelCommandCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: CancelCommandCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    CancelCommandCommandInput,
+    CancelCommandCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class CancelCommandCommand extends CancelCommandCommand_base {
+  protected static __types: {
+    api: {
+      input: CancelCommandRequest;
+      output: {};
+    };
+    sdk: {
+      input: CancelCommandCommandInput;
+      output: CancelCommandCommandOutput;
+    };
+  };
+}

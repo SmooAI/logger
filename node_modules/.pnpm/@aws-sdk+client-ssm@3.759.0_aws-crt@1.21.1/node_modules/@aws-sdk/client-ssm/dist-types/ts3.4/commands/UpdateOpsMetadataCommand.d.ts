@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  UpdateOpsMetadataRequest,
+  UpdateOpsMetadataResult,
+} from "../models/models_2";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface UpdateOpsMetadataCommandInput
+  extends UpdateOpsMetadataRequest {}
+export interface UpdateOpsMetadataCommandOutput
+  extends UpdateOpsMetadataResult,
+    __MetadataBearer {}
+declare const UpdateOpsMetadataCommand_base: {
+  new (
+    input: UpdateOpsMetadataCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    UpdateOpsMetadataCommandInput,
+    UpdateOpsMetadataCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: UpdateOpsMetadataCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    UpdateOpsMetadataCommandInput,
+    UpdateOpsMetadataCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class UpdateOpsMetadataCommand extends UpdateOpsMetadataCommand_base {
+  protected static __types: {
+    api: {
+      input: UpdateOpsMetadataRequest;
+      output: UpdateOpsMetadataResult;
+    };
+    sdk: {
+      input: UpdateOpsMetadataCommandInput;
+      output: UpdateOpsMetadataCommandOutput;
+    };
+  };
+}

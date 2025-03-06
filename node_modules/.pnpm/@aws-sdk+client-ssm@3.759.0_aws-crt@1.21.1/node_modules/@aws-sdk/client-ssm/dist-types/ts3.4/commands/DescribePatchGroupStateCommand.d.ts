@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DescribePatchGroupStateRequest,
+  DescribePatchGroupStateResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DescribePatchGroupStateCommandInput
+  extends DescribePatchGroupStateRequest {}
+export interface DescribePatchGroupStateCommandOutput
+  extends DescribePatchGroupStateResult,
+    __MetadataBearer {}
+declare const DescribePatchGroupStateCommand_base: {
+  new (
+    input: DescribePatchGroupStateCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribePatchGroupStateCommandInput,
+    DescribePatchGroupStateCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: DescribePatchGroupStateCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribePatchGroupStateCommandInput,
+    DescribePatchGroupStateCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DescribePatchGroupStateCommand extends DescribePatchGroupStateCommand_base {
+  protected static __types: {
+    api: {
+      input: DescribePatchGroupStateRequest;
+      output: DescribePatchGroupStateResult;
+    };
+    sdk: {
+      input: DescribePatchGroupStateCommandInput;
+      output: DescribePatchGroupStateCommandOutput;
+    };
+  };
+}

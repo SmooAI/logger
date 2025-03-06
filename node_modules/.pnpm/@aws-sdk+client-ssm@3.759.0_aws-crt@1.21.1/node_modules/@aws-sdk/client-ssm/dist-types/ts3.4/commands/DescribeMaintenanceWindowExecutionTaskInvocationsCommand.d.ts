@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DescribeMaintenanceWindowExecutionTaskInvocationsRequest,
+  DescribeMaintenanceWindowExecutionTaskInvocationsResult,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DescribeMaintenanceWindowExecutionTaskInvocationsCommandInput
+  extends DescribeMaintenanceWindowExecutionTaskInvocationsRequest {}
+export interface DescribeMaintenanceWindowExecutionTaskInvocationsCommandOutput
+  extends DescribeMaintenanceWindowExecutionTaskInvocationsResult,
+    __MetadataBearer {}
+declare const DescribeMaintenanceWindowExecutionTaskInvocationsCommand_base: {
+  new (
+    input: DescribeMaintenanceWindowExecutionTaskInvocationsCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeMaintenanceWindowExecutionTaskInvocationsCommandInput,
+    DescribeMaintenanceWindowExecutionTaskInvocationsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: DescribeMaintenanceWindowExecutionTaskInvocationsCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeMaintenanceWindowExecutionTaskInvocationsCommandInput,
+    DescribeMaintenanceWindowExecutionTaskInvocationsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DescribeMaintenanceWindowExecutionTaskInvocationsCommand extends DescribeMaintenanceWindowExecutionTaskInvocationsCommand_base {
+  protected static __types: {
+    api: {
+      input: DescribeMaintenanceWindowExecutionTaskInvocationsRequest;
+      output: DescribeMaintenanceWindowExecutionTaskInvocationsResult;
+    };
+    sdk: {
+      input: DescribeMaintenanceWindowExecutionTaskInvocationsCommandInput;
+      output: DescribeMaintenanceWindowExecutionTaskInvocationsCommandOutput;
+    };
+  };
+}

@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DeleteResourceDataSyncRequest,
+  DeleteResourceDataSyncResult,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DeleteResourceDataSyncCommandInput
+  extends DeleteResourceDataSyncRequest {}
+export interface DeleteResourceDataSyncCommandOutput
+  extends DeleteResourceDataSyncResult,
+    __MetadataBearer {}
+declare const DeleteResourceDataSyncCommand_base: {
+  new (
+    input: DeleteResourceDataSyncCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DeleteResourceDataSyncCommandInput,
+    DeleteResourceDataSyncCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: DeleteResourceDataSyncCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DeleteResourceDataSyncCommandInput,
+    DeleteResourceDataSyncCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DeleteResourceDataSyncCommand extends DeleteResourceDataSyncCommand_base {
+  protected static __types: {
+    api: {
+      input: DeleteResourceDataSyncRequest;
+      output: {};
+    };
+    sdk: {
+      input: DeleteResourceDataSyncCommandInput;
+      output: DeleteResourceDataSyncCommandOutput;
+    };
+  };
+}

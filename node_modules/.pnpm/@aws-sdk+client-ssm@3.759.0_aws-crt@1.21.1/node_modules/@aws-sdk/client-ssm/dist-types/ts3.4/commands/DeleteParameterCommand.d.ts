@@ -1,0 +1,50 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DeleteParameterRequest,
+  DeleteParameterResult,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DeleteParameterCommandInput extends DeleteParameterRequest {}
+export interface DeleteParameterCommandOutput
+  extends DeleteParameterResult,
+    __MetadataBearer {}
+declare const DeleteParameterCommand_base: {
+  new (
+    input: DeleteParameterCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DeleteParameterCommandInput,
+    DeleteParameterCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: DeleteParameterCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DeleteParameterCommandInput,
+    DeleteParameterCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DeleteParameterCommand extends DeleteParameterCommand_base {
+  protected static __types: {
+    api: {
+      input: DeleteParameterRequest;
+      output: {};
+    };
+    sdk: {
+      input: DeleteParameterCommandInput;
+      output: DeleteParameterCommandOutput;
+    };
+  };
+}

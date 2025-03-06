@@ -1,0 +1,22 @@
+import { getEndpointPlugin } from "@smithy/middleware-endpoint";
+import { getSerdePlugin } from "@smithy/middleware-serde";
+import { Command as $Command } from "@smithy/smithy-client";
+import { commonParams } from "../endpoint/EndpointParameters";
+import { de_UpdateResourceDataSyncCommand, se_UpdateResourceDataSyncCommand } from "../protocols/Aws_json1_1";
+export { $Command };
+export class UpdateResourceDataSyncCommand extends $Command
+    .classBuilder()
+    .ep(commonParams)
+    .m(function (Command, cs, config, o) {
+    return [
+        getSerdePlugin(config, this.serialize, this.deserialize),
+        getEndpointPlugin(config, Command.getEndpointParameterInstructions()),
+    ];
+})
+    .s("AmazonSSM", "UpdateResourceDataSync", {})
+    .n("SSMClient", "UpdateResourceDataSyncCommand")
+    .f(void 0, void 0)
+    .ser(se_UpdateResourceDataSyncCommand)
+    .de(de_UpdateResourceDataSyncCommand)
+    .build() {
+}
