@@ -1,0 +1,142 @@
+name: Publish Package
+
+on:
+  workflow_dispatch:  # Allow manual trigger
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write  # Add explicit PR permission
+  issues: write        # Sometimes needed for PR creation
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 9
+          
+      - name: Install dependencies and generate lockfile
+        run: |
+          if [ ! -f pnpm-lock.yaml ]; then
+            echo "No lockfile found, generating one..."
+            pnpm install --lockfile-only
+            git config --global user.email "roux@smoo.ai"
+            git config --global user.name "Roux"
+            
+            # Fetch and checkout main
+            git fetch origin
+            git checkout -B main origin/main
+            
+            git add pnpm-lock.yaml
+            git commit -m "chore: add pnpm-lock.yaml"
+            git push origin main
+          fi
+          pnpm install
+        
+      - name: Type check
+        run: |
+          if grep -q "\"typecheck\":" package.json; then
+            pnpm typecheck
+          else
+            echo "No typecheck script found, skipping"
+          fi
+        
+      - name: Lint
+        run: |
+          if grep -q "\"lint\":" package.json; then
+            pnpm lint
+          else
+            echo "No lint script found, skipping"
+          fi
+        
+      - name: Test
+        run: |
+          if grep -q "\"test\":" package.json; then
+            pnpm test
+          else
+            echo "No test script found, skipping"
+          fi
+
+      - name: Build
+        run: |
+          if grep -q "\"build\":" package.json; then
+            pnpm build
+          else
+            echo "No build script found, skipping"
+          fi
+
+      - name: Update version and create release
+        run: |
+          # Get package name and current version from package.json
+          PACKAGE_NAME=$(node -p "require('./package.json').name")
+          CURRENT_VERSION=$(node -p "require('./package.json').version")
+          
+          # Try to get latest version from npm
+          NPM_VERSION=$(npm view $PACKAGE_NAME version 2>/dev/null || echo "0.0.0")
+          
+          if [ "$NPM_VERSION" = "$CURRENT_VERSION" ]; then
+            # Bump patch version
+            IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+            NEW_VERSION="${major}.${minor}.$((patch + 1))"
+          else
+            # Use version from package.json if it's different
+            NEW_VERSION=$CURRENT_VERSION
+          fi
+          
+          # Ensure major version is at least 1
+          if [[ "$NEW_VERSION" =~ ^0\. ]]; then
+            NEW_VERSION="1.0.0"
+          fi
+          
+          # Configure git
+          git config --global user.email "roux@smoo.ai"
+          git config --global user.name "Roux"
+
+          # Create branch and push with regular git commands (uses GITHUB_TOKEN automatically)
+          BRANCH_NAME="version-bump-${NEW_VERSION}-$(date +%s)"
+          git checkout -b $BRANCH_NAME
+          
+          node -e "const pkg=require('./package.json'); pkg.version='$NEW_VERSION'; require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\n')"
+          
+          git add package.json
+          git commit -m "chore: bump version to $NEW_VERSION"
+          git push origin $BRANCH_NAME
+
+          # Set GH_TOKEN just for the gh commands
+          export GH_TOKEN="${{ github.token }}"
+          
+          # Create and auto-merge PR using gh
+          gh pr create \
+            --title "Bump version to $NEW_VERSION" \
+            --body "Automated version bump by publish workflow" \
+            --base main \
+            --head $BRANCH_NAME
+
+          gh pr merge --auto --squash $BRANCH_NAME
+
+          sleep 5
+
+          gh release create "v${NEW_VERSION}" \
+            --title "Release v${NEW_VERSION}" \
+            --notes "Release created by publish workflow" \
+            --target main
+
+      - name: Publish to NPM
+        run: pnpm publish --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.SMOOAI_NPM_TOKEN }}

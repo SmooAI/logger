@@ -1,0 +1,86 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    if: contains(github.head_ref, 'smooai-auto-update-') # Updated branch prefix check
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 9
+          
+      - name: Install dependencies and generate lockfile
+        run: |
+          if [ ! -f pnpm-lock.yaml ]; then
+            echo "No lockfile found, generating one..."
+            pnpm install --lockfile-only
+            git config --global user.email "roux@smoo.ai"
+            git config --global user.name "Roux"
+            
+            # Get PR branch name from GitHub context
+            BRANCH_NAME="${GITHUB_HEAD_REF}"
+            
+            # Fetch and checkout the PR branch
+            git fetch origin
+            git checkout -B "$BRANCH_NAME" "origin/$BRANCH_NAME"
+            
+            git add pnpm-lock.yaml
+            git commit -m "chore: add pnpm-lock.yaml"
+            git push origin "$BRANCH_NAME"
+          fi
+          pnpm install
+        
+      - name: Type check
+        run: |
+          if grep -q "\"typecheck\":" package.json; then
+            pnpm typecheck
+          else
+            echo "No typecheck script found, skipping"
+          fi
+        
+      - name: Lint
+        run: |
+          if grep -q "\"lint\":" package.json; then
+            pnpm lint
+          else
+            echo "No lint script found, skipping"
+          fi
+        
+      - name: Test
+        run: |
+          if grep -q "\"test\":" package.json; then
+            pnpm test
+          else
+            echo "No test script found, skipping"
+          fi
+
+      - name: Auto-merge and trigger publish
+        if: success()
+        run: |
+          # Merge the PR
+          gh pr merge \
+            --squash \
+            --auto \
+            --delete-branch \
+            "${{ github.event.pull_request.number }}"
+
+          # Wait a moment for the merge to complete
+          sleep 5
+
+          # Trigger publish workflow
+          gh workflow run publish.yml
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
