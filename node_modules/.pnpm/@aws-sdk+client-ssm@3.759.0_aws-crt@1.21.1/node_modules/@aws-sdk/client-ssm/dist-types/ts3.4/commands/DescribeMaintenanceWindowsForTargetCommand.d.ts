@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DescribeMaintenanceWindowsForTargetRequest,
+  DescribeMaintenanceWindowsForTargetResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DescribeMaintenanceWindowsForTargetCommandInput
+  extends DescribeMaintenanceWindowsForTargetRequest {}
+export interface DescribeMaintenanceWindowsForTargetCommandOutput
+  extends DescribeMaintenanceWindowsForTargetResult,
+    __MetadataBearer {}
+declare const DescribeMaintenanceWindowsForTargetCommand_base: {
+  new (
+    input: DescribeMaintenanceWindowsForTargetCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeMaintenanceWindowsForTargetCommandInput,
+    DescribeMaintenanceWindowsForTargetCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: DescribeMaintenanceWindowsForTargetCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeMaintenanceWindowsForTargetCommandInput,
+    DescribeMaintenanceWindowsForTargetCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DescribeMaintenanceWindowsForTargetCommand extends DescribeMaintenanceWindowsForTargetCommand_base {
+  protected static __types: {
+    api: {
+      input: DescribeMaintenanceWindowsForTargetRequest;
+      output: DescribeMaintenanceWindowsForTargetResult;
+    };
+    sdk: {
+      input: DescribeMaintenanceWindowsForTargetCommandInput;
+      output: DescribeMaintenanceWindowsForTargetCommandOutput;
+    };
+  };
+}

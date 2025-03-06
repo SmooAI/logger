@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  GetMaintenanceWindowRequest,
+  GetMaintenanceWindowResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface GetMaintenanceWindowCommandInput
+  extends GetMaintenanceWindowRequest {}
+export interface GetMaintenanceWindowCommandOutput
+  extends GetMaintenanceWindowResult,
+    __MetadataBearer {}
+declare const GetMaintenanceWindowCommand_base: {
+  new (
+    input: GetMaintenanceWindowCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetMaintenanceWindowCommandInput,
+    GetMaintenanceWindowCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: GetMaintenanceWindowCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetMaintenanceWindowCommandInput,
+    GetMaintenanceWindowCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class GetMaintenanceWindowCommand extends GetMaintenanceWindowCommand_base {
+  protected static __types: {
+    api: {
+      input: GetMaintenanceWindowRequest;
+      output: GetMaintenanceWindowResult;
+    };
+    sdk: {
+      input: GetMaintenanceWindowCommandInput;
+      output: GetMaintenanceWindowCommandOutput;
+    };
+  };
+}

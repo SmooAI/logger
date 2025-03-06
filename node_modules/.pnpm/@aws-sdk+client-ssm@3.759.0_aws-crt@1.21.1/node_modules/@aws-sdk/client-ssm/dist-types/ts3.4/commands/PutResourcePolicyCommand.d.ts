@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  PutResourcePolicyRequest,
+  PutResourcePolicyResponse,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface PutResourcePolicyCommandInput
+  extends PutResourcePolicyRequest {}
+export interface PutResourcePolicyCommandOutput
+  extends PutResourcePolicyResponse,
+    __MetadataBearer {}
+declare const PutResourcePolicyCommand_base: {
+  new (
+    input: PutResourcePolicyCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    PutResourcePolicyCommandInput,
+    PutResourcePolicyCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: PutResourcePolicyCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    PutResourcePolicyCommandInput,
+    PutResourcePolicyCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class PutResourcePolicyCommand extends PutResourcePolicyCommand_base {
+  protected static __types: {
+    api: {
+      input: PutResourcePolicyRequest;
+      output: PutResourcePolicyResponse;
+    };
+    sdk: {
+      input: PutResourcePolicyCommandInput;
+      output: PutResourcePolicyCommandOutput;
+    };
+  };
+}

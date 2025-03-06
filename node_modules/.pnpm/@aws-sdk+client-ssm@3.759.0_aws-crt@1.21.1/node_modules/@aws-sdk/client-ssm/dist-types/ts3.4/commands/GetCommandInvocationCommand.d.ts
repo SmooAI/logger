@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  GetCommandInvocationRequest,
+  GetCommandInvocationResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface GetCommandInvocationCommandInput
+  extends GetCommandInvocationRequest {}
+export interface GetCommandInvocationCommandOutput
+  extends GetCommandInvocationResult,
+    __MetadataBearer {}
+declare const GetCommandInvocationCommand_base: {
+  new (
+    input: GetCommandInvocationCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetCommandInvocationCommandInput,
+    GetCommandInvocationCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: GetCommandInvocationCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetCommandInvocationCommandInput,
+    GetCommandInvocationCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class GetCommandInvocationCommand extends GetCommandInvocationCommand_base {
+  protected static __types: {
+    api: {
+      input: GetCommandInvocationRequest;
+      output: GetCommandInvocationResult;
+    };
+    sdk: {
+      input: GetCommandInvocationCommandInput;
+      output: GetCommandInvocationCommandOutput;
+    };
+  };
+}

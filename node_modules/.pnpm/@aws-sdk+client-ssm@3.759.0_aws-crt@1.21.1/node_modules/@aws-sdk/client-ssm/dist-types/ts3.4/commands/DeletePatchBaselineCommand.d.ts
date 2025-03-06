@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DeletePatchBaselineRequest,
+  DeletePatchBaselineResult,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DeletePatchBaselineCommandInput
+  extends DeletePatchBaselineRequest {}
+export interface DeletePatchBaselineCommandOutput
+  extends DeletePatchBaselineResult,
+    __MetadataBearer {}
+declare const DeletePatchBaselineCommand_base: {
+  new (
+    input: DeletePatchBaselineCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DeletePatchBaselineCommandInput,
+    DeletePatchBaselineCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: DeletePatchBaselineCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DeletePatchBaselineCommandInput,
+    DeletePatchBaselineCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DeletePatchBaselineCommand extends DeletePatchBaselineCommand_base {
+  protected static __types: {
+    api: {
+      input: DeletePatchBaselineRequest;
+      output: DeletePatchBaselineResult;
+    };
+    sdk: {
+      input: DeletePatchBaselineCommandInput;
+      output: DeletePatchBaselineCommandOutput;
+    };
+  };
+}

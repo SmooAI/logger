@@ -1,0 +1,23 @@
+import { getEndpointPlugin } from "@smithy/middleware-endpoint";
+import { getSerdePlugin } from "@smithy/middleware-serde";
+import { Command as $Command } from "@smithy/smithy-client";
+import { commonParams } from "../endpoint/EndpointParameters";
+import { GetPatchBaselineResultFilterSensitiveLog, } from "../models/models_1";
+import { de_GetPatchBaselineCommand, se_GetPatchBaselineCommand } from "../protocols/Aws_json1_1";
+export { $Command };
+export class GetPatchBaselineCommand extends $Command
+    .classBuilder()
+    .ep(commonParams)
+    .m(function (Command, cs, config, o) {
+    return [
+        getSerdePlugin(config, this.serialize, this.deserialize),
+        getEndpointPlugin(config, Command.getEndpointParameterInstructions()),
+    ];
+})
+    .s("AmazonSSM", "GetPatchBaseline", {})
+    .n("SSMClient", "GetPatchBaselineCommand")
+    .f(void 0, GetPatchBaselineResultFilterSensitiveLog)
+    .ser(se_GetPatchBaselineCommand)
+    .de(de_GetPatchBaselineCommand)
+    .build() {
+}

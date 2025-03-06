@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  LabelParameterVersionRequest,
+  LabelParameterVersionResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface LabelParameterVersionCommandInput
+  extends LabelParameterVersionRequest {}
+export interface LabelParameterVersionCommandOutput
+  extends LabelParameterVersionResult,
+    __MetadataBearer {}
+declare const LabelParameterVersionCommand_base: {
+  new (
+    input: LabelParameterVersionCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    LabelParameterVersionCommandInput,
+    LabelParameterVersionCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: LabelParameterVersionCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    LabelParameterVersionCommandInput,
+    LabelParameterVersionCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class LabelParameterVersionCommand extends LabelParameterVersionCommand_base {
+  protected static __types: {
+    api: {
+      input: LabelParameterVersionRequest;
+      output: LabelParameterVersionResult;
+    };
+    sdk: {
+      input: LabelParameterVersionCommandInput;
+      output: LabelParameterVersionCommandOutput;
+    };
+  };
+}

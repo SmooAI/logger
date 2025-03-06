@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  GetMaintenanceWindowExecutionTaskInvocationRequest,
+  GetMaintenanceWindowExecutionTaskInvocationResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface GetMaintenanceWindowExecutionTaskInvocationCommandInput
+  extends GetMaintenanceWindowExecutionTaskInvocationRequest {}
+export interface GetMaintenanceWindowExecutionTaskInvocationCommandOutput
+  extends GetMaintenanceWindowExecutionTaskInvocationResult,
+    __MetadataBearer {}
+declare const GetMaintenanceWindowExecutionTaskInvocationCommand_base: {
+  new (
+    input: GetMaintenanceWindowExecutionTaskInvocationCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetMaintenanceWindowExecutionTaskInvocationCommandInput,
+    GetMaintenanceWindowExecutionTaskInvocationCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: GetMaintenanceWindowExecutionTaskInvocationCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetMaintenanceWindowExecutionTaskInvocationCommandInput,
+    GetMaintenanceWindowExecutionTaskInvocationCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class GetMaintenanceWindowExecutionTaskInvocationCommand extends GetMaintenanceWindowExecutionTaskInvocationCommand_base {
+  protected static __types: {
+    api: {
+      input: GetMaintenanceWindowExecutionTaskInvocationRequest;
+      output: GetMaintenanceWindowExecutionTaskInvocationResult;
+    };
+    sdk: {
+      input: GetMaintenanceWindowExecutionTaskInvocationCommandInput;
+      output: GetMaintenanceWindowExecutionTaskInvocationCommandOutput;
+    };
+  };
+}

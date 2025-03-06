@@ -1,0 +1,50 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  CreateActivationRequest,
+  CreateActivationResult,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface CreateActivationCommandInput extends CreateActivationRequest {}
+export interface CreateActivationCommandOutput
+  extends CreateActivationResult,
+    __MetadataBearer {}
+declare const CreateActivationCommand_base: {
+  new (
+    input: CreateActivationCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    CreateActivationCommandInput,
+    CreateActivationCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: CreateActivationCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    CreateActivationCommandInput,
+    CreateActivationCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class CreateActivationCommand extends CreateActivationCommand_base {
+  protected static __types: {
+    api: {
+      input: CreateActivationRequest;
+      output: CreateActivationResult;
+    };
+    sdk: {
+      input: CreateActivationCommandInput;
+      output: CreateActivationCommandOutput;
+    };
+  };
+}

@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  GetConnectionStatusRequest,
+  GetConnectionStatusResponse,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface GetConnectionStatusCommandInput
+  extends GetConnectionStatusRequest {}
+export interface GetConnectionStatusCommandOutput
+  extends GetConnectionStatusResponse,
+    __MetadataBearer {}
+declare const GetConnectionStatusCommand_base: {
+  new (
+    input: GetConnectionStatusCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetConnectionStatusCommandInput,
+    GetConnectionStatusCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: GetConnectionStatusCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetConnectionStatusCommandInput,
+    GetConnectionStatusCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class GetConnectionStatusCommand extends GetConnectionStatusCommand_base {
+  protected static __types: {
+    api: {
+      input: GetConnectionStatusRequest;
+      output: GetConnectionStatusResponse;
+    };
+    sdk: {
+      input: GetConnectionStatusCommandInput;
+      output: GetConnectionStatusCommandOutput;
+    };
+  };
+}

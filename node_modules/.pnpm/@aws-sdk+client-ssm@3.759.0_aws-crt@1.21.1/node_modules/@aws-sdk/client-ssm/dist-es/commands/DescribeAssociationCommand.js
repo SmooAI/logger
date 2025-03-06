@@ -1,0 +1,23 @@
+import { getEndpointPlugin } from "@smithy/middleware-endpoint";
+import { getSerdePlugin } from "@smithy/middleware-serde";
+import { Command as $Command } from "@smithy/smithy-client";
+import { commonParams } from "../endpoint/EndpointParameters";
+import { DescribeAssociationResultFilterSensitiveLog, } from "../models/models_0";
+import { de_DescribeAssociationCommand, se_DescribeAssociationCommand } from "../protocols/Aws_json1_1";
+export { $Command };
+export class DescribeAssociationCommand extends $Command
+    .classBuilder()
+    .ep(commonParams)
+    .m(function (Command, cs, config, o) {
+    return [
+        getSerdePlugin(config, this.serialize, this.deserialize),
+        getEndpointPlugin(config, Command.getEndpointParameterInstructions()),
+    ];
+})
+    .s("AmazonSSM", "DescribeAssociation", {})
+    .n("SSMClient", "DescribeAssociationCommand")
+    .f(void 0, DescribeAssociationResultFilterSensitiveLog)
+    .ser(se_DescribeAssociationCommand)
+    .de(de_DescribeAssociationCommand)
+    .build() {
+}

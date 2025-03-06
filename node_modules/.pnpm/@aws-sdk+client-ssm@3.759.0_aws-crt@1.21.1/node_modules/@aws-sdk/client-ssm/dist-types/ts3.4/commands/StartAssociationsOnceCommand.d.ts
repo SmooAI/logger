@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  StartAssociationsOnceRequest,
+  StartAssociationsOnceResult,
+} from "../models/models_2";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface StartAssociationsOnceCommandInput
+  extends StartAssociationsOnceRequest {}
+export interface StartAssociationsOnceCommandOutput
+  extends StartAssociationsOnceResult,
+    __MetadataBearer {}
+declare const StartAssociationsOnceCommand_base: {
+  new (
+    input: StartAssociationsOnceCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    StartAssociationsOnceCommandInput,
+    StartAssociationsOnceCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: StartAssociationsOnceCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    StartAssociationsOnceCommandInput,
+    StartAssociationsOnceCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class StartAssociationsOnceCommand extends StartAssociationsOnceCommand_base {
+  protected static __types: {
+    api: {
+      input: StartAssociationsOnceRequest;
+      output: {};
+    };
+    sdk: {
+      input: StartAssociationsOnceCommandInput;
+      output: StartAssociationsOnceCommandOutput;
+    };
+  };
+}

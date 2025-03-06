@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  AssociateOpsItemRelatedItemRequest,
+  AssociateOpsItemRelatedItemResponse,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface AssociateOpsItemRelatedItemCommandInput
+  extends AssociateOpsItemRelatedItemRequest {}
+export interface AssociateOpsItemRelatedItemCommandOutput
+  extends AssociateOpsItemRelatedItemResponse,
+    __MetadataBearer {}
+declare const AssociateOpsItemRelatedItemCommand_base: {
+  new (
+    input: AssociateOpsItemRelatedItemCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    AssociateOpsItemRelatedItemCommandInput,
+    AssociateOpsItemRelatedItemCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: AssociateOpsItemRelatedItemCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    AssociateOpsItemRelatedItemCommandInput,
+    AssociateOpsItemRelatedItemCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class AssociateOpsItemRelatedItemCommand extends AssociateOpsItemRelatedItemCommand_base {
+  protected static __types: {
+    api: {
+      input: AssociateOpsItemRelatedItemRequest;
+      output: AssociateOpsItemRelatedItemResponse;
+    };
+    sdk: {
+      input: AssociateOpsItemRelatedItemCommandInput;
+      output: AssociateOpsItemRelatedItemCommandOutput;
+    };
+  };
+}

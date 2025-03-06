@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  UpdateManagedInstanceRoleRequest,
+  UpdateManagedInstanceRoleResult,
+} from "../models/models_2";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface UpdateManagedInstanceRoleCommandInput
+  extends UpdateManagedInstanceRoleRequest {}
+export interface UpdateManagedInstanceRoleCommandOutput
+  extends UpdateManagedInstanceRoleResult,
+    __MetadataBearer {}
+declare const UpdateManagedInstanceRoleCommand_base: {
+  new (
+    input: UpdateManagedInstanceRoleCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    UpdateManagedInstanceRoleCommandInput,
+    UpdateManagedInstanceRoleCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: UpdateManagedInstanceRoleCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    UpdateManagedInstanceRoleCommandInput,
+    UpdateManagedInstanceRoleCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class UpdateManagedInstanceRoleCommand extends UpdateManagedInstanceRoleCommand_base {
+  protected static __types: {
+    api: {
+      input: UpdateManagedInstanceRoleRequest;
+      output: {};
+    };
+    sdk: {
+      input: UpdateManagedInstanceRoleCommandInput;
+      output: UpdateManagedInstanceRoleCommandOutput;
+    };
+  };
+}

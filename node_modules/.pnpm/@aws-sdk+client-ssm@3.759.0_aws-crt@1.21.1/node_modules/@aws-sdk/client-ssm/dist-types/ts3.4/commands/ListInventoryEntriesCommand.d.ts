@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  ListInventoryEntriesRequest,
+  ListInventoryEntriesResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface ListInventoryEntriesCommandInput
+  extends ListInventoryEntriesRequest {}
+export interface ListInventoryEntriesCommandOutput
+  extends ListInventoryEntriesResult,
+    __MetadataBearer {}
+declare const ListInventoryEntriesCommand_base: {
+  new (
+    input: ListInventoryEntriesCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListInventoryEntriesCommandInput,
+    ListInventoryEntriesCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: ListInventoryEntriesCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListInventoryEntriesCommandInput,
+    ListInventoryEntriesCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class ListInventoryEntriesCommand extends ListInventoryEntriesCommand_base {
+  protected static __types: {
+    api: {
+      input: ListInventoryEntriesRequest;
+      output: ListInventoryEntriesResult;
+    };
+    sdk: {
+      input: ListInventoryEntriesCommandInput;
+      output: ListInventoryEntriesCommandOutput;
+    };
+  };
+}

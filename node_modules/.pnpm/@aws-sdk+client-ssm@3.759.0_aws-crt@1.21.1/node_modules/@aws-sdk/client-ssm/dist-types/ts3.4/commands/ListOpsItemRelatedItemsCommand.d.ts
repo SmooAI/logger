@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  ListOpsItemRelatedItemsRequest,
+  ListOpsItemRelatedItemsResponse,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface ListOpsItemRelatedItemsCommandInput
+  extends ListOpsItemRelatedItemsRequest {}
+export interface ListOpsItemRelatedItemsCommandOutput
+  extends ListOpsItemRelatedItemsResponse,
+    __MetadataBearer {}
+declare const ListOpsItemRelatedItemsCommand_base: {
+  new (
+    input: ListOpsItemRelatedItemsCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListOpsItemRelatedItemsCommandInput,
+    ListOpsItemRelatedItemsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    ...[input]: [] | [ListOpsItemRelatedItemsCommandInput]
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListOpsItemRelatedItemsCommandInput,
+    ListOpsItemRelatedItemsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class ListOpsItemRelatedItemsCommand extends ListOpsItemRelatedItemsCommand_base {
+  protected static __types: {
+    api: {
+      input: ListOpsItemRelatedItemsRequest;
+      output: ListOpsItemRelatedItemsResponse;
+    };
+    sdk: {
+      input: ListOpsItemRelatedItemsCommandInput;
+      output: ListOpsItemRelatedItemsCommandOutput;
+    };
+  };
+}

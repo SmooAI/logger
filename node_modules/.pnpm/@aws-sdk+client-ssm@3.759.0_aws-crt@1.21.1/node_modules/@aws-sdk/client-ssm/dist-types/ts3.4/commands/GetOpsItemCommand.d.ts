@@ -1,0 +1,47 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import { GetOpsItemRequest, GetOpsItemResponse } from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface GetOpsItemCommandInput extends GetOpsItemRequest {}
+export interface GetOpsItemCommandOutput
+  extends GetOpsItemResponse,
+    __MetadataBearer {}
+declare const GetOpsItemCommand_base: {
+  new (
+    input: GetOpsItemCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetOpsItemCommandInput,
+    GetOpsItemCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: GetOpsItemCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetOpsItemCommandInput,
+    GetOpsItemCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class GetOpsItemCommand extends GetOpsItemCommand_base {
+  protected static __types: {
+    api: {
+      input: GetOpsItemRequest;
+      output: GetOpsItemResponse;
+    };
+    sdk: {
+      input: GetOpsItemCommandInput;
+      output: GetOpsItemCommandOutput;
+    };
+  };
+}

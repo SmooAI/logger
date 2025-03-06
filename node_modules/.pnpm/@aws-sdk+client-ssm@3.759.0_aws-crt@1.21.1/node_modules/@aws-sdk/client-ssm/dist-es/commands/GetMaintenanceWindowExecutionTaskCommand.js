@@ -1,0 +1,23 @@
+import { getEndpointPlugin } from "@smithy/middleware-endpoint";
+import { getSerdePlugin } from "@smithy/middleware-serde";
+import { Command as $Command } from "@smithy/smithy-client";
+import { commonParams } from "../endpoint/EndpointParameters";
+import { GetMaintenanceWindowExecutionTaskResultFilterSensitiveLog, } from "../models/models_1";
+import { de_GetMaintenanceWindowExecutionTaskCommand, se_GetMaintenanceWindowExecutionTaskCommand, } from "../protocols/Aws_json1_1";
+export { $Command };
+export class GetMaintenanceWindowExecutionTaskCommand extends $Command
+    .classBuilder()
+    .ep(commonParams)
+    .m(function (Command, cs, config, o) {
+    return [
+        getSerdePlugin(config, this.serialize, this.deserialize),
+        getEndpointPlugin(config, Command.getEndpointParameterInstructions()),
+    ];
+})
+    .s("AmazonSSM", "GetMaintenanceWindowExecutionTask", {})
+    .n("SSMClient", "GetMaintenanceWindowExecutionTaskCommand")
+    .f(void 0, GetMaintenanceWindowExecutionTaskResultFilterSensitiveLog)
+    .ser(se_GetMaintenanceWindowExecutionTaskCommand)
+    .de(de_GetMaintenanceWindowExecutionTaskCommand)
+    .build() {
+}

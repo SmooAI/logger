@@ -1,0 +1,47 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import { PutParameterRequest, PutParameterResult } from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface PutParameterCommandInput extends PutParameterRequest {}
+export interface PutParameterCommandOutput
+  extends PutParameterResult,
+    __MetadataBearer {}
+declare const PutParameterCommand_base: {
+  new (
+    input: PutParameterCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    PutParameterCommandInput,
+    PutParameterCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: PutParameterCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    PutParameterCommandInput,
+    PutParameterCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class PutParameterCommand extends PutParameterCommand_base {
+  protected static __types: {
+    api: {
+      input: PutParameterRequest;
+      output: PutParameterResult;
+    };
+    sdk: {
+      input: PutParameterCommandInput;
+      output: PutParameterCommandOutput;
+    };
+  };
+}
