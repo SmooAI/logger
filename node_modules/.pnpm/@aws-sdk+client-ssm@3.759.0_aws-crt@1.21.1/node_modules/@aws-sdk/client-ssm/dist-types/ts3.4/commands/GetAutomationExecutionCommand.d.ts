@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  GetAutomationExecutionRequest,
+  GetAutomationExecutionResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface GetAutomationExecutionCommandInput
+  extends GetAutomationExecutionRequest {}
+export interface GetAutomationExecutionCommandOutput
+  extends GetAutomationExecutionResult,
+    __MetadataBearer {}
+declare const GetAutomationExecutionCommand_base: {
+  new (
+    input: GetAutomationExecutionCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetAutomationExecutionCommandInput,
+    GetAutomationExecutionCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: GetAutomationExecutionCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetAutomationExecutionCommandInput,
+    GetAutomationExecutionCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class GetAutomationExecutionCommand extends GetAutomationExecutionCommand_base {
+  protected static __types: {
+    api: {
+      input: GetAutomationExecutionRequest;
+      output: GetAutomationExecutionResult;
+    };
+    sdk: {
+      input: GetAutomationExecutionCommandInput;
+      output: GetAutomationExecutionCommandOutput;
+    };
+  };
+}

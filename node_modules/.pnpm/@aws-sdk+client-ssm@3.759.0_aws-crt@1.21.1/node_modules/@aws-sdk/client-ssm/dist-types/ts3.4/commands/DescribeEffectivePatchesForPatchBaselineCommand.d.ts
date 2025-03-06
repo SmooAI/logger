@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DescribeEffectivePatchesForPatchBaselineRequest,
+  DescribeEffectivePatchesForPatchBaselineResult,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DescribeEffectivePatchesForPatchBaselineCommandInput
+  extends DescribeEffectivePatchesForPatchBaselineRequest {}
+export interface DescribeEffectivePatchesForPatchBaselineCommandOutput
+  extends DescribeEffectivePatchesForPatchBaselineResult,
+    __MetadataBearer {}
+declare const DescribeEffectivePatchesForPatchBaselineCommand_base: {
+  new (
+    input: DescribeEffectivePatchesForPatchBaselineCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeEffectivePatchesForPatchBaselineCommandInput,
+    DescribeEffectivePatchesForPatchBaselineCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: DescribeEffectivePatchesForPatchBaselineCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeEffectivePatchesForPatchBaselineCommandInput,
+    DescribeEffectivePatchesForPatchBaselineCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DescribeEffectivePatchesForPatchBaselineCommand extends DescribeEffectivePatchesForPatchBaselineCommand_base {
+  protected static __types: {
+    api: {
+      input: DescribeEffectivePatchesForPatchBaselineRequest;
+      output: DescribeEffectivePatchesForPatchBaselineResult;
+    };
+    sdk: {
+      input: DescribeEffectivePatchesForPatchBaselineCommandInput;
+      output: DescribeEffectivePatchesForPatchBaselineCommandOutput;
+    };
+  };
+}

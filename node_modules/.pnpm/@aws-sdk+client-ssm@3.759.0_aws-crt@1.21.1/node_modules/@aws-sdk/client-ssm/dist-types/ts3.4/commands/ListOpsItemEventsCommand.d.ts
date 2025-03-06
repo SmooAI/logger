@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  ListOpsItemEventsRequest,
+  ListOpsItemEventsResponse,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface ListOpsItemEventsCommandInput
+  extends ListOpsItemEventsRequest {}
+export interface ListOpsItemEventsCommandOutput
+  extends ListOpsItemEventsResponse,
+    __MetadataBearer {}
+declare const ListOpsItemEventsCommand_base: {
+  new (
+    input: ListOpsItemEventsCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListOpsItemEventsCommandInput,
+    ListOpsItemEventsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    ...[input]: [] | [ListOpsItemEventsCommandInput]
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListOpsItemEventsCommandInput,
+    ListOpsItemEventsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class ListOpsItemEventsCommand extends ListOpsItemEventsCommand_base {
+  protected static __types: {
+    api: {
+      input: ListOpsItemEventsRequest;
+      output: ListOpsItemEventsResponse;
+    };
+    sdk: {
+      input: ListOpsItemEventsCommandInput;
+      output: ListOpsItemEventsCommandOutput;
+    };
+  };
+}

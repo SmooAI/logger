@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DescribeAvailablePatchesRequest,
+  DescribeAvailablePatchesResult,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DescribeAvailablePatchesCommandInput
+  extends DescribeAvailablePatchesRequest {}
+export interface DescribeAvailablePatchesCommandOutput
+  extends DescribeAvailablePatchesResult,
+    __MetadataBearer {}
+declare const DescribeAvailablePatchesCommand_base: {
+  new (
+    input: DescribeAvailablePatchesCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeAvailablePatchesCommandInput,
+    DescribeAvailablePatchesCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    ...[input]: [] | [DescribeAvailablePatchesCommandInput]
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeAvailablePatchesCommandInput,
+    DescribeAvailablePatchesCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DescribeAvailablePatchesCommand extends DescribeAvailablePatchesCommand_base {
+  protected static __types: {
+    api: {
+      input: DescribeAvailablePatchesRequest;
+      output: DescribeAvailablePatchesResult;
+    };
+    sdk: {
+      input: DescribeAvailablePatchesCommandInput;
+      output: DescribeAvailablePatchesCommandOutput;
+    };
+  };
+}

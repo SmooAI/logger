@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DeleteOpsMetadataRequest,
+  DeleteOpsMetadataResult,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DeleteOpsMetadataCommandInput
+  extends DeleteOpsMetadataRequest {}
+export interface DeleteOpsMetadataCommandOutput
+  extends DeleteOpsMetadataResult,
+    __MetadataBearer {}
+declare const DeleteOpsMetadataCommand_base: {
+  new (
+    input: DeleteOpsMetadataCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DeleteOpsMetadataCommandInput,
+    DeleteOpsMetadataCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: DeleteOpsMetadataCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DeleteOpsMetadataCommandInput,
+    DeleteOpsMetadataCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DeleteOpsMetadataCommand extends DeleteOpsMetadataCommand_base {
+  protected static __types: {
+    api: {
+      input: DeleteOpsMetadataRequest;
+      output: {};
+    };
+    sdk: {
+      input: DeleteOpsMetadataCommandInput;
+      output: DeleteOpsMetadataCommandOutput;
+    };
+  };
+}

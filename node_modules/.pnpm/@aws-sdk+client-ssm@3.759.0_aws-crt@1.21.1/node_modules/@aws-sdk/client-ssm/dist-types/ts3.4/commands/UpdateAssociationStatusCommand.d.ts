@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  UpdateAssociationStatusRequest,
+  UpdateAssociationStatusResult,
+} from "../models/models_2";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface UpdateAssociationStatusCommandInput
+  extends UpdateAssociationStatusRequest {}
+export interface UpdateAssociationStatusCommandOutput
+  extends UpdateAssociationStatusResult,
+    __MetadataBearer {}
+declare const UpdateAssociationStatusCommand_base: {
+  new (
+    input: UpdateAssociationStatusCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    UpdateAssociationStatusCommandInput,
+    UpdateAssociationStatusCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: UpdateAssociationStatusCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    UpdateAssociationStatusCommandInput,
+    UpdateAssociationStatusCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class UpdateAssociationStatusCommand extends UpdateAssociationStatusCommand_base {
+  protected static __types: {
+    api: {
+      input: UpdateAssociationStatusRequest;
+      output: UpdateAssociationStatusResult;
+    };
+    sdk: {
+      input: UpdateAssociationStatusCommandInput;
+      output: UpdateAssociationStatusCommandOutput;
+    };
+  };
+}

@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  CreateAssociationBatchRequest,
+  CreateAssociationBatchResult,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface CreateAssociationBatchCommandInput
+  extends CreateAssociationBatchRequest {}
+export interface CreateAssociationBatchCommandOutput
+  extends CreateAssociationBatchResult,
+    __MetadataBearer {}
+declare const CreateAssociationBatchCommand_base: {
+  new (
+    input: CreateAssociationBatchCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    CreateAssociationBatchCommandInput,
+    CreateAssociationBatchCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: CreateAssociationBatchCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    CreateAssociationBatchCommandInput,
+    CreateAssociationBatchCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class CreateAssociationBatchCommand extends CreateAssociationBatchCommand_base {
+  protected static __types: {
+    api: {
+      input: CreateAssociationBatchRequest;
+      output: CreateAssociationBatchResult;
+    };
+    sdk: {
+      input: CreateAssociationBatchCommandInput;
+      output: CreateAssociationBatchCommandOutput;
+    };
+  };
+}

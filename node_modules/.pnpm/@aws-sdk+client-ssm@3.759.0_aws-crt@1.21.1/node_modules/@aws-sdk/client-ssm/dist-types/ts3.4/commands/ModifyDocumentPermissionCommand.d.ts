@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  ModifyDocumentPermissionRequest,
+  ModifyDocumentPermissionResponse,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface ModifyDocumentPermissionCommandInput
+  extends ModifyDocumentPermissionRequest {}
+export interface ModifyDocumentPermissionCommandOutput
+  extends ModifyDocumentPermissionResponse,
+    __MetadataBearer {}
+declare const ModifyDocumentPermissionCommand_base: {
+  new (
+    input: ModifyDocumentPermissionCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    ModifyDocumentPermissionCommandInput,
+    ModifyDocumentPermissionCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: ModifyDocumentPermissionCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    ModifyDocumentPermissionCommandInput,
+    ModifyDocumentPermissionCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class ModifyDocumentPermissionCommand extends ModifyDocumentPermissionCommand_base {
+  protected static __types: {
+    api: {
+      input: ModifyDocumentPermissionRequest;
+      output: {};
+    };
+    sdk: {
+      input: ModifyDocumentPermissionCommandInput;
+      output: ModifyDocumentPermissionCommandOutput;
+    };
+  };
+}

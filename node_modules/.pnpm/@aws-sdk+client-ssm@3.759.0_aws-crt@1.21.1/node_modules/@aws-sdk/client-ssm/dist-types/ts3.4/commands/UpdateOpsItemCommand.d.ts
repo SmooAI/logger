@@ -1,0 +1,50 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  UpdateOpsItemRequest,
+  UpdateOpsItemResponse,
+} from "../models/models_2";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface UpdateOpsItemCommandInput extends UpdateOpsItemRequest {}
+export interface UpdateOpsItemCommandOutput
+  extends UpdateOpsItemResponse,
+    __MetadataBearer {}
+declare const UpdateOpsItemCommand_base: {
+  new (
+    input: UpdateOpsItemCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    UpdateOpsItemCommandInput,
+    UpdateOpsItemCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: UpdateOpsItemCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    UpdateOpsItemCommandInput,
+    UpdateOpsItemCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class UpdateOpsItemCommand extends UpdateOpsItemCommand_base {
+  protected static __types: {
+    api: {
+      input: UpdateOpsItemRequest;
+      output: {};
+    };
+    sdk: {
+      input: UpdateOpsItemCommandInput;
+      output: UpdateOpsItemCommandOutput;
+    };
+  };
+}

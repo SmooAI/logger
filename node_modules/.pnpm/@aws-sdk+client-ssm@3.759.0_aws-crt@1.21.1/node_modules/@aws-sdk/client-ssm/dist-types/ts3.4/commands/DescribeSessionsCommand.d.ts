@@ -1,0 +1,50 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DescribeSessionsRequest,
+  DescribeSessionsResponse,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DescribeSessionsCommandInput extends DescribeSessionsRequest {}
+export interface DescribeSessionsCommandOutput
+  extends DescribeSessionsResponse,
+    __MetadataBearer {}
+declare const DescribeSessionsCommand_base: {
+  new (
+    input: DescribeSessionsCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeSessionsCommandInput,
+    DescribeSessionsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: DescribeSessionsCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeSessionsCommandInput,
+    DescribeSessionsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DescribeSessionsCommand extends DescribeSessionsCommand_base {
+  protected static __types: {
+    api: {
+      input: DescribeSessionsRequest;
+      output: DescribeSessionsResponse;
+    };
+    sdk: {
+      input: DescribeSessionsCommandInput;
+      output: DescribeSessionsCommandOutput;
+    };
+  };
+}

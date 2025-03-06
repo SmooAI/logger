@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DeregisterPatchBaselineForPatchGroupRequest,
+  DeregisterPatchBaselineForPatchGroupResult,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DeregisterPatchBaselineForPatchGroupCommandInput
+  extends DeregisterPatchBaselineForPatchGroupRequest {}
+export interface DeregisterPatchBaselineForPatchGroupCommandOutput
+  extends DeregisterPatchBaselineForPatchGroupResult,
+    __MetadataBearer {}
+declare const DeregisterPatchBaselineForPatchGroupCommand_base: {
+  new (
+    input: DeregisterPatchBaselineForPatchGroupCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DeregisterPatchBaselineForPatchGroupCommandInput,
+    DeregisterPatchBaselineForPatchGroupCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: DeregisterPatchBaselineForPatchGroupCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DeregisterPatchBaselineForPatchGroupCommandInput,
+    DeregisterPatchBaselineForPatchGroupCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DeregisterPatchBaselineForPatchGroupCommand extends DeregisterPatchBaselineForPatchGroupCommand_base {
+  protected static __types: {
+    api: {
+      input: DeregisterPatchBaselineForPatchGroupRequest;
+      output: DeregisterPatchBaselineForPatchGroupResult;
+    };
+    sdk: {
+      input: DeregisterPatchBaselineForPatchGroupCommandInput;
+      output: DeregisterPatchBaselineForPatchGroupCommandOutput;
+    };
+  };
+}

@@ -1,0 +1,50 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DescribeDocumentRequest,
+  DescribeDocumentResult,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DescribeDocumentCommandInput extends DescribeDocumentRequest {}
+export interface DescribeDocumentCommandOutput
+  extends DescribeDocumentResult,
+    __MetadataBearer {}
+declare const DescribeDocumentCommand_base: {
+  new (
+    input: DescribeDocumentCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeDocumentCommandInput,
+    DescribeDocumentCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: DescribeDocumentCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeDocumentCommandInput,
+    DescribeDocumentCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DescribeDocumentCommand extends DescribeDocumentCommand_base {
+  protected static __types: {
+    api: {
+      input: DescribeDocumentRequest;
+      output: DescribeDocumentResult;
+    };
+    sdk: {
+      input: DescribeDocumentCommandInput;
+      output: DescribeDocumentCommandOutput;
+    };
+  };
+}

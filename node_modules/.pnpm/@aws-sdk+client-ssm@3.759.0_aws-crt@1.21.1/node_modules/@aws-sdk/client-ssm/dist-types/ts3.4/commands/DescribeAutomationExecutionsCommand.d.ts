@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DescribeAutomationExecutionsRequest,
+  DescribeAutomationExecutionsResult,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DescribeAutomationExecutionsCommandInput
+  extends DescribeAutomationExecutionsRequest {}
+export interface DescribeAutomationExecutionsCommandOutput
+  extends DescribeAutomationExecutionsResult,
+    __MetadataBearer {}
+declare const DescribeAutomationExecutionsCommand_base: {
+  new (
+    input: DescribeAutomationExecutionsCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeAutomationExecutionsCommandInput,
+    DescribeAutomationExecutionsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    ...[input]: [] | [DescribeAutomationExecutionsCommandInput]
+  ): import("@smithy/smithy-client").CommandImpl<
+    DescribeAutomationExecutionsCommandInput,
+    DescribeAutomationExecutionsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DescribeAutomationExecutionsCommand extends DescribeAutomationExecutionsCommand_base {
+  protected static __types: {
+    api: {
+      input: DescribeAutomationExecutionsRequest;
+      output: DescribeAutomationExecutionsResult;
+    };
+    sdk: {
+      input: DescribeAutomationExecutionsCommandInput;
+      output: DescribeAutomationExecutionsCommandOutput;
+    };
+  };
+}

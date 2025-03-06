@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  DeregisterManagedInstanceRequest,
+  DeregisterManagedInstanceResult,
+} from "../models/models_0";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface DeregisterManagedInstanceCommandInput
+  extends DeregisterManagedInstanceRequest {}
+export interface DeregisterManagedInstanceCommandOutput
+  extends DeregisterManagedInstanceResult,
+    __MetadataBearer {}
+declare const DeregisterManagedInstanceCommand_base: {
+  new (
+    input: DeregisterManagedInstanceCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DeregisterManagedInstanceCommandInput,
+    DeregisterManagedInstanceCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: DeregisterManagedInstanceCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    DeregisterManagedInstanceCommandInput,
+    DeregisterManagedInstanceCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class DeregisterManagedInstanceCommand extends DeregisterManagedInstanceCommand_base {
+  protected static __types: {
+    api: {
+      input: DeregisterManagedInstanceRequest;
+      output: {};
+    };
+    sdk: {
+      input: DeregisterManagedInstanceCommandInput;
+      output: DeregisterManagedInstanceCommandOutput;
+    };
+  };
+}

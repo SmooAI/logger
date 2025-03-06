@@ -1,0 +1,47 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import { ListCommandsRequest, ListCommandsResult } from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface ListCommandsCommandInput extends ListCommandsRequest {}
+export interface ListCommandsCommandOutput
+  extends ListCommandsResult,
+    __MetadataBearer {}
+declare const ListCommandsCommand_base: {
+  new (
+    input: ListCommandsCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListCommandsCommandInput,
+    ListCommandsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    ...[input]: [] | [ListCommandsCommandInput]
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListCommandsCommandInput,
+    ListCommandsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class ListCommandsCommand extends ListCommandsCommand_base {
+  protected static __types: {
+    api: {
+      input: ListCommandsRequest;
+      output: ListCommandsResult;
+    };
+    sdk: {
+      input: ListCommandsCommandInput;
+      output: ListCommandsCommandOutput;
+    };
+  };
+}

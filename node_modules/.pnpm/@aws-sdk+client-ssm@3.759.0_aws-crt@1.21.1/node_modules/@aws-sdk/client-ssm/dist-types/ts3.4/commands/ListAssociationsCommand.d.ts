@@ -1,0 +1,50 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  ListAssociationsRequest,
+  ListAssociationsResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface ListAssociationsCommandInput extends ListAssociationsRequest {}
+export interface ListAssociationsCommandOutput
+  extends ListAssociationsResult,
+    __MetadataBearer {}
+declare const ListAssociationsCommand_base: {
+  new (
+    input: ListAssociationsCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListAssociationsCommandInput,
+    ListAssociationsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    ...[input]: [] | [ListAssociationsCommandInput]
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListAssociationsCommandInput,
+    ListAssociationsCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class ListAssociationsCommand extends ListAssociationsCommand_base {
+  protected static __types: {
+    api: {
+      input: ListAssociationsRequest;
+      output: ListAssociationsResult;
+    };
+    sdk: {
+      input: ListAssociationsCommandInput;
+      output: ListAssociationsCommandOutput;
+    };
+  };
+}

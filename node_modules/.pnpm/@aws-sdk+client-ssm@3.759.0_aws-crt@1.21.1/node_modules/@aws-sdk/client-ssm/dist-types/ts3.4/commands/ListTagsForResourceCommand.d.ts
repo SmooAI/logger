@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  ListTagsForResourceRequest,
+  ListTagsForResourceResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface ListTagsForResourceCommandInput
+  extends ListTagsForResourceRequest {}
+export interface ListTagsForResourceCommandOutput
+  extends ListTagsForResourceResult,
+    __MetadataBearer {}
+declare const ListTagsForResourceCommand_base: {
+  new (
+    input: ListTagsForResourceCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListTagsForResourceCommandInput,
+    ListTagsForResourceCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: ListTagsForResourceCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    ListTagsForResourceCommandInput,
+    ListTagsForResourceCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class ListTagsForResourceCommand extends ListTagsForResourceCommand_base {
+  protected static __types: {
+    api: {
+      input: ListTagsForResourceRequest;
+      output: ListTagsForResourceResult;
+    };
+    sdk: {
+      input: ListTagsForResourceCommandInput;
+      output: ListTagsForResourceCommandOutput;
+    };
+  };
+}

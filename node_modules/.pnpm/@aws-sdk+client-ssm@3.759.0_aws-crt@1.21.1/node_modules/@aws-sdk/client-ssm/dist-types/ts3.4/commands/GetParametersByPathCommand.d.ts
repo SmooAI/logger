@@ -1,0 +1,51 @@
+import { Command as $Command } from "@smithy/smithy-client";
+import { MetadataBearer as __MetadataBearer } from "@smithy/types";
+import {
+  GetParametersByPathRequest,
+  GetParametersByPathResult,
+} from "../models/models_1";
+import {
+  ServiceInputTypes,
+  ServiceOutputTypes,
+  SSMClientResolvedConfig,
+} from "../SSMClient";
+export { __MetadataBearer };
+export { $Command };
+export interface GetParametersByPathCommandInput
+  extends GetParametersByPathRequest {}
+export interface GetParametersByPathCommandOutput
+  extends GetParametersByPathResult,
+    __MetadataBearer {}
+declare const GetParametersByPathCommand_base: {
+  new (
+    input: GetParametersByPathCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetParametersByPathCommandInput,
+    GetParametersByPathCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  new (
+    __0_0: GetParametersByPathCommandInput
+  ): import("@smithy/smithy-client").CommandImpl<
+    GetParametersByPathCommandInput,
+    GetParametersByPathCommandOutput,
+    SSMClientResolvedConfig,
+    ServiceInputTypes,
+    ServiceOutputTypes
+  >;
+  getEndpointParameterInstructions(): import("@smithy/middleware-endpoint").EndpointParameterInstructions;
+};
+export declare class GetParametersByPathCommand extends GetParametersByPathCommand_base {
+  protected static __types: {
+    api: {
+      input: GetParametersByPathRequest;
+      output: GetParametersByPathResult;
+    };
+    sdk: {
+      input: GetParametersByPathCommandInput;
+      output: GetParametersByPathCommandOutput;
+    };
+  };
+}

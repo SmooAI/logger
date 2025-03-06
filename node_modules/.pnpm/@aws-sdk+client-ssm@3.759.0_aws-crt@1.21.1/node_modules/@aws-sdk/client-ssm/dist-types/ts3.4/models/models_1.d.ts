@@ -1,0 +1,2288 @@
+import { ExceptionOptionType as __ExceptionOptionType } from "@smithy/smithy-client";
+import {
+  AlarmConfiguration,
+  AlarmStateInformation,
+  AssociationComplianceSeverity,
+  AssociationOverview,
+  AssociationSyncCompliance,
+  AutomationExecutionStatus,
+  AutomationSubtype,
+  DocumentFormat,
+  DocumentHashType,
+  DocumentPermissionType,
+  DocumentRequires,
+  DocumentStatus,
+  DocumentType,
+  ExecutionMode,
+  InstanceAssociationOutputLocation,
+  MaintenanceWindowExecutionStatus,
+  MaintenanceWindowFilter,
+  MaintenanceWindowResourceType,
+  MaintenanceWindowTaskType,
+  MetadataValue,
+  OperatingSystem,
+  OpsItemDataValue,
+  OpsItemNotification,
+  PatchAction,
+  PatchComplianceLevel,
+  PatchFilterGroup,
+  PatchOrchestratorFilter,
+  PatchRuleGroup,
+  PatchSource,
+  PlatformType,
+  RelatedOpsItem,
+  ResolvedTargets,
+  ResourceDataSyncAwsOrganizationsSource,
+  ResourceDataSyncS3Destination,
+  ResourceType,
+  ResourceTypeForTagging,
+  ReviewStatus,
+  Runbook,
+  ScheduledWindowExecution,
+  StepExecution,
+  Tag,
+  Target,
+  TargetLocation,
+} from "./models_0";
+import { SSMServiceException as __BaseException } from "./SSMServiceException";
+export interface DescribeMaintenanceWindowScheduleResult {
+  ScheduledWindowExecutions?: ScheduledWindowExecution[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface DescribeMaintenanceWindowsForTargetRequest {
+  Targets: Target[] | undefined;
+  ResourceType: MaintenanceWindowResourceType | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export interface MaintenanceWindowIdentityForTarget {
+  WindowId?: string | undefined;
+  Name?: string | undefined;
+}
+export interface DescribeMaintenanceWindowsForTargetResult {
+  WindowIdentities?: MaintenanceWindowIdentityForTarget[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface DescribeMaintenanceWindowTargetsRequest {
+  WindowId: string | undefined;
+  Filters?: MaintenanceWindowFilter[] | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export interface MaintenanceWindowTarget {
+  WindowId?: string | undefined;
+  WindowTargetId?: string | undefined;
+  ResourceType?: MaintenanceWindowResourceType | undefined;
+  Targets?: Target[] | undefined;
+  OwnerInformation?: string | undefined;
+  Name?: string | undefined;
+  Description?: string | undefined;
+}
+export interface DescribeMaintenanceWindowTargetsResult {
+  Targets?: MaintenanceWindowTarget[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface DescribeMaintenanceWindowTasksRequest {
+  WindowId: string | undefined;
+  Filters?: MaintenanceWindowFilter[] | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export declare const MaintenanceWindowTaskCutoffBehavior: {
+  readonly CancelTask: "CANCEL_TASK";
+  readonly ContinueTask: "CONTINUE_TASK";
+};
+export type MaintenanceWindowTaskCutoffBehavior =
+  (typeof MaintenanceWindowTaskCutoffBehavior)[keyof typeof MaintenanceWindowTaskCutoffBehavior];
+export interface LoggingInfo {
+  S3BucketName: string | undefined;
+  S3KeyPrefix?: string | undefined;
+  S3Region: string | undefined;
+}
+export interface MaintenanceWindowTaskParameterValueExpression {
+  Values?: string[] | undefined;
+}
+export interface MaintenanceWindowTask {
+  WindowId?: string | undefined;
+  WindowTaskId?: string | undefined;
+  TaskArn?: string | undefined;
+  Type?: MaintenanceWindowTaskType | undefined;
+  Targets?: Target[] | undefined;
+  TaskParameters?:
+    | Record<string, MaintenanceWindowTaskParameterValueExpression>
+    | undefined;
+  Priority?: number | undefined;
+  LoggingInfo?: LoggingInfo | undefined;
+  ServiceRoleArn?: string | undefined;
+  MaxConcurrency?: string | undefined;
+  MaxErrors?: string | undefined;
+  Name?: string | undefined;
+  Description?: string | undefined;
+  CutoffBehavior?: MaintenanceWindowTaskCutoffBehavior | undefined;
+  AlarmConfiguration?: AlarmConfiguration | undefined;
+}
+export interface DescribeMaintenanceWindowTasksResult {
+  Tasks?: MaintenanceWindowTask[] | undefined;
+  NextToken?: string | undefined;
+}
+export declare const OpsItemFilterKey: {
+  readonly ACCOUNT_ID: "AccountId";
+  readonly ACTUAL_END_TIME: "ActualEndTime";
+  readonly ACTUAL_START_TIME: "ActualStartTime";
+  readonly AUTOMATION_ID: "AutomationId";
+  readonly CATEGORY: "Category";
+  readonly CHANGE_REQUEST_APPROVER_ARN: "ChangeRequestByApproverArn";
+  readonly CHANGE_REQUEST_APPROVER_NAME: "ChangeRequestByApproverName";
+  readonly CHANGE_REQUEST_REQUESTER_ARN: "ChangeRequestByRequesterArn";
+  readonly CHANGE_REQUEST_REQUESTER_NAME: "ChangeRequestByRequesterName";
+  readonly CHANGE_REQUEST_TARGETS_RESOURCE_GROUP: "ChangeRequestByTargetsResourceGroup";
+  readonly CHANGE_REQUEST_TEMPLATE: "ChangeRequestByTemplate";
+  readonly CREATED_BY: "CreatedBy";
+  readonly CREATED_TIME: "CreatedTime";
+  readonly INSIGHT_TYPE: "InsightByType";
+  readonly LAST_MODIFIED_TIME: "LastModifiedTime";
+  readonly OPERATIONAL_DATA: "OperationalData";
+  readonly OPERATIONAL_DATA_KEY: "OperationalDataKey";
+  readonly OPERATIONAL_DATA_VALUE: "OperationalDataValue";
+  readonly OPSITEM_ID: "OpsItemId";
+  readonly OPSITEM_TYPE: "OpsItemType";
+  readonly PLANNED_END_TIME: "PlannedEndTime";
+  readonly PLANNED_START_TIME: "PlannedStartTime";
+  readonly PRIORITY: "Priority";
+  readonly RESOURCE_ID: "ResourceId";
+  readonly SEVERITY: "Severity";
+  readonly SOURCE: "Source";
+  readonly STATUS: "Status";
+  readonly TITLE: "Title";
+};
+export type OpsItemFilterKey =
+  (typeof OpsItemFilterKey)[keyof typeof OpsItemFilterKey];
+export declare const OpsItemFilterOperator: {
+  readonly CONTAINS: "Contains";
+  readonly EQUAL: "Equal";
+  readonly GREATER_THAN: "GreaterThan";
+  readonly LESS_THAN: "LessThan";
+};
+export type OpsItemFilterOperator =
+  (typeof OpsItemFilterOperator)[keyof typeof OpsItemFilterOperator];
+export interface OpsItemFilter {
+  Key: OpsItemFilterKey | undefined;
+  Values: string[] | undefined;
+  Operator: OpsItemFilterOperator | undefined;
+}
+export interface DescribeOpsItemsRequest {
+  OpsItemFilters?: OpsItemFilter[] | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export declare const OpsItemStatus: {
+  readonly APPROVED: "Approved";
+  readonly CANCELLED: "Cancelled";
+  readonly CANCELLING: "Cancelling";
+  readonly CHANGE_CALENDAR_OVERRIDE_APPROVED: "ChangeCalendarOverrideApproved";
+  readonly CHANGE_CALENDAR_OVERRIDE_REJECTED: "ChangeCalendarOverrideRejected";
+  readonly CLOSED: "Closed";
+  readonly COMPLETED_WITH_FAILURE: "CompletedWithFailure";
+  readonly COMPLETED_WITH_SUCCESS: "CompletedWithSuccess";
+  readonly FAILED: "Failed";
+  readonly IN_PROGRESS: "InProgress";
+  readonly OPEN: "Open";
+  readonly PENDING: "Pending";
+  readonly PENDING_APPROVAL: "PendingApproval";
+  readonly PENDING_CHANGE_CALENDAR_OVERRIDE: "PendingChangeCalendarOverride";
+  readonly REJECTED: "Rejected";
+  readonly RESOLVED: "Resolved";
+  readonly RUNBOOK_IN_PROGRESS: "RunbookInProgress";
+  readonly SCHEDULED: "Scheduled";
+  readonly TIMED_OUT: "TimedOut";
+};
+export type OpsItemStatus = (typeof OpsItemStatus)[keyof typeof OpsItemStatus];
+export interface OpsItemSummary {
+  CreatedBy?: string | undefined;
+  CreatedTime?: Date | undefined;
+  LastModifiedBy?: string | undefined;
+  LastModifiedTime?: Date | undefined;
+  Priority?: number | undefined;
+  Source?: string | undefined;
+  Status?: OpsItemStatus | undefined;
+  OpsItemId?: string | undefined;
+  Title?: string | undefined;
+  OperationalData?: Record<string, OpsItemDataValue> | undefined;
+  Category?: string | undefined;
+  Severity?: string | undefined;
+  OpsItemType?: string | undefined;
+  ActualStartTime?: Date | undefined;
+  ActualEndTime?: Date | undefined;
+  PlannedStartTime?: Date | undefined;
+  PlannedEndTime?: Date | undefined;
+}
+export interface DescribeOpsItemsResponse {
+  NextToken?: string | undefined;
+  OpsItemSummaries?: OpsItemSummary[] | undefined;
+}
+export declare const ParametersFilterKey: {
+  readonly KEY_ID: "KeyId";
+  readonly NAME: "Name";
+  readonly TYPE: "Type";
+};
+export type ParametersFilterKey =
+  (typeof ParametersFilterKey)[keyof typeof ParametersFilterKey];
+export interface ParametersFilter {
+  Key: ParametersFilterKey | undefined;
+  Values: string[] | undefined;
+}
+export interface ParameterStringFilter {
+  Key: string | undefined;
+  Option?: string | undefined;
+  Values?: string[] | undefined;
+}
+export interface DescribeParametersRequest {
+  Filters?: ParametersFilter[] | undefined;
+  ParameterFilters?: ParameterStringFilter[] | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+  Shared?: boolean | undefined;
+}
+export interface ParameterInlinePolicy {
+  PolicyText?: string | undefined;
+  PolicyType?: string | undefined;
+  PolicyStatus?: string | undefined;
+}
+export declare const ParameterTier: {
+  readonly ADVANCED: "Advanced";
+  readonly INTELLIGENT_TIERING: "Intelligent-Tiering";
+  readonly STANDARD: "Standard";
+};
+export type ParameterTier = (typeof ParameterTier)[keyof typeof ParameterTier];
+export declare const ParameterType: {
+  readonly SECURE_STRING: "SecureString";
+  readonly STRING: "String";
+  readonly STRING_LIST: "StringList";
+};
+export type ParameterType = (typeof ParameterType)[keyof typeof ParameterType];
+export interface ParameterMetadata {
+  Name?: string | undefined;
+  ARN?: string | undefined;
+  Type?: ParameterType | undefined;
+  KeyId?: string | undefined;
+  LastModifiedDate?: Date | undefined;
+  LastModifiedUser?: string | undefined;
+  Description?: string | undefined;
+  AllowedPattern?: string | undefined;
+  Version?: number | undefined;
+  Tier?: ParameterTier | undefined;
+  Policies?: ParameterInlinePolicy[] | undefined;
+  DataType?: string | undefined;
+}
+export interface DescribeParametersResult {
+  Parameters?: ParameterMetadata[] | undefined;
+  NextToken?: string | undefined;
+}
+export declare class InvalidFilterOption extends __BaseException {
+  readonly name: "InvalidFilterOption";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<InvalidFilterOption, __BaseException>
+  );
+}
+export interface DescribePatchBaselinesRequest {
+  Filters?: PatchOrchestratorFilter[] | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export interface PatchBaselineIdentity {
+  BaselineId?: string | undefined;
+  BaselineName?: string | undefined;
+  OperatingSystem?: OperatingSystem | undefined;
+  BaselineDescription?: string | undefined;
+  DefaultBaseline?: boolean | undefined;
+}
+export interface DescribePatchBaselinesResult {
+  BaselineIdentities?: PatchBaselineIdentity[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface DescribePatchGroupsRequest {
+  MaxResults?: number | undefined;
+  Filters?: PatchOrchestratorFilter[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface PatchGroupPatchBaselineMapping {
+  PatchGroup?: string | undefined;
+  BaselineIdentity?: PatchBaselineIdentity | undefined;
+}
+export interface DescribePatchGroupsResult {
+  Mappings?: PatchGroupPatchBaselineMapping[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface DescribePatchGroupStateRequest {
+  PatchGroup: string | undefined;
+}
+export interface DescribePatchGroupStateResult {
+  Instances?: number | undefined;
+  InstancesWithInstalledPatches?: number | undefined;
+  InstancesWithInstalledOtherPatches?: number | undefined;
+  InstancesWithInstalledPendingRebootPatches?: number | undefined;
+  InstancesWithInstalledRejectedPatches?: number | undefined;
+  InstancesWithMissingPatches?: number | undefined;
+  InstancesWithFailedPatches?: number | undefined;
+  InstancesWithNotApplicablePatches?: number | undefined;
+  InstancesWithUnreportedNotApplicablePatches?: number | undefined;
+  InstancesWithCriticalNonCompliantPatches?: number | undefined;
+  InstancesWithSecurityNonCompliantPatches?: number | undefined;
+  InstancesWithOtherNonCompliantPatches?: number | undefined;
+}
+export declare const PatchSet: {
+  readonly Application: "APPLICATION";
+  readonly Os: "OS";
+};
+export type PatchSet = (typeof PatchSet)[keyof typeof PatchSet];
+export declare const PatchProperty: {
+  readonly PatchClassification: "CLASSIFICATION";
+  readonly PatchMsrcSeverity: "MSRC_SEVERITY";
+  readonly PatchPriority: "PRIORITY";
+  readonly PatchProductFamily: "PRODUCT_FAMILY";
+  readonly PatchSeverity: "SEVERITY";
+  readonly Product: "PRODUCT";
+};
+export type PatchProperty = (typeof PatchProperty)[keyof typeof PatchProperty];
+export interface DescribePatchPropertiesRequest {
+  OperatingSystem: OperatingSystem | undefined;
+  Property: PatchProperty | undefined;
+  PatchSet?: PatchSet | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export interface DescribePatchPropertiesResult {
+  Properties?: Record<string, string>[] | undefined;
+  NextToken?: string | undefined;
+}
+export declare const SessionFilterKey: {
+  readonly INVOKED_AFTER: "InvokedAfter";
+  readonly INVOKED_BEFORE: "InvokedBefore";
+  readonly OWNER: "Owner";
+  readonly SESSION_ID: "SessionId";
+  readonly STATUS: "Status";
+  readonly TARGET_ID: "Target";
+};
+export type SessionFilterKey =
+  (typeof SessionFilterKey)[keyof typeof SessionFilterKey];
+export interface SessionFilter {
+  key: SessionFilterKey | undefined;
+  value: string | undefined;
+}
+export declare const SessionState: {
+  readonly ACTIVE: "Active";
+  readonly HISTORY: "History";
+};
+export type SessionState = (typeof SessionState)[keyof typeof SessionState];
+export interface DescribeSessionsRequest {
+  State: SessionState | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+  Filters?: SessionFilter[] | undefined;
+}
+export interface SessionManagerOutputUrl {
+  S3OutputUrl?: string | undefined;
+  CloudWatchOutputUrl?: string | undefined;
+}
+export declare const SessionStatus: {
+  readonly CONNECTED: "Connected";
+  readonly CONNECTING: "Connecting";
+  readonly DISCONNECTED: "Disconnected";
+  readonly FAILED: "Failed";
+  readonly TERMINATED: "Terminated";
+  readonly TERMINATING: "Terminating";
+};
+export type SessionStatus = (typeof SessionStatus)[keyof typeof SessionStatus];
+export interface Session {
+  SessionId?: string | undefined;
+  Target?: string | undefined;
+  Status?: SessionStatus | undefined;
+  StartDate?: Date | undefined;
+  EndDate?: Date | undefined;
+  DocumentName?: string | undefined;
+  Owner?: string | undefined;
+  Reason?: string | undefined;
+  Details?: string | undefined;
+  OutputUrl?: SessionManagerOutputUrl | undefined;
+  MaxSessionDuration?: string | undefined;
+}
+export interface DescribeSessionsResponse {
+  Sessions?: Session[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface DisassociateOpsItemRelatedItemRequest {
+  OpsItemId: string | undefined;
+  AssociationId: string | undefined;
+}
+export interface DisassociateOpsItemRelatedItemResponse {}
+export declare class OpsItemRelatedItemAssociationNotFoundException extends __BaseException {
+  readonly name: "OpsItemRelatedItemAssociationNotFoundException";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<
+      OpsItemRelatedItemAssociationNotFoundException,
+      __BaseException
+    >
+  );
+}
+export interface GetAutomationExecutionRequest {
+  AutomationExecutionId: string | undefined;
+}
+export interface ProgressCounters {
+  TotalSteps?: number | undefined;
+  SuccessSteps?: number | undefined;
+  FailedSteps?: number | undefined;
+  CancelledSteps?: number | undefined;
+  TimedOutSteps?: number | undefined;
+}
+export interface AutomationExecution {
+  AutomationExecutionId?: string | undefined;
+  DocumentName?: string | undefined;
+  DocumentVersion?: string | undefined;
+  ExecutionStartTime?: Date | undefined;
+  ExecutionEndTime?: Date | undefined;
+  AutomationExecutionStatus?: AutomationExecutionStatus | undefined;
+  StepExecutions?: StepExecution[] | undefined;
+  StepExecutionsTruncated?: boolean | undefined;
+  Parameters?: Record<string, string[]> | undefined;
+  Outputs?: Record<string, string[]> | undefined;
+  FailureMessage?: string | undefined;
+  Mode?: ExecutionMode | undefined;
+  ParentAutomationExecutionId?: string | undefined;
+  ExecutedBy?: string | undefined;
+  CurrentStepName?: string | undefined;
+  CurrentAction?: string | undefined;
+  TargetParameterName?: string | undefined;
+  Targets?: Target[] | undefined;
+  TargetMaps?: Record<string, string[]>[] | undefined;
+  ResolvedTargets?: ResolvedTargets | undefined;
+  MaxConcurrency?: string | undefined;
+  MaxErrors?: string | undefined;
+  Target?: string | undefined;
+  TargetLocations?: TargetLocation[] | undefined;
+  ProgressCounters?: ProgressCounters | undefined;
+  AlarmConfiguration?: AlarmConfiguration | undefined;
+  TriggeredAlarms?: AlarmStateInformation[] | undefined;
+  TargetLocationsURL?: string | undefined;
+  AutomationSubtype?: AutomationSubtype | undefined;
+  ScheduledTime?: Date | undefined;
+  Runbooks?: Runbook[] | undefined;
+  OpsItemId?: string | undefined;
+  AssociationId?: string | undefined;
+  ChangeRequestName?: string | undefined;
+  Variables?: Record<string, string[]> | undefined;
+}
+export interface GetAutomationExecutionResult {
+  AutomationExecution?: AutomationExecution | undefined;
+}
+export interface GetCalendarStateRequest {
+  CalendarNames: string[] | undefined;
+  AtTime?: string | undefined;
+}
+export declare const CalendarState: {
+  readonly CLOSED: "CLOSED";
+  readonly OPEN: "OPEN";
+};
+export type CalendarState = (typeof CalendarState)[keyof typeof CalendarState];
+export interface GetCalendarStateResponse {
+  State?: CalendarState | undefined;
+  AtTime?: string | undefined;
+  NextTransitionTime?: string | undefined;
+}
+export declare class InvalidDocumentType extends __BaseException {
+  readonly name: "InvalidDocumentType";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<InvalidDocumentType, __BaseException>
+  );
+}
+export declare class UnsupportedCalendarException extends __BaseException {
+  readonly name: "UnsupportedCalendarException";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<UnsupportedCalendarException, __BaseException>
+  );
+}
+export interface GetCommandInvocationRequest {
+  CommandId: string | undefined;
+  InstanceId: string | undefined;
+  PluginName?: string | undefined;
+}
+export interface CloudWatchOutputConfig {
+  CloudWatchLogGroupName?: string | undefined;
+  CloudWatchOutputEnabled?: boolean | undefined;
+}
+export declare const CommandInvocationStatus: {
+  readonly CANCELLED: "Cancelled";
+  readonly CANCELLING: "Cancelling";
+  readonly DELAYED: "Delayed";
+  readonly FAILED: "Failed";
+  readonly IN_PROGRESS: "InProgress";
+  readonly PENDING: "Pending";
+  readonly SUCCESS: "Success";
+  readonly TIMED_OUT: "TimedOut";
+};
+export type CommandInvocationStatus =
+  (typeof CommandInvocationStatus)[keyof typeof CommandInvocationStatus];
+export interface GetCommandInvocationResult {
+  CommandId?: string | undefined;
+  InstanceId?: string | undefined;
+  Comment?: string | undefined;
+  DocumentName?: string | undefined;
+  DocumentVersion?: string | undefined;
+  PluginName?: string | undefined;
+  ResponseCode?: number | undefined;
+  ExecutionStartDateTime?: string | undefined;
+  ExecutionElapsedTime?: string | undefined;
+  ExecutionEndDateTime?: string | undefined;
+  Status?: CommandInvocationStatus | undefined;
+  StatusDetails?: string | undefined;
+  StandardOutputContent?: string | undefined;
+  StandardOutputUrl?: string | undefined;
+  StandardErrorContent?: string | undefined;
+  StandardErrorUrl?: string | undefined;
+  CloudWatchOutputConfig?: CloudWatchOutputConfig | undefined;
+}
+export declare class InvalidPluginName extends __BaseException {
+  readonly name: "InvalidPluginName";
+  readonly $fault: "client";
+  constructor(opts: __ExceptionOptionType<InvalidPluginName, __BaseException>);
+}
+export declare class InvocationDoesNotExist extends __BaseException {
+  readonly name: "InvocationDoesNotExist";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<InvocationDoesNotExist, __BaseException>
+  );
+}
+export interface GetConnectionStatusRequest {
+  Target: string | undefined;
+}
+export declare const ConnectionStatus: {
+  readonly CONNECTED: "connected";
+  readonly NOT_CONNECTED: "notconnected";
+};
+export type ConnectionStatus =
+  (typeof ConnectionStatus)[keyof typeof ConnectionStatus];
+export interface GetConnectionStatusResponse {
+  Target?: string | undefined;
+  Status?: ConnectionStatus | undefined;
+}
+export interface GetDefaultPatchBaselineRequest {
+  OperatingSystem?: OperatingSystem | undefined;
+}
+export interface GetDefaultPatchBaselineResult {
+  BaselineId?: string | undefined;
+  OperatingSystem?: OperatingSystem | undefined;
+}
+export interface BaselineOverride {
+  OperatingSystem?: OperatingSystem | undefined;
+  GlobalFilters?: PatchFilterGroup | undefined;
+  ApprovalRules?: PatchRuleGroup | undefined;
+  ApprovedPatches?: string[] | undefined;
+  ApprovedPatchesComplianceLevel?: PatchComplianceLevel | undefined;
+  RejectedPatches?: string[] | undefined;
+  RejectedPatchesAction?: PatchAction | undefined;
+  ApprovedPatchesEnableNonSecurity?: boolean | undefined;
+  Sources?: PatchSource[] | undefined;
+}
+export interface GetDeployablePatchSnapshotForInstanceRequest {
+  InstanceId: string | undefined;
+  SnapshotId: string | undefined;
+  BaselineOverride?: BaselineOverride | undefined;
+}
+export interface GetDeployablePatchSnapshotForInstanceResult {
+  InstanceId?: string | undefined;
+  SnapshotId?: string | undefined;
+  SnapshotDownloadUrl?: string | undefined;
+  Product?: string | undefined;
+}
+export declare class UnsupportedFeatureRequiredException extends __BaseException {
+  readonly name: "UnsupportedFeatureRequiredException";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<
+      UnsupportedFeatureRequiredException,
+      __BaseException
+    >
+  );
+}
+export interface GetDocumentRequest {
+  Name: string | undefined;
+  VersionName?: string | undefined;
+  DocumentVersion?: string | undefined;
+  DocumentFormat?: DocumentFormat | undefined;
+}
+export declare const AttachmentHashType: {
+  readonly SHA256: "Sha256";
+};
+export type AttachmentHashType =
+  (typeof AttachmentHashType)[keyof typeof AttachmentHashType];
+export interface AttachmentContent {
+  Name?: string | undefined;
+  Size?: number | undefined;
+  Hash?: string | undefined;
+  HashType?: AttachmentHashType | undefined;
+  Url?: string | undefined;
+}
+export interface GetDocumentResult {
+  Name?: string | undefined;
+  CreatedDate?: Date | undefined;
+  DisplayName?: string | undefined;
+  VersionName?: string | undefined;
+  DocumentVersion?: string | undefined;
+  Status?: DocumentStatus | undefined;
+  StatusInformation?: string | undefined;
+  Content?: string | undefined;
+  DocumentType?: DocumentType | undefined;
+  DocumentFormat?: DocumentFormat | undefined;
+  Requires?: DocumentRequires[] | undefined;
+  AttachmentsContent?: AttachmentContent[] | undefined;
+  ReviewStatus?: ReviewStatus | undefined;
+}
+export interface GetExecutionPreviewRequest {
+  ExecutionPreviewId: string | undefined;
+}
+export declare const ImpactType: {
+  readonly MUTATING: "Mutating";
+  readonly NON_MUTATING: "NonMutating";
+  readonly UNDETERMINED: "Undetermined";
+};
+export type ImpactType = (typeof ImpactType)[keyof typeof ImpactType];
+export interface TargetPreview {
+  Count?: number | undefined;
+  TargetType?: string | undefined;
+}
+export interface AutomationExecutionPreview {
+  StepPreviews?: Partial<Record<ImpactType, number>> | undefined;
+  Regions?: string[] | undefined;
+  TargetPreviews?: TargetPreview[] | undefined;
+  TotalAccounts?: number | undefined;
+}
+export type ExecutionPreview =
+  | ExecutionPreview.AutomationMember
+  | ExecutionPreview.$UnknownMember;
+export declare namespace ExecutionPreview {
+  interface AutomationMember {
+    Automation: AutomationExecutionPreview;
+    $unknown?: never;
+  }
+  interface $UnknownMember {
+    Automation?: never;
+    $unknown: [string, any];
+  }
+  interface Visitor<T> {
+    Automation: (value: AutomationExecutionPreview) => T;
+    _: (name: string, value: any) => T;
+  }
+  const visit: <T>(value: ExecutionPreview, visitor: Visitor<T>) => T;
+}
+export declare const ExecutionPreviewStatus: {
+  readonly FAILED: "Failed";
+  readonly IN_PROGRESS: "InProgress";
+  readonly PENDING: "Pending";
+  readonly SUCCESS: "Success";
+};
+export type ExecutionPreviewStatus =
+  (typeof ExecutionPreviewStatus)[keyof typeof ExecutionPreviewStatus];
+export interface GetExecutionPreviewResponse {
+  ExecutionPreviewId?: string | undefined;
+  EndedAt?: Date | undefined;
+  Status?: ExecutionPreviewStatus | undefined;
+  StatusMessage?: string | undefined;
+  ExecutionPreview?: ExecutionPreview | undefined;
+}
+export declare const InventoryQueryOperatorType: {
+  readonly BEGIN_WITH: "BeginWith";
+  readonly EQUAL: "Equal";
+  readonly EXISTS: "Exists";
+  readonly GREATER_THAN: "GreaterThan";
+  readonly LESS_THAN: "LessThan";
+  readonly NOT_EQUAL: "NotEqual";
+};
+export type InventoryQueryOperatorType =
+  (typeof InventoryQueryOperatorType)[keyof typeof InventoryQueryOperatorType];
+export interface InventoryFilter {
+  Key: string | undefined;
+  Values: string[] | undefined;
+  Type?: InventoryQueryOperatorType | undefined;
+}
+export interface InventoryGroup {
+  Name: string | undefined;
+  Filters: InventoryFilter[] | undefined;
+}
+export interface ResultAttribute {
+  TypeName: string | undefined;
+}
+export interface InventoryResultItem {
+  TypeName: string | undefined;
+  SchemaVersion: string | undefined;
+  CaptureTime?: string | undefined;
+  ContentHash?: string | undefined;
+  Content: Record<string, string>[] | undefined;
+}
+export interface InventoryResultEntity {
+  Id?: string | undefined;
+  Data?: Record<string, InventoryResultItem> | undefined;
+}
+export interface GetInventoryResult {
+  Entities?: InventoryResultEntity[] | undefined;
+  NextToken?: string | undefined;
+}
+export declare class InvalidAggregatorException extends __BaseException {
+  readonly name: "InvalidAggregatorException";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<InvalidAggregatorException, __BaseException>
+  );
+}
+export declare class InvalidInventoryGroupException extends __BaseException {
+  readonly name: "InvalidInventoryGroupException";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<InvalidInventoryGroupException, __BaseException>
+  );
+}
+export declare class InvalidResultAttributeException extends __BaseException {
+  readonly name: "InvalidResultAttributeException";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<
+      InvalidResultAttributeException,
+      __BaseException
+    >
+  );
+}
+export interface GetInventorySchemaRequest {
+  TypeName?: string | undefined;
+  NextToken?: string | undefined;
+  MaxResults?: number | undefined;
+  Aggregator?: boolean | undefined;
+  SubType?: boolean | undefined;
+}
+export declare const InventoryAttributeDataType: {
+  readonly NUMBER: "number";
+  readonly STRING: "string";
+};
+export type InventoryAttributeDataType =
+  (typeof InventoryAttributeDataType)[keyof typeof InventoryAttributeDataType];
+export interface InventoryItemAttribute {
+  Name: string | undefined;
+  DataType: InventoryAttributeDataType | undefined;
+}
+export interface InventoryItemSchema {
+  TypeName: string | undefined;
+  Version?: string | undefined;
+  Attributes: InventoryItemAttribute[] | undefined;
+  DisplayName?: string | undefined;
+}
+export interface GetInventorySchemaResult {
+  Schemas?: InventoryItemSchema[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface GetMaintenanceWindowRequest {
+  WindowId: string | undefined;
+}
+export interface GetMaintenanceWindowResult {
+  WindowId?: string | undefined;
+  Name?: string | undefined;
+  Description?: string | undefined;
+  StartDate?: string | undefined;
+  EndDate?: string | undefined;
+  Schedule?: string | undefined;
+  ScheduleTimezone?: string | undefined;
+  ScheduleOffset?: number | undefined;
+  NextExecutionTime?: string | undefined;
+  Duration?: number | undefined;
+  Cutoff?: number | undefined;
+  AllowUnassociatedTargets?: boolean | undefined;
+  Enabled?: boolean | undefined;
+  CreatedDate?: Date | undefined;
+  ModifiedDate?: Date | undefined;
+}
+export interface GetMaintenanceWindowExecutionRequest {
+  WindowExecutionId: string | undefined;
+}
+export interface GetMaintenanceWindowExecutionResult {
+  WindowExecutionId?: string | undefined;
+  TaskIds?: string[] | undefined;
+  Status?: MaintenanceWindowExecutionStatus | undefined;
+  StatusDetails?: string | undefined;
+  StartTime?: Date | undefined;
+  EndTime?: Date | undefined;
+}
+export interface GetMaintenanceWindowExecutionTaskRequest {
+  WindowExecutionId: string | undefined;
+  TaskId: string | undefined;
+}
+export interface GetMaintenanceWindowExecutionTaskResult {
+  WindowExecutionId?: string | undefined;
+  TaskExecutionId?: string | undefined;
+  TaskArn?: string | undefined;
+  ServiceRole?: string | undefined;
+  Type?: MaintenanceWindowTaskType | undefined;
+  TaskParameters?:
+    | Record<string, MaintenanceWindowTaskParameterValueExpression>[]
+    | undefined;
+  Priority?: number | undefined;
+  MaxConcurrency?: string | undefined;
+  MaxErrors?: string | undefined;
+  Status?: MaintenanceWindowExecutionStatus | undefined;
+  StatusDetails?: string | undefined;
+  StartTime?: Date | undefined;
+  EndTime?: Date | undefined;
+  AlarmConfiguration?: AlarmConfiguration | undefined;
+  TriggeredAlarms?: AlarmStateInformation[] | undefined;
+}
+export interface GetMaintenanceWindowExecutionTaskInvocationRequest {
+  WindowExecutionId: string | undefined;
+  TaskId: string | undefined;
+  InvocationId: string | undefined;
+}
+export interface GetMaintenanceWindowExecutionTaskInvocationResult {
+  WindowExecutionId?: string | undefined;
+  TaskExecutionId?: string | undefined;
+  InvocationId?: string | undefined;
+  ExecutionId?: string | undefined;
+  TaskType?: MaintenanceWindowTaskType | undefined;
+  Parameters?: string | undefined;
+  Status?: MaintenanceWindowExecutionStatus | undefined;
+  StatusDetails?: string | undefined;
+  StartTime?: Date | undefined;
+  EndTime?: Date | undefined;
+  OwnerInformation?: string | undefined;
+  WindowTargetId?: string | undefined;
+}
+export interface GetMaintenanceWindowTaskRequest {
+  WindowId: string | undefined;
+  WindowTaskId: string | undefined;
+}
+export interface MaintenanceWindowAutomationParameters {
+  DocumentVersion?: string | undefined;
+  Parameters?: Record<string, string[]> | undefined;
+}
+export interface MaintenanceWindowLambdaParameters {
+  ClientContext?: string | undefined;
+  Qualifier?: string | undefined;
+  Payload?: Uint8Array | undefined;
+}
+export declare const NotificationEvent: {
+  readonly ALL: "All";
+  readonly CANCELLED: "Cancelled";
+  readonly FAILED: "Failed";
+  readonly IN_PROGRESS: "InProgress";
+  readonly SUCCESS: "Success";
+  readonly TIMED_OUT: "TimedOut";
+};
+export type NotificationEvent =
+  (typeof NotificationEvent)[keyof typeof NotificationEvent];
+export declare const NotificationType: {
+  readonly Command: "Command";
+  readonly Invocation: "Invocation";
+};
+export type NotificationType =
+  (typeof NotificationType)[keyof typeof NotificationType];
+export interface NotificationConfig {
+  NotificationArn?: string | undefined;
+  NotificationEvents?: NotificationEvent[] | undefined;
+  NotificationType?: NotificationType | undefined;
+}
+export interface MaintenanceWindowRunCommandParameters {
+  Comment?: string | undefined;
+  CloudWatchOutputConfig?: CloudWatchOutputConfig | undefined;
+  DocumentHash?: string | undefined;
+  DocumentHashType?: DocumentHashType | undefined;
+  DocumentVersion?: string | undefined;
+  NotificationConfig?: NotificationConfig | undefined;
+  OutputS3BucketName?: string | undefined;
+  OutputS3KeyPrefix?: string | undefined;
+  Parameters?: Record<string, string[]> | undefined;
+  ServiceRoleArn?: string | undefined;
+  TimeoutSeconds?: number | undefined;
+}
+export interface MaintenanceWindowStepFunctionsParameters {
+  Input?: string | undefined;
+  Name?: string | undefined;
+}
+export interface MaintenanceWindowTaskInvocationParameters {
+  RunCommand?: MaintenanceWindowRunCommandParameters | undefined;
+  Automation?: MaintenanceWindowAutomationParameters | undefined;
+  StepFunctions?: MaintenanceWindowStepFunctionsParameters | undefined;
+  Lambda?: MaintenanceWindowLambdaParameters | undefined;
+}
+export interface GetMaintenanceWindowTaskResult {
+  WindowId?: string | undefined;
+  WindowTaskId?: string | undefined;
+  Targets?: Target[] | undefined;
+  TaskArn?: string | undefined;
+  ServiceRoleArn?: string | undefined;
+  TaskType?: MaintenanceWindowTaskType | undefined;
+  TaskParameters?:
+    | Record<string, MaintenanceWindowTaskParameterValueExpression>
+    | undefined;
+  TaskInvocationParameters?:
+    | MaintenanceWindowTaskInvocationParameters
+    | undefined;
+  Priority?: number | undefined;
+  MaxConcurrency?: string | undefined;
+  MaxErrors?: string | undefined;
+  LoggingInfo?: LoggingInfo | undefined;
+  Name?: string | undefined;
+  Description?: string | undefined;
+  CutoffBehavior?: MaintenanceWindowTaskCutoffBehavior | undefined;
+  AlarmConfiguration?: AlarmConfiguration | undefined;
+}
+export interface GetOpsItemRequest {
+  OpsItemId: string | undefined;
+  OpsItemArn?: string | undefined;
+}
+export interface OpsItem {
+  CreatedBy?: string | undefined;
+  OpsItemType?: string | undefined;
+  CreatedTime?: Date | undefined;
+  Description?: string | undefined;
+  LastModifiedBy?: string | undefined;
+  LastModifiedTime?: Date | undefined;
+  Notifications?: OpsItemNotification[] | undefined;
+  Priority?: number | undefined;
+  RelatedOpsItems?: RelatedOpsItem[] | undefined;
+  Status?: OpsItemStatus | undefined;
+  OpsItemId?: string | undefined;
+  Version?: string | undefined;
+  Title?: string | undefined;
+  Source?: string | undefined;
+  OperationalData?: Record<string, OpsItemDataValue> | undefined;
+  Category?: string | undefined;
+  Severity?: string | undefined;
+  ActualStartTime?: Date | undefined;
+  ActualEndTime?: Date | undefined;
+  PlannedStartTime?: Date | undefined;
+  PlannedEndTime?: Date | undefined;
+  OpsItemArn?: string | undefined;
+}
+export interface GetOpsItemResponse {
+  OpsItem?: OpsItem | undefined;
+}
+export interface GetOpsMetadataRequest {
+  OpsMetadataArn: string | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export interface GetOpsMetadataResult {
+  ResourceId?: string | undefined;
+  Metadata?: Record<string, MetadataValue> | undefined;
+  NextToken?: string | undefined;
+}
+export declare const OpsFilterOperatorType: {
+  readonly BEGIN_WITH: "BeginWith";
+  readonly EQUAL: "Equal";
+  readonly EXISTS: "Exists";
+  readonly GREATER_THAN: "GreaterThan";
+  readonly LESS_THAN: "LessThan";
+  readonly NOT_EQUAL: "NotEqual";
+};
+export type OpsFilterOperatorType =
+  (typeof OpsFilterOperatorType)[keyof typeof OpsFilterOperatorType];
+export interface OpsFilter {
+  Key: string | undefined;
+  Values: string[] | undefined;
+  Type?: OpsFilterOperatorType | undefined;
+}
+export interface OpsResultAttribute {
+  TypeName: string | undefined;
+}
+export interface OpsEntityItem {
+  CaptureTime?: string | undefined;
+  Content?: Record<string, string>[] | undefined;
+}
+export interface OpsEntity {
+  Id?: string | undefined;
+  Data?: Record<string, OpsEntityItem> | undefined;
+}
+export interface GetOpsSummaryResult {
+  Entities?: OpsEntity[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface GetParameterRequest {
+  Name: string | undefined;
+  WithDecryption?: boolean | undefined;
+}
+export interface Parameter {
+  Name?: string | undefined;
+  Type?: ParameterType | undefined;
+  Value?: string | undefined;
+  Version?: number | undefined;
+  Selector?: string | undefined;
+  SourceResult?: string | undefined;
+  LastModifiedDate?: Date | undefined;
+  ARN?: string | undefined;
+  DataType?: string | undefined;
+}
+export interface GetParameterResult {
+  Parameter?: Parameter | undefined;
+}
+export declare class InvalidKeyId extends __BaseException {
+  readonly name: "InvalidKeyId";
+  readonly $fault: "client";
+  constructor(opts: __ExceptionOptionType<InvalidKeyId, __BaseException>);
+}
+export declare class ParameterVersionNotFound extends __BaseException {
+  readonly name: "ParameterVersionNotFound";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<ParameterVersionNotFound, __BaseException>
+  );
+}
+export interface GetParameterHistoryRequest {
+  Name: string | undefined;
+  WithDecryption?: boolean | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export interface ParameterHistory {
+  Name?: string | undefined;
+  Type?: ParameterType | undefined;
+  KeyId?: string | undefined;
+  LastModifiedDate?: Date | undefined;
+  LastModifiedUser?: string | undefined;
+  Description?: string | undefined;
+  Value?: string | undefined;
+  AllowedPattern?: string | undefined;
+  Version?: number | undefined;
+  Labels?: string[] | undefined;
+  Tier?: ParameterTier | undefined;
+  Policies?: ParameterInlinePolicy[] | undefined;
+  DataType?: string | undefined;
+}
+export interface GetParameterHistoryResult {
+  Parameters?: ParameterHistory[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface GetParametersRequest {
+  Names: string[] | undefined;
+  WithDecryption?: boolean | undefined;
+}
+export interface GetParametersResult {
+  Parameters?: Parameter[] | undefined;
+  InvalidParameters?: string[] | undefined;
+}
+export interface GetParametersByPathRequest {
+  Path: string | undefined;
+  Recursive?: boolean | undefined;
+  ParameterFilters?: ParameterStringFilter[] | undefined;
+  WithDecryption?: boolean | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export interface GetParametersByPathResult {
+  Parameters?: Parameter[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface GetPatchBaselineRequest {
+  BaselineId: string | undefined;
+}
+export interface GetPatchBaselineResult {
+  BaselineId?: string | undefined;
+  Name?: string | undefined;
+  OperatingSystem?: OperatingSystem | undefined;
+  GlobalFilters?: PatchFilterGroup | undefined;
+  ApprovalRules?: PatchRuleGroup | undefined;
+  ApprovedPatches?: string[] | undefined;
+  ApprovedPatchesComplianceLevel?: PatchComplianceLevel | undefined;
+  ApprovedPatchesEnableNonSecurity?: boolean | undefined;
+  RejectedPatches?: string[] | undefined;
+  RejectedPatchesAction?: PatchAction | undefined;
+  PatchGroups?: string[] | undefined;
+  CreatedDate?: Date | undefined;
+  ModifiedDate?: Date | undefined;
+  Description?: string | undefined;
+  Sources?: PatchSource[] | undefined;
+}
+export interface GetPatchBaselineForPatchGroupRequest {
+  PatchGroup: string | undefined;
+  OperatingSystem?: OperatingSystem | undefined;
+}
+export interface GetPatchBaselineForPatchGroupResult {
+  BaselineId?: string | undefined;
+  PatchGroup?: string | undefined;
+  OperatingSystem?: OperatingSystem | undefined;
+}
+export interface GetResourcePoliciesRequest {
+  ResourceArn: string | undefined;
+  NextToken?: string | undefined;
+  MaxResults?: number | undefined;
+}
+export interface GetResourcePoliciesResponseEntry {
+  PolicyId?: string | undefined;
+  PolicyHash?: string | undefined;
+  Policy?: string | undefined;
+}
+export interface GetResourcePoliciesResponse {
+  NextToken?: string | undefined;
+  Policies?: GetResourcePoliciesResponseEntry[] | undefined;
+}
+export interface GetServiceSettingRequest {
+  SettingId: string | undefined;
+}
+export interface ServiceSetting {
+  SettingId?: string | undefined;
+  SettingValue?: string | undefined;
+  LastModifiedDate?: Date | undefined;
+  LastModifiedUser?: string | undefined;
+  ARN?: string | undefined;
+  Status?: string | undefined;
+}
+export interface GetServiceSettingResult {
+  ServiceSetting?: ServiceSetting | undefined;
+}
+export declare class ServiceSettingNotFound extends __BaseException {
+  readonly name: "ServiceSettingNotFound";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<ServiceSettingNotFound, __BaseException>
+  );
+}
+export interface LabelParameterVersionRequest {
+  Name: string | undefined;
+  ParameterVersion?: number | undefined;
+  Labels: string[] | undefined;
+}
+export interface LabelParameterVersionResult {
+  InvalidLabels?: string[] | undefined;
+  ParameterVersion?: number | undefined;
+}
+export declare class ParameterVersionLabelLimitExceeded extends __BaseException {
+  readonly name: "ParameterVersionLabelLimitExceeded";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<
+      ParameterVersionLabelLimitExceeded,
+      __BaseException
+    >
+  );
+}
+export declare const AssociationFilterKey: {
+  readonly AssociationId: "AssociationId";
+  readonly AssociationName: "AssociationName";
+  readonly InstanceId: "InstanceId";
+  readonly LastExecutedAfter: "LastExecutedAfter";
+  readonly LastExecutedBefore: "LastExecutedBefore";
+  readonly Name: "Name";
+  readonly ResourceGroupName: "ResourceGroupName";
+  readonly Status: "AssociationStatusName";
+};
+export type AssociationFilterKey =
+  (typeof AssociationFilterKey)[keyof typeof AssociationFilterKey];
+export interface AssociationFilter {
+  key: AssociationFilterKey | undefined;
+  value: string | undefined;
+}
+export interface ListAssociationsRequest {
+  AssociationFilterList?: AssociationFilter[] | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export interface Association {
+  Name?: string | undefined;
+  InstanceId?: string | undefined;
+  AssociationId?: string | undefined;
+  AssociationVersion?: string | undefined;
+  DocumentVersion?: string | undefined;
+  Targets?: Target[] | undefined;
+  LastExecutionDate?: Date | undefined;
+  Overview?: AssociationOverview | undefined;
+  ScheduleExpression?: string | undefined;
+  AssociationName?: string | undefined;
+  ScheduleOffset?: number | undefined;
+  Duration?: number | undefined;
+  TargetMaps?: Record<string, string[]>[] | undefined;
+}
+export interface ListAssociationsResult {
+  Associations?: Association[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface ListAssociationVersionsRequest {
+  AssociationId: string | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export interface AssociationVersionInfo {
+  AssociationId?: string | undefined;
+  AssociationVersion?: string | undefined;
+  CreatedDate?: Date | undefined;
+  Name?: string | undefined;
+  DocumentVersion?: string | undefined;
+  Parameters?: Record<string, string[]> | undefined;
+  Targets?: Target[] | undefined;
+  ScheduleExpression?: string | undefined;
+  OutputLocation?: InstanceAssociationOutputLocation | undefined;
+  AssociationName?: string | undefined;
+  MaxErrors?: string | undefined;
+  MaxConcurrency?: string | undefined;
+  ComplianceSeverity?: AssociationComplianceSeverity | undefined;
+  SyncCompliance?: AssociationSyncCompliance | undefined;
+  ApplyOnlyAtCronInterval?: boolean | undefined;
+  CalendarNames?: string[] | undefined;
+  TargetLocations?: TargetLocation[] | undefined;
+  ScheduleOffset?: number | undefined;
+  Duration?: number | undefined;
+  TargetMaps?: Record<string, string[]>[] | undefined;
+}
+export interface ListAssociationVersionsResult {
+  AssociationVersions?: AssociationVersionInfo[] | undefined;
+  NextToken?: string | undefined;
+}
+export declare const CommandFilterKey: {
+  readonly DOCUMENT_NAME: "DocumentName";
+  readonly EXECUTION_STAGE: "ExecutionStage";
+  readonly INVOKED_AFTER: "InvokedAfter";
+  readonly INVOKED_BEFORE: "InvokedBefore";
+  readonly STATUS: "Status";
+};
+export type CommandFilterKey =
+  (typeof CommandFilterKey)[keyof typeof CommandFilterKey];
+export interface CommandFilter {
+  key: CommandFilterKey | undefined;
+  value: string | undefined;
+}
+export interface ListCommandInvocationsRequest {
+  CommandId?: string | undefined;
+  InstanceId?: string | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+  Filters?: CommandFilter[] | undefined;
+  Details?: boolean | undefined;
+}
+export declare const CommandPluginStatus: {
+  readonly CANCELLED: "Cancelled";
+  readonly FAILED: "Failed";
+  readonly IN_PROGRESS: "InProgress";
+  readonly PENDING: "Pending";
+  readonly SUCCESS: "Success";
+  readonly TIMED_OUT: "TimedOut";
+};
+export type CommandPluginStatus =
+  (typeof CommandPluginStatus)[keyof typeof CommandPluginStatus];
+export interface CommandPlugin {
+  Name?: string | undefined;
+  Status?: CommandPluginStatus | undefined;
+  StatusDetails?: string | undefined;
+  ResponseCode?: number | undefined;
+  ResponseStartDateTime?: Date | undefined;
+  ResponseFinishDateTime?: Date | undefined;
+  Output?: string | undefined;
+  StandardOutputUrl?: string | undefined;
+  StandardErrorUrl?: string | undefined;
+  OutputS3Region?: string | undefined;
+  OutputS3BucketName?: string | undefined;
+  OutputS3KeyPrefix?: string | undefined;
+}
+export interface CommandInvocation {
+  CommandId?: string | undefined;
+  InstanceId?: string | undefined;
+  InstanceName?: string | undefined;
+  Comment?: string | undefined;
+  DocumentName?: string | undefined;
+  DocumentVersion?: string | undefined;
+  RequestedDateTime?: Date | undefined;
+  Status?: CommandInvocationStatus | undefined;
+  StatusDetails?: string | undefined;
+  TraceOutput?: string | undefined;
+  StandardOutputUrl?: string | undefined;
+  StandardErrorUrl?: string | undefined;
+  CommandPlugins?: CommandPlugin[] | undefined;
+  ServiceRole?: string | undefined;
+  NotificationConfig?: NotificationConfig | undefined;
+  CloudWatchOutputConfig?: CloudWatchOutputConfig | undefined;
+}
+export interface ListCommandInvocationsResult {
+  CommandInvocations?: CommandInvocation[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface ListCommandsRequest {
+  CommandId?: string | undefined;
+  InstanceId?: string | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+  Filters?: CommandFilter[] | undefined;
+}
+export declare const CommandStatus: {
+  readonly CANCELLED: "Cancelled";
+  readonly CANCELLING: "Cancelling";
+  readonly FAILED: "Failed";
+  readonly IN_PROGRESS: "InProgress";
+  readonly PENDING: "Pending";
+  readonly SUCCESS: "Success";
+  readonly TIMED_OUT: "TimedOut";
+};
+export type CommandStatus = (typeof CommandStatus)[keyof typeof CommandStatus];
+export interface Command {
+  CommandId?: string | undefined;
+  DocumentName?: string | undefined;
+  DocumentVersion?: string | undefined;
+  Comment?: string | undefined;
+  ExpiresAfter?: Date | undefined;
+  Parameters?: Record<string, string[]> | undefined;
+  InstanceIds?: string[] | undefined;
+  Targets?: Target[] | undefined;
+  RequestedDateTime?: Date | undefined;
+  Status?: CommandStatus | undefined;
+  StatusDetails?: string | undefined;
+  OutputS3Region?: string | undefined;
+  OutputS3BucketName?: string | undefined;
+  OutputS3KeyPrefix?: string | undefined;
+  MaxConcurrency?: string | undefined;
+  MaxErrors?: string | undefined;
+  TargetCount?: number | undefined;
+  CompletedCount?: number | undefined;
+  ErrorCount?: number | undefined;
+  DeliveryTimedOutCount?: number | undefined;
+  ServiceRole?: string | undefined;
+  NotificationConfig?: NotificationConfig | undefined;
+  CloudWatchOutputConfig?: CloudWatchOutputConfig | undefined;
+  TimeoutSeconds?: number | undefined;
+  AlarmConfiguration?: AlarmConfiguration | undefined;
+  TriggeredAlarms?: AlarmStateInformation[] | undefined;
+}
+export interface ListCommandsResult {
+  Commands?: Command[] | undefined;
+  NextToken?: string | undefined;
+}
+export declare const ComplianceQueryOperatorType: {
+  readonly BeginWith: "BEGIN_WITH";
+  readonly Equal: "EQUAL";
+  readonly GreaterThan: "GREATER_THAN";
+  readonly LessThan: "LESS_THAN";
+  readonly NotEqual: "NOT_EQUAL";
+};
+export type ComplianceQueryOperatorType =
+  (typeof ComplianceQueryOperatorType)[keyof typeof ComplianceQueryOperatorType];
+export interface ComplianceStringFilter {
+  Key?: string | undefined;
+  Values?: string[] | undefined;
+  Type?: ComplianceQueryOperatorType | undefined;
+}
+export interface ListComplianceItemsRequest {
+  Filters?: ComplianceStringFilter[] | undefined;
+  ResourceIds?: string[] | undefined;
+  ResourceTypes?: string[] | undefined;
+  NextToken?: string | undefined;
+  MaxResults?: number | undefined;
+}
+export interface ComplianceExecutionSummary {
+  ExecutionTime: Date | undefined;
+  ExecutionId?: string | undefined;
+  ExecutionType?: string | undefined;
+}
+export declare const ComplianceSeverity: {
+  readonly Critical: "CRITICAL";
+  readonly High: "HIGH";
+  readonly Informational: "INFORMATIONAL";
+  readonly Low: "LOW";
+  readonly Medium: "MEDIUM";
+  readonly Unspecified: "UNSPECIFIED";
+};
+export type ComplianceSeverity =
+  (typeof ComplianceSeverity)[keyof typeof ComplianceSeverity];
+export declare const ComplianceStatus: {
+  readonly Compliant: "COMPLIANT";
+  readonly NonCompliant: "NON_COMPLIANT";
+};
+export type ComplianceStatus =
+  (typeof ComplianceStatus)[keyof typeof ComplianceStatus];
+export interface ComplianceItem {
+  ComplianceType?: string | undefined;
+  ResourceType?: string | undefined;
+  ResourceId?: string | undefined;
+  Id?: string | undefined;
+  Title?: string | undefined;
+  Status?: ComplianceStatus | undefined;
+  Severity?: ComplianceSeverity | undefined;
+  ExecutionSummary?: ComplianceExecutionSummary | undefined;
+  Details?: Record<string, string> | undefined;
+}
+export interface ListComplianceItemsResult {
+  ComplianceItems?: ComplianceItem[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface ListComplianceSummariesRequest {
+  Filters?: ComplianceStringFilter[] | undefined;
+  NextToken?: string | undefined;
+  MaxResults?: number | undefined;
+}
+export interface SeveritySummary {
+  CriticalCount?: number | undefined;
+  HighCount?: number | undefined;
+  MediumCount?: number | undefined;
+  LowCount?: number | undefined;
+  InformationalCount?: number | undefined;
+  UnspecifiedCount?: number | undefined;
+}
+export interface CompliantSummary {
+  CompliantCount?: number | undefined;
+  SeveritySummary?: SeveritySummary | undefined;
+}
+export interface NonCompliantSummary {
+  NonCompliantCount?: number | undefined;
+  SeveritySummary?: SeveritySummary | undefined;
+}
+export interface ComplianceSummaryItem {
+  ComplianceType?: string | undefined;
+  CompliantSummary?: CompliantSummary | undefined;
+  NonCompliantSummary?: NonCompliantSummary | undefined;
+}
+export interface ListComplianceSummariesResult {
+  ComplianceSummaryItems?: ComplianceSummaryItem[] | undefined;
+  NextToken?: string | undefined;
+}
+export declare const DocumentMetadataEnum: {
+  readonly DocumentReviews: "DocumentReviews";
+};
+export type DocumentMetadataEnum =
+  (typeof DocumentMetadataEnum)[keyof typeof DocumentMetadataEnum];
+export interface ListDocumentMetadataHistoryRequest {
+  Name: string | undefined;
+  DocumentVersion?: string | undefined;
+  Metadata: DocumentMetadataEnum | undefined;
+  NextToken?: string | undefined;
+  MaxResults?: number | undefined;
+}
+export declare const DocumentReviewCommentType: {
+  readonly Comment: "Comment";
+};
+export type DocumentReviewCommentType =
+  (typeof DocumentReviewCommentType)[keyof typeof DocumentReviewCommentType];
+export interface DocumentReviewCommentSource {
+  Type?: DocumentReviewCommentType | undefined;
+  Content?: string | undefined;
+}
+export interface DocumentReviewerResponseSource {
+  CreateTime?: Date | undefined;
+  UpdatedTime?: Date | undefined;
+  ReviewStatus?: ReviewStatus | undefined;
+  Comment?: DocumentReviewCommentSource[] | undefined;
+  Reviewer?: string | undefined;
+}
+export interface DocumentMetadataResponseInfo {
+  ReviewerResponse?: DocumentReviewerResponseSource[] | undefined;
+}
+export interface ListDocumentMetadataHistoryResponse {
+  Name?: string | undefined;
+  DocumentVersion?: string | undefined;
+  Author?: string | undefined;
+  Metadata?: DocumentMetadataResponseInfo | undefined;
+  NextToken?: string | undefined;
+}
+export declare const DocumentFilterKey: {
+  readonly DocumentType: "DocumentType";
+  readonly Name: "Name";
+  readonly Owner: "Owner";
+  readonly PlatformTypes: "PlatformTypes";
+};
+export type DocumentFilterKey =
+  (typeof DocumentFilterKey)[keyof typeof DocumentFilterKey];
+export interface DocumentFilter {
+  key: DocumentFilterKey | undefined;
+  value: string | undefined;
+}
+export interface DocumentKeyValuesFilter {
+  Key?: string | undefined;
+  Values?: string[] | undefined;
+}
+export interface ListDocumentsRequest {
+  DocumentFilterList?: DocumentFilter[] | undefined;
+  Filters?: DocumentKeyValuesFilter[] | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export interface DocumentIdentifier {
+  Name?: string | undefined;
+  CreatedDate?: Date | undefined;
+  DisplayName?: string | undefined;
+  Owner?: string | undefined;
+  VersionName?: string | undefined;
+  PlatformTypes?: PlatformType[] | undefined;
+  DocumentVersion?: string | undefined;
+  DocumentType?: DocumentType | undefined;
+  SchemaVersion?: string | undefined;
+  DocumentFormat?: DocumentFormat | undefined;
+  TargetType?: string | undefined;
+  Tags?: Tag[] | undefined;
+  Requires?: DocumentRequires[] | undefined;
+  ReviewStatus?: ReviewStatus | undefined;
+  Author?: string | undefined;
+}
+export interface ListDocumentsResult {
+  DocumentIdentifiers?: DocumentIdentifier[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface ListDocumentVersionsRequest {
+  Name: string | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export interface DocumentVersionInfo {
+  Name?: string | undefined;
+  DisplayName?: string | undefined;
+  DocumentVersion?: string | undefined;
+  VersionName?: string | undefined;
+  CreatedDate?: Date | undefined;
+  IsDefaultVersion?: boolean | undefined;
+  DocumentFormat?: DocumentFormat | undefined;
+  Status?: DocumentStatus | undefined;
+  StatusInformation?: string | undefined;
+  ReviewStatus?: ReviewStatus | undefined;
+}
+export interface ListDocumentVersionsResult {
+  DocumentVersions?: DocumentVersionInfo[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface ListInventoryEntriesRequest {
+  InstanceId: string | undefined;
+  TypeName: string | undefined;
+  Filters?: InventoryFilter[] | undefined;
+  NextToken?: string | undefined;
+  MaxResults?: number | undefined;
+}
+export interface ListInventoryEntriesResult {
+  TypeName?: string | undefined;
+  InstanceId?: string | undefined;
+  SchemaVersion?: string | undefined;
+  CaptureTime?: string | undefined;
+  Entries?: Record<string, string>[] | undefined;
+  NextToken?: string | undefined;
+}
+export declare const NodeFilterKey: {
+  readonly ACCOUNT_ID: "AccountId";
+  readonly AGENT_TYPE: "AgentType";
+  readonly AGENT_VERSION: "AgentVersion";
+  readonly COMPUTER_NAME: "ComputerName";
+  readonly INSTANCE_ID: "InstanceId";
+  readonly INSTANCE_STATUS: "InstanceStatus";
+  readonly IP_ADDRESS: "IpAddress";
+  readonly MANAGED_STATUS: "ManagedStatus";
+  readonly ORGANIZATIONAL_UNIT_ID: "OrganizationalUnitId";
+  readonly ORGANIZATIONAL_UNIT_PATH: "OrganizationalUnitPath";
+  readonly PLATFORM_NAME: "PlatformName";
+  readonly PLATFORM_TYPE: "PlatformType";
+  readonly PLATFORM_VERSION: "PlatformVersion";
+  readonly REGION: "Region";
+  readonly RESOURCE_TYPE: "ResourceType";
+};
+export type NodeFilterKey = (typeof NodeFilterKey)[keyof typeof NodeFilterKey];
+export declare const NodeFilterOperatorType: {
+  readonly BEGIN_WITH: "BeginWith";
+  readonly EQUAL: "Equal";
+  readonly NOT_EQUAL: "NotEqual";
+};
+export type NodeFilterOperatorType =
+  (typeof NodeFilterOperatorType)[keyof typeof NodeFilterOperatorType];
+export interface NodeFilter {
+  Key: NodeFilterKey | undefined;
+  Values: string[] | undefined;
+  Type?: NodeFilterOperatorType | undefined;
+}
+export interface ListNodesRequest {
+  SyncName?: string | undefined;
+  Filters?: NodeFilter[] | undefined;
+  NextToken?: string | undefined;
+  MaxResults?: number | undefined;
+}
+export declare const ManagedStatus: {
+  readonly ALL: "All";
+  readonly MANAGED: "Managed";
+  readonly UNMANAGED: "Unmanaged";
+};
+export type ManagedStatus = (typeof ManagedStatus)[keyof typeof ManagedStatus];
+export interface InstanceInfo {
+  AgentType?: string | undefined;
+  AgentVersion?: string | undefined;
+  ComputerName?: string | undefined;
+  InstanceStatus?: string | undefined;
+  IpAddress?: string | undefined;
+  ManagedStatus?: ManagedStatus | undefined;
+  PlatformType?: PlatformType | undefined;
+  PlatformName?: string | undefined;
+  PlatformVersion?: string | undefined;
+  ResourceType?: ResourceType | undefined;
+}
+export type NodeType = NodeType.InstanceMember | NodeType.$UnknownMember;
+export declare namespace NodeType {
+  interface InstanceMember {
+    Instance: InstanceInfo;
+    $unknown?: never;
+  }
+  interface $UnknownMember {
+    Instance?: never;
+    $unknown: [string, any];
+  }
+  interface Visitor<T> {
+    Instance: (value: InstanceInfo) => T;
+    _: (name: string, value: any) => T;
+  }
+  const visit: <T>(value: NodeType, visitor: Visitor<T>) => T;
+}
+export interface NodeOwnerInfo {
+  AccountId?: string | undefined;
+  OrganizationalUnitId?: string | undefined;
+  OrganizationalUnitPath?: string | undefined;
+}
+export interface Node {
+  CaptureTime?: Date | undefined;
+  Id?: string | undefined;
+  Owner?: NodeOwnerInfo | undefined;
+  Region?: string | undefined;
+  NodeType?: NodeType | undefined;
+}
+export interface ListNodesResult {
+  Nodes?: Node[] | undefined;
+  NextToken?: string | undefined;
+}
+export declare class UnsupportedOperationException extends __BaseException {
+  readonly name: "UnsupportedOperationException";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<UnsupportedOperationException, __BaseException>
+  );
+}
+export declare const NodeAggregatorType: {
+  readonly COUNT: "Count";
+};
+export type NodeAggregatorType =
+  (typeof NodeAggregatorType)[keyof typeof NodeAggregatorType];
+export declare const NodeAttributeName: {
+  readonly AGENT_VERSION: "AgentVersion";
+  readonly PLATFORM_NAME: "PlatformName";
+  readonly PLATFORM_TYPE: "PlatformType";
+  readonly PLATFORM_VERSION: "PlatformVersion";
+  readonly REGION: "Region";
+  readonly RESOURCE_TYPE: "ResourceType";
+};
+export type NodeAttributeName =
+  (typeof NodeAttributeName)[keyof typeof NodeAttributeName];
+export declare const NodeTypeName: {
+  readonly INSTANCE: "Instance";
+};
+export type NodeTypeName = (typeof NodeTypeName)[keyof typeof NodeTypeName];
+export interface ListNodesSummaryResult {
+  Summary?: Record<string, string>[] | undefined;
+  NextToken?: string | undefined;
+}
+export declare const OpsItemEventFilterKey: {
+  readonly OPSITEM_ID: "OpsItemId";
+};
+export type OpsItemEventFilterKey =
+  (typeof OpsItemEventFilterKey)[keyof typeof OpsItemEventFilterKey];
+export declare const OpsItemEventFilterOperator: {
+  readonly EQUAL: "Equal";
+};
+export type OpsItemEventFilterOperator =
+  (typeof OpsItemEventFilterOperator)[keyof typeof OpsItemEventFilterOperator];
+export interface OpsItemEventFilter {
+  Key: OpsItemEventFilterKey | undefined;
+  Values: string[] | undefined;
+  Operator: OpsItemEventFilterOperator | undefined;
+}
+export interface ListOpsItemEventsRequest {
+  Filters?: OpsItemEventFilter[] | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export interface OpsItemIdentity {
+  Arn?: string | undefined;
+}
+export interface OpsItemEventSummary {
+  OpsItemId?: string | undefined;
+  EventId?: string | undefined;
+  Source?: string | undefined;
+  DetailType?: string | undefined;
+  Detail?: string | undefined;
+  CreatedBy?: OpsItemIdentity | undefined;
+  CreatedTime?: Date | undefined;
+}
+export interface ListOpsItemEventsResponse {
+  NextToken?: string | undefined;
+  Summaries?: OpsItemEventSummary[] | undefined;
+}
+export declare const OpsItemRelatedItemsFilterKey: {
+  readonly ASSOCIATION_ID: "AssociationId";
+  readonly RESOURCE_TYPE: "ResourceType";
+  readonly RESOURCE_URI: "ResourceUri";
+};
+export type OpsItemRelatedItemsFilterKey =
+  (typeof OpsItemRelatedItemsFilterKey)[keyof typeof OpsItemRelatedItemsFilterKey];
+export declare const OpsItemRelatedItemsFilterOperator: {
+  readonly EQUAL: "Equal";
+};
+export type OpsItemRelatedItemsFilterOperator =
+  (typeof OpsItemRelatedItemsFilterOperator)[keyof typeof OpsItemRelatedItemsFilterOperator];
+export interface OpsItemRelatedItemsFilter {
+  Key: OpsItemRelatedItemsFilterKey | undefined;
+  Values: string[] | undefined;
+  Operator: OpsItemRelatedItemsFilterOperator | undefined;
+}
+export interface ListOpsItemRelatedItemsRequest {
+  OpsItemId?: string | undefined;
+  Filters?: OpsItemRelatedItemsFilter[] | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export interface OpsItemRelatedItemSummary {
+  OpsItemId?: string | undefined;
+  AssociationId?: string | undefined;
+  ResourceType?: string | undefined;
+  AssociationType?: string | undefined;
+  ResourceUri?: string | undefined;
+  CreatedBy?: OpsItemIdentity | undefined;
+  CreatedTime?: Date | undefined;
+  LastModifiedBy?: OpsItemIdentity | undefined;
+  LastModifiedTime?: Date | undefined;
+}
+export interface ListOpsItemRelatedItemsResponse {
+  NextToken?: string | undefined;
+  Summaries?: OpsItemRelatedItemSummary[] | undefined;
+}
+export interface OpsMetadataFilter {
+  Key: string | undefined;
+  Values: string[] | undefined;
+}
+export interface ListOpsMetadataRequest {
+  Filters?: OpsMetadataFilter[] | undefined;
+  MaxResults?: number | undefined;
+  NextToken?: string | undefined;
+}
+export interface OpsMetadata {
+  ResourceId?: string | undefined;
+  OpsMetadataArn?: string | undefined;
+  LastModifiedDate?: Date | undefined;
+  LastModifiedUser?: string | undefined;
+  CreationDate?: Date | undefined;
+}
+export interface ListOpsMetadataResult {
+  OpsMetadataList?: OpsMetadata[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface ListResourceComplianceSummariesRequest {
+  Filters?: ComplianceStringFilter[] | undefined;
+  NextToken?: string | undefined;
+  MaxResults?: number | undefined;
+}
+export interface ResourceComplianceSummaryItem {
+  ComplianceType?: string | undefined;
+  ResourceType?: string | undefined;
+  ResourceId?: string | undefined;
+  Status?: ComplianceStatus | undefined;
+  OverallSeverity?: ComplianceSeverity | undefined;
+  ExecutionSummary?: ComplianceExecutionSummary | undefined;
+  CompliantSummary?: CompliantSummary | undefined;
+  NonCompliantSummary?: NonCompliantSummary | undefined;
+}
+export interface ListResourceComplianceSummariesResult {
+  ResourceComplianceSummaryItems?: ResourceComplianceSummaryItem[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface ListResourceDataSyncRequest {
+  SyncType?: string | undefined;
+  NextToken?: string | undefined;
+  MaxResults?: number | undefined;
+}
+export declare const LastResourceDataSyncStatus: {
+  readonly FAILED: "Failed";
+  readonly INPROGRESS: "InProgress";
+  readonly SUCCESSFUL: "Successful";
+};
+export type LastResourceDataSyncStatus =
+  (typeof LastResourceDataSyncStatus)[keyof typeof LastResourceDataSyncStatus];
+export interface ResourceDataSyncSourceWithState {
+  SourceType?: string | undefined;
+  AwsOrganizationsSource?: ResourceDataSyncAwsOrganizationsSource | undefined;
+  SourceRegions?: string[] | undefined;
+  IncludeFutureRegions?: boolean | undefined;
+  State?: string | undefined;
+  EnableAllOpsDataSources?: boolean | undefined;
+}
+export interface ResourceDataSyncItem {
+  SyncName?: string | undefined;
+  SyncType?: string | undefined;
+  SyncSource?: ResourceDataSyncSourceWithState | undefined;
+  S3Destination?: ResourceDataSyncS3Destination | undefined;
+  LastSyncTime?: Date | undefined;
+  LastSuccessfulSyncTime?: Date | undefined;
+  SyncLastModifiedTime?: Date | undefined;
+  LastStatus?: LastResourceDataSyncStatus | undefined;
+  SyncCreatedTime?: Date | undefined;
+  LastSyncStatusMessage?: string | undefined;
+}
+export interface ListResourceDataSyncResult {
+  ResourceDataSyncItems?: ResourceDataSyncItem[] | undefined;
+  NextToken?: string | undefined;
+}
+export interface ListTagsForResourceRequest {
+  ResourceType: ResourceTypeForTagging | undefined;
+  ResourceId: string | undefined;
+}
+export interface ListTagsForResourceResult {
+  TagList?: Tag[] | undefined;
+}
+export declare class DocumentPermissionLimit extends __BaseException {
+  readonly name: "DocumentPermissionLimit";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<DocumentPermissionLimit, __BaseException>
+  );
+}
+export interface ModifyDocumentPermissionRequest {
+  Name: string | undefined;
+  PermissionType: DocumentPermissionType | undefined;
+  AccountIdsToAdd?: string[] | undefined;
+  AccountIdsToRemove?: string[] | undefined;
+  SharedDocumentVersion?: string | undefined;
+}
+export interface ModifyDocumentPermissionResponse {}
+export declare class ComplianceTypeCountLimitExceededException extends __BaseException {
+  readonly name: "ComplianceTypeCountLimitExceededException";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<
+      ComplianceTypeCountLimitExceededException,
+      __BaseException
+    >
+  );
+}
+export declare class InvalidItemContentException extends __BaseException {
+  readonly name: "InvalidItemContentException";
+  readonly $fault: "client";
+  TypeName?: string | undefined;
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<InvalidItemContentException, __BaseException>
+  );
+}
+export declare class ItemSizeLimitExceededException extends __BaseException {
+  readonly name: "ItemSizeLimitExceededException";
+  readonly $fault: "client";
+  TypeName?: string | undefined;
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<ItemSizeLimitExceededException, __BaseException>
+  );
+}
+export interface ComplianceItemEntry {
+  Id?: string | undefined;
+  Title?: string | undefined;
+  Severity: ComplianceSeverity | undefined;
+  Status: ComplianceStatus | undefined;
+  Details?: Record<string, string> | undefined;
+}
+export declare const ComplianceUploadType: {
+  readonly Complete: "COMPLETE";
+  readonly Partial: "PARTIAL";
+};
+export type ComplianceUploadType =
+  (typeof ComplianceUploadType)[keyof typeof ComplianceUploadType];
+export interface PutComplianceItemsRequest {
+  ResourceId: string | undefined;
+  ResourceType: string | undefined;
+  ComplianceType: string | undefined;
+  ExecutionSummary: ComplianceExecutionSummary | undefined;
+  Items: ComplianceItemEntry[] | undefined;
+  ItemContentHash?: string | undefined;
+  UploadType?: ComplianceUploadType | undefined;
+}
+export interface PutComplianceItemsResult {}
+export declare class TotalSizeLimitExceededException extends __BaseException {
+  readonly name: "TotalSizeLimitExceededException";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<
+      TotalSizeLimitExceededException,
+      __BaseException
+    >
+  );
+}
+export declare class CustomSchemaCountLimitExceededException extends __BaseException {
+  readonly name: "CustomSchemaCountLimitExceededException";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<
+      CustomSchemaCountLimitExceededException,
+      __BaseException
+    >
+  );
+}
+export declare class InvalidInventoryItemContextException extends __BaseException {
+  readonly name: "InvalidInventoryItemContextException";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<
+      InvalidInventoryItemContextException,
+      __BaseException
+    >
+  );
+}
+export declare class ItemContentMismatchException extends __BaseException {
+  readonly name: "ItemContentMismatchException";
+  readonly $fault: "client";
+  TypeName?: string | undefined;
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<ItemContentMismatchException, __BaseException>
+  );
+}
+export interface InventoryItem {
+  TypeName: string | undefined;
+  SchemaVersion: string | undefined;
+  CaptureTime: string | undefined;
+  ContentHash?: string | undefined;
+  Content?: Record<string, string>[] | undefined;
+  Context?: Record<string, string> | undefined;
+}
+export interface PutInventoryRequest {
+  InstanceId: string | undefined;
+  Items: InventoryItem[] | undefined;
+}
+export interface PutInventoryResult {
+  Message?: string | undefined;
+}
+export declare class SubTypeCountLimitExceededException extends __BaseException {
+  readonly name: "SubTypeCountLimitExceededException";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<
+      SubTypeCountLimitExceededException,
+      __BaseException
+    >
+  );
+}
+export declare class UnsupportedInventoryItemContextException extends __BaseException {
+  readonly name: "UnsupportedInventoryItemContextException";
+  readonly $fault: "client";
+  TypeName?: string | undefined;
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<
+      UnsupportedInventoryItemContextException,
+      __BaseException
+    >
+  );
+}
+export declare class UnsupportedInventorySchemaVersionException extends __BaseException {
+  readonly name: "UnsupportedInventorySchemaVersionException";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<
+      UnsupportedInventorySchemaVersionException,
+      __BaseException
+    >
+  );
+}
+export declare class HierarchyLevelLimitExceededException extends __BaseException {
+  readonly name: "HierarchyLevelLimitExceededException";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<
+      HierarchyLevelLimitExceededException,
+      __BaseException
+    >
+  );
+}
+export declare class HierarchyTypeMismatchException extends __BaseException {
+  readonly name: "HierarchyTypeMismatchException";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<HierarchyTypeMismatchException, __BaseException>
+  );
+}
+export declare class IncompatiblePolicyException extends __BaseException {
+  readonly name: "IncompatiblePolicyException";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<IncompatiblePolicyException, __BaseException>
+  );
+}
+export declare class InvalidAllowedPatternException extends __BaseException {
+  readonly name: "InvalidAllowedPatternException";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<InvalidAllowedPatternException, __BaseException>
+  );
+}
+export declare class InvalidPolicyAttributeException extends __BaseException {
+  readonly name: "InvalidPolicyAttributeException";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<
+      InvalidPolicyAttributeException,
+      __BaseException
+    >
+  );
+}
+export declare class InvalidPolicyTypeException extends __BaseException {
+  readonly name: "InvalidPolicyTypeException";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<InvalidPolicyTypeException, __BaseException>
+  );
+}
+export declare class ParameterAlreadyExists extends __BaseException {
+  readonly name: "ParameterAlreadyExists";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<ParameterAlreadyExists, __BaseException>
+  );
+}
+export declare class ParameterLimitExceeded extends __BaseException {
+  readonly name: "ParameterLimitExceeded";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<ParameterLimitExceeded, __BaseException>
+  );
+}
+export declare class ParameterMaxVersionLimitExceeded extends __BaseException {
+  readonly name: "ParameterMaxVersionLimitExceeded";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<
+      ParameterMaxVersionLimitExceeded,
+      __BaseException
+    >
+  );
+}
+export declare class ParameterPatternMismatchException extends __BaseException {
+  readonly name: "ParameterPatternMismatchException";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<
+      ParameterPatternMismatchException,
+      __BaseException
+    >
+  );
+}
+export declare class PoliciesLimitExceededException extends __BaseException {
+  readonly name: "PoliciesLimitExceededException";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<PoliciesLimitExceededException, __BaseException>
+  );
+}
+export interface PutParameterRequest {
+  Name: string | undefined;
+  Description?: string | undefined;
+  Value: string | undefined;
+  Type?: ParameterType | undefined;
+  KeyId?: string | undefined;
+  Overwrite?: boolean | undefined;
+  AllowedPattern?: string | undefined;
+  Tags?: Tag[] | undefined;
+  Tier?: ParameterTier | undefined;
+  Policies?: string | undefined;
+  DataType?: string | undefined;
+}
+export interface PutParameterResult {
+  Version?: number | undefined;
+  Tier?: ParameterTier | undefined;
+}
+export declare class UnsupportedParameterType extends __BaseException {
+  readonly name: "UnsupportedParameterType";
+  readonly $fault: "client";
+  constructor(
+    opts: __ExceptionOptionType<UnsupportedParameterType, __BaseException>
+  );
+}
+export interface PutResourcePolicyRequest {
+  ResourceArn: string | undefined;
+  Policy: string | undefined;
+  PolicyId?: string | undefined;
+  PolicyHash?: string | undefined;
+}
+export interface PutResourcePolicyResponse {
+  PolicyId?: string | undefined;
+  PolicyHash?: string | undefined;
+}
+export declare class ResourcePolicyLimitExceededException extends __BaseException {
+  readonly name: "ResourcePolicyLimitExceededException";
+  readonly $fault: "client";
+  Limit?: number | undefined;
+  LimitType?: string | undefined;
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<
+      ResourcePolicyLimitExceededException,
+      __BaseException
+    >
+  );
+}
+export interface RegisterDefaultPatchBaselineRequest {
+  BaselineId: string | undefined;
+}
+export interface RegisterDefaultPatchBaselineResult {
+  BaselineId?: string | undefined;
+}
+export interface RegisterPatchBaselineForPatchGroupRequest {
+  BaselineId: string | undefined;
+  PatchGroup: string | undefined;
+}
+export interface RegisterPatchBaselineForPatchGroupResult {
+  BaselineId?: string | undefined;
+  PatchGroup?: string | undefined;
+}
+export interface RegisterTargetWithMaintenanceWindowRequest {
+  WindowId: string | undefined;
+  ResourceType: MaintenanceWindowResourceType | undefined;
+  Targets: Target[] | undefined;
+  OwnerInformation?: string | undefined;
+  Name?: string | undefined;
+  Description?: string | undefined;
+  ClientToken?: string | undefined;
+}
+export interface RegisterTargetWithMaintenanceWindowResult {
+  WindowTargetId?: string | undefined;
+}
+export declare class FeatureNotAvailableException extends __BaseException {
+  readonly name: "FeatureNotAvailableException";
+  readonly $fault: "client";
+  Message?: string | undefined;
+  constructor(
+    opts: __ExceptionOptionType<FeatureNotAvailableException, __BaseException>
+  );
+}
+export interface RegisterTaskWithMaintenanceWindowRequest {
+  WindowId: string | undefined;
+  Targets?: Target[] | undefined;
+  TaskArn: string | undefined;
+  ServiceRoleArn?: string | undefined;
+  TaskType: MaintenanceWindowTaskType | undefined;
+  TaskParameters?:
+    | Record<string, MaintenanceWindowTaskParameterValueExpression>
+    | undefined;
+  TaskInvocationParameters?:
+    | MaintenanceWindowTaskInvocationParameters
+    | undefined;
+  Priority?: number | undefined;
+  MaxConcurrency?: string | undefined;
+  MaxErrors?: string | undefined;
+  LoggingInfo?: LoggingInfo | undefined;
+  Name?: string | undefined;
+  Description?: string | undefined;
+  ClientToken?: string | undefined;
+  CutoffBehavior?: MaintenanceWindowTaskCutoffBehavior | undefined;
+  AlarmConfiguration?: AlarmConfiguration | undefined;
+}
+export interface RegisterTaskWithMaintenanceWindowResult {
+  WindowTaskId?: string | undefined;
+}
+export interface RemoveTagsFromResourceRequest {
+  ResourceType: ResourceTypeForTagging | undefined;
+  ResourceId: string | undefined;
+  TagKeys: string[] | undefined;
+}
+export interface RemoveTagsFromResourceResult {}
+export interface ResetServiceSettingRequest {
+  SettingId: string | undefined;
+}
+export declare const MaintenanceWindowTargetFilterSensitiveLog: (
+  obj: MaintenanceWindowTarget
+) => any;
+export declare const DescribeMaintenanceWindowTargetsResultFilterSensitiveLog: (
+  obj: DescribeMaintenanceWindowTargetsResult
+) => any;
+export declare const MaintenanceWindowTaskParameterValueExpressionFilterSensitiveLog: (
+  obj: MaintenanceWindowTaskParameterValueExpression
+) => any;
+export declare const MaintenanceWindowTaskFilterSensitiveLog: (
+  obj: MaintenanceWindowTask
+) => any;
+export declare const DescribeMaintenanceWindowTasksResultFilterSensitiveLog: (
+  obj: DescribeMaintenanceWindowTasksResult
+) => any;
+export declare const BaselineOverrideFilterSensitiveLog: (
+  obj: BaselineOverride
+) => any;
+export declare const GetDeployablePatchSnapshotForInstanceRequestFilterSensitiveLog: (
+  obj: GetDeployablePatchSnapshotForInstanceRequest
+) => any;
+export declare const GetMaintenanceWindowResultFilterSensitiveLog: (
+  obj: GetMaintenanceWindowResult
+) => any;
+export declare const GetMaintenanceWindowExecutionTaskResultFilterSensitiveLog: (
+  obj: GetMaintenanceWindowExecutionTaskResult
+) => any;
+export declare const GetMaintenanceWindowExecutionTaskInvocationResultFilterSensitiveLog: (
+  obj: GetMaintenanceWindowExecutionTaskInvocationResult
+) => any;
+export declare const MaintenanceWindowLambdaParametersFilterSensitiveLog: (
+  obj: MaintenanceWindowLambdaParameters
+) => any;
+export declare const MaintenanceWindowRunCommandParametersFilterSensitiveLog: (
+  obj: MaintenanceWindowRunCommandParameters
+) => any;
+export declare const MaintenanceWindowStepFunctionsParametersFilterSensitiveLog: (
+  obj: MaintenanceWindowStepFunctionsParameters
+) => any;
+export declare const MaintenanceWindowTaskInvocationParametersFilterSensitiveLog: (
+  obj: MaintenanceWindowTaskInvocationParameters
+) => any;
+export declare const GetMaintenanceWindowTaskResultFilterSensitiveLog: (
+  obj: GetMaintenanceWindowTaskResult
+) => any;
+export declare const ParameterFilterSensitiveLog: (obj: Parameter) => any;
+export declare const GetParameterResultFilterSensitiveLog: (
+  obj: GetParameterResult
+) => any;
+export declare const ParameterHistoryFilterSensitiveLog: (
+  obj: ParameterHistory
+) => any;
+export declare const GetParameterHistoryResultFilterSensitiveLog: (
+  obj: GetParameterHistoryResult
+) => any;
+export declare const GetParametersResultFilterSensitiveLog: (
+  obj: GetParametersResult
+) => any;
+export declare const GetParametersByPathResultFilterSensitiveLog: (
+  obj: GetParametersByPathResult
+) => any;
+export declare const GetPatchBaselineResultFilterSensitiveLog: (
+  obj: GetPatchBaselineResult
+) => any;
+export declare const AssociationVersionInfoFilterSensitiveLog: (
+  obj: AssociationVersionInfo
+) => any;
+export declare const ListAssociationVersionsResultFilterSensitiveLog: (
+  obj: ListAssociationVersionsResult
+) => any;
+export declare const CommandFilterSensitiveLog: (obj: Command) => any;
+export declare const ListCommandsResultFilterSensitiveLog: (
+  obj: ListCommandsResult
+) => any;
+export declare const InstanceInfoFilterSensitiveLog: (obj: InstanceInfo) => any;
+export declare const NodeTypeFilterSensitiveLog: (obj: NodeType) => any;
+export declare const NodeFilterSensitiveLog: (obj: Node) => any;
+export declare const ListNodesResultFilterSensitiveLog: (
+  obj: ListNodesResult
+) => any;
+export declare const PutParameterRequestFilterSensitiveLog: (
+  obj: PutParameterRequest
+) => any;
+export declare const RegisterTargetWithMaintenanceWindowRequestFilterSensitiveLog: (
+  obj: RegisterTargetWithMaintenanceWindowRequest
+) => any;
+export declare const RegisterTaskWithMaintenanceWindowRequestFilterSensitiveLog: (
+  obj: RegisterTaskWithMaintenanceWindowRequest
+) => any;

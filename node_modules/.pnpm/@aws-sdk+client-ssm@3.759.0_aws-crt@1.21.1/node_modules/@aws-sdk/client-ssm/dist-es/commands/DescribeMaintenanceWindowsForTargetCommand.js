@@ -1,0 +1,22 @@
+import { getEndpointPlugin } from "@smithy/middleware-endpoint";
+import { getSerdePlugin } from "@smithy/middleware-serde";
+import { Command as $Command } from "@smithy/smithy-client";
+import { commonParams } from "../endpoint/EndpointParameters";
+import { de_DescribeMaintenanceWindowsForTargetCommand, se_DescribeMaintenanceWindowsForTargetCommand, } from "../protocols/Aws_json1_1";
+export { $Command };
+export class DescribeMaintenanceWindowsForTargetCommand extends $Command
+    .classBuilder()
+    .ep(commonParams)
+    .m(function (Command, cs, config, o) {
+    return [
+        getSerdePlugin(config, this.serialize, this.deserialize),
+        getEndpointPlugin(config, Command.getEndpointParameterInstructions()),
+    ];
+})
+    .s("AmazonSSM", "DescribeMaintenanceWindowsForTarget", {})
+    .n("SSMClient", "DescribeMaintenanceWindowsForTargetCommand")
+    .f(void 0, void 0)
+    .ser(se_DescribeMaintenanceWindowsForTargetCommand)
+    .de(de_DescribeMaintenanceWindowsForTargetCommand)
+    .build() {
+}

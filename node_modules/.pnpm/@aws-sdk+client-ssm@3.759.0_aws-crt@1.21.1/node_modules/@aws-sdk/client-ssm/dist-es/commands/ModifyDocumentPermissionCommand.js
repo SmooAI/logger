@@ -1,0 +1,22 @@
+import { getEndpointPlugin } from "@smithy/middleware-endpoint";
+import { getSerdePlugin } from "@smithy/middleware-serde";
+import { Command as $Command } from "@smithy/smithy-client";
+import { commonParams } from "../endpoint/EndpointParameters";
+import { de_ModifyDocumentPermissionCommand, se_ModifyDocumentPermissionCommand } from "../protocols/Aws_json1_1";
+export { $Command };
+export class ModifyDocumentPermissionCommand extends $Command
+    .classBuilder()
+    .ep(commonParams)
+    .m(function (Command, cs, config, o) {
+    return [
+        getSerdePlugin(config, this.serialize, this.deserialize),
+        getEndpointPlugin(config, Command.getEndpointParameterInstructions()),
+    ];
+})
+    .s("AmazonSSM", "ModifyDocumentPermission", {})
+    .n("SSMClient", "ModifyDocumentPermissionCommand")
+    .f(void 0, void 0)
+    .ser(se_ModifyDocumentPermissionCommand)
+    .de(de_ModifyDocumentPermissionCommand)
+    .build() {
+}
