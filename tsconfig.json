@@ -1,0 +1,12 @@
+{
+    "extends": "@smooai/config-typescript/base.json",
+    "compilerOptions": {
+        "lib": ["ES2023"],
+        "outDir": "./dist",
+        "types": ["node"],
+        "target": "ES2022",
+        "baseUrl": "./"
+    },
+    "include": ["./src/**/*.ts", "./src/**/*.tsx", "tsup.config.ts"],
+    "exclude": ["dist", "node_modules", "*.js", "../../node_modules"]
+}
