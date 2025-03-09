@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.11
+
+### Patch Changes
+
+- dfc62be: Fix package exports.
+
 ## 1.0.10
 
 ### Patch Changes
