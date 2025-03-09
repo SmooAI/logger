@@ -1,6 +1,5 @@
- 
 /* eslint-disable @typescript-eslint/no-explicit-any */
- 
+
 import * as sourceMapSupport from 'source-map-support';
 import { APIGatewayProxyEventV2, Context as LambdaContext, SQSRecord } from 'aws-lambda';
 import type { MessageAttributeValue } from '@aws-sdk/client-sqs';

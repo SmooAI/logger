@@ -557,20 +557,21 @@ export default class Logger {
     }
 
     private prettyStringify(object: any): string {
-        let str = stableStringify(JSON.decycle(object), {
-            space: '  ',
-            cmp: (a, b) => {
-                if (a.key === ContextKey.Message && b.key !== ContextKey.Message) return -1;
-                if (a.key !== ContextKey.Message && b.key === ContextKey.Message) return 1;
-                if (a.key === ContextKey.Time && b.key !== ContextKey.Time) return -1;
-                if (a.key !== ContextKey.Time && b.key === ContextKey.Time) return 1;
-                if (a.key === ContextKey.Error && b.key !== ContextKey.Error) return -1;
-                if (a.key !== ContextKey.Error && b.key === ContextKey.Error) return 1;
-                if (a.key === ContextKey.ErrorDetails && b.key !== ContextKey.ErrorDetails) return -1;
-                if (a.key !== ContextKey.ErrorDetails && b.key === ContextKey.ErrorDetails) return 1;
-                return a.key < b.key ? -1 : 1;
-            },
-        }) ?? '{}';
+        let str =
+            stableStringify(JSON.decycle(object), {
+                space: '  ',
+                cmp: (a, b) => {
+                    if (a.key === ContextKey.Message && b.key !== ContextKey.Message) return -1;
+                    if (a.key !== ContextKey.Message && b.key === ContextKey.Message) return 1;
+                    if (a.key === ContextKey.Time && b.key !== ContextKey.Time) return -1;
+                    if (a.key !== ContextKey.Time && b.key === ContextKey.Time) return 1;
+                    if (a.key === ContextKey.Error && b.key !== ContextKey.Error) return -1;
+                    if (a.key !== ContextKey.Error && b.key === ContextKey.Error) return 1;
+                    if (a.key === ContextKey.ErrorDetails && b.key !== ContextKey.ErrorDetails) return -1;
+                    if (a.key !== ContextKey.ErrorDetails && b.key === ContextKey.ErrorDetails) return 1;
+                    return a.key < b.key ? -1 : 1;
+                },
+            }) ?? '{}';
         str = str.replace(/"msg": "(.*?)",\n/g, `"msg": "${chalk.bold(chalk.green('$1'))}",\n`);
         str = str.replace(/"time": "(.*?)",\n/g, `"time": "${chalk.blue('$1')}",\n`);
         this.logFunc('----------------------------------------------------------------------------------------------------', true);
