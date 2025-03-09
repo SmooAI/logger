@@ -1,5 +1,12 @@
 # @smooai/logger
 
+## 1.0.12
+
+### Patch Changes
+
+- 3086ea5: Fix package exports.
+- 3086ea5: Add default to package exports.
+
 ## 1.0.11
 
 ### Patch Changes
