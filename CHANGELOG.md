@@ -4,5 +4,5 @@
 
 ### Patch Changes
 
--   b10956f: Fix issue with @vercel/style-guid.
--   e0d719f: Moved into its own package.
+- b10956f: Fix issue with @vercel/style-guid.
+- e0d719f: Moved into its own package.
