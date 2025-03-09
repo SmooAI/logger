@@ -15,7 +15,6 @@ if (!global?.process) {
     } as any;
 }
 
-import { Request as FetchRequest } from 'cross-fetch';
 import { isLocal, isBuild } from './env';
 
 import './decycle.cjs';
@@ -38,7 +37,7 @@ declare global {
 // Export to make sure it works as a module augmentation
 export {};
 
-type Request = typeof FetchRequest.prototype;
+type Request = globalThis.Request;
 export { type Request };
 
 if (!global?.process) {
