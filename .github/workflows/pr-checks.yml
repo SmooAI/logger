@@ -1,0 +1,30 @@
+name: PR Checks
+
+on:
+  pull_request:
+    branches: [ main ]
+    types: [ opened, synchronize ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 10
+          
+      - name: Install dependencies
+        run: pnpm install
+
+      # - name: Require changesets
+      #   run: pnpm changeset status --since=main
+          
+          
