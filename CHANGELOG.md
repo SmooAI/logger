@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.10
+
+### Patch Changes
+
+- fb07588: Fix local env.
+
 ## 1.0.9
 
 ### Patch Changes
