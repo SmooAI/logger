@@ -43,6 +43,23 @@ Check out other SmooAI packages at [npmjs.com/org/smooai](https://www.npmjs.com/
 
 A powerful contextual logging system designed for AWS Lambda and Browser environments, with built-in support for structured logging, correlation tracking, and automatic context gathering.
 
+### Key Features
+
+- 📋 Structured JSON logging with configurable levels
+- 🔄 Automatic context tracking across distributed systems
+- ☁️ AWS Lambda and CloudWatch integration
+- 🌐 Browser environment support
+- 🔍 Advanced error tracking with stack traces
+- 📊 OpenTelemetry integration
+
+![NPM Version](https://img.shields.io/npm/v/%40smooai%2Flogger?style=for-the-badge)
+![NPM Downloads](https://img.shields.io/npm/dw/%40smooai%2Flogger?style=for-the-badge)
+![NPM Last Update](https://img.shields.io/npm/last-update/%40smooai%2Flogger?style=for-the-badge)
+
+![GitHub License](https://img.shields.io/github/license/SmooAI/logger?style=for-the-badge)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/SmooAI/logger/release.yml?style=for-the-badge)
+![GitHub Repo stars](https://img.shields.io/github/stars/SmooAI/logger?style=for-the-badge)
+
 ### Install
 
 ```sh
