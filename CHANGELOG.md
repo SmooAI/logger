@@ -4,11 +4,11 @@
 
 ### Patch Changes
 
--   9b46780: Added ci:publish.
+- 9b46780: Added ci:publish.
 
 ## 1.0.1
 
 ### Patch Changes
 
--   b10956f: Fix issue with @vercel/style-guid.
--   e0d719f: Moved into its own package.
+- b10956f: Fix issue with @vercel/style-guid.
+- e0d719f: Moved into its own package.
