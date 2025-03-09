@@ -1,4 +1,5 @@
 pnpm lint-staged
 pnpm typecheck
 pnpm format
+pnpm test
 git add .
