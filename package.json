@@ -12,7 +12,7 @@
         "dist/**"
     ],
     "scripts": {
-        "build": "pnpm createEntryPoints && pnpm dlx cross-env tsup && cp src/decycle.cjs dist/",
+        "build": "pnpm createEntryPoints && pnpm tsup && cp src/decycle.cjs dist/",
         "check-all": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run build",
         "ci:publish": "pnpm publish -r",
         "createEntryPoints": "pnpm vite-node ./src/scripts/createEntryPoints.ts -i \"src/**/*.ts\"",
