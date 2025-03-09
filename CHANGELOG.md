@@ -1,5 +1,12 @@
 # @smooai/logger
 
+## 1.0.8
+
+### Patch Changes
+
+- c6c993d: Make sure typings are included.
+- c6c993d: Add license to package.
+
 ## 1.0.7
 
 ### Patch Changes
