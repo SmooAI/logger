@@ -10,7 +10,7 @@ export enum Level {
 export const MAIN_ENVIRONMENTS = ['development', 'staging', 'production'];
 
 export function getEnvironment(stage = process.env.SST_STAGE ?? 'local'): string {
-    if (process.env.IS_LOCAL) {
+    if (process.env.IS_LOCAL || process.env.SST_DEV) {
         return 'local';
     } else {
         return stage;
