@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.6
+
+### Patch Changes
+
+- 167aff5: Add checks to CI.
+
 ## 1.0.5
 
 ### Patch Changes
