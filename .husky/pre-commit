@@ -3,5 +3,4 @@ pnpm typecheck
 pnpm test
 pnpm build
 pnpm format
-pnpm test
 git add .
