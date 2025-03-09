@@ -40,6 +40,9 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: Format
+        run: pnpm format
       
       - name: Version Update 🦋  
         uses: changesets/action@v1  
