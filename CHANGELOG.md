@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.9
+
+### Patch Changes
+
+- 017ac94: Add build to git hooks.
+
 ## 1.0.8
 
 ### Patch Changes
