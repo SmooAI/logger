@@ -19,7 +19,8 @@
         "lint:fix": "eslint src/ --fix",
         "test": "vitest run --passWithNoTests",
         "typecheck": "tsc --noEmit --skipLibCheck",
-        "watch": "tsup --watch"
+        "watch": "tsup --watch",
+        "ci:publish": "pnpm publish -r"
     },
     "dependencies": {
         "@aws-sdk/client-sqs": "^3.504.0",
