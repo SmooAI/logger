@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.7
+
+### Patch Changes
+
+- f645b67: Fix release CI.
+
 ## 1.0.6
 
 ### Patch Changes
