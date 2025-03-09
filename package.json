@@ -7,6 +7,23 @@
         "url": "https://github.com/SmooAI/logger.git"
     },
     "license": "MIT",
+    "exports": {
+        "./AwsLambdaLogger": {
+            "types": "./dist/AwsLambdaLogger.d.ts",
+            "require": "./dist/AwsLambdaLogger.js",
+            "import": "./dist/AwsLambdaLogger.js"
+        },
+        "./BrowserLogger": {
+            "types": "./dist/BrowserLogger.d.ts",
+            "require": "./dist/BrowserLogger.js",
+            "import": "./dist/BrowserLogger.js"
+        },
+        "./Logger": {
+            "types": "./dist/Logger.d.ts",
+            "require": "./dist/Logger.js",
+            "import": "./dist/Logger.js"
+        }
+    },
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "files": [
