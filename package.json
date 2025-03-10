@@ -8,35 +8,38 @@
     },
     "license": "MIT",
     "exports": {
-        "./AwsLambdaLogger": {
-            "types": "./dist/AwsLambdaLogger.d.ts",
-            "require": "./dist/AwsLambdaLogger.js",
-            "import": "./dist/AwsLambdaLogger.js",
-            "default": "./dist/AwsLambdaLogger.js"
+        "./src/env": {
+            "types": "./dist/src/env.d.ts",
+            "import": "./dist/src/env.js",
+            "require": "./dist/src/env.js",
+            "default": "./dist/src/env.js"
         },
-        "./BrowserLogger": {
-            "types": "./dist/BrowserLogger.d.ts",
-            "require": "./dist/BrowserLogger.js",
-            "import": "./dist/BrowserLogger.js",
-            "default": "./dist/BrowserLogger.js"
+        "./src/Logger": {
+            "types": "./dist/src/Logger.d.ts",
+            "import": "./dist/src/Logger.js",
+            "require": "./dist/src/Logger.js",
+            "default": "./dist/src/Logger.js"
         },
-        "./Logger": {
-            "types": "./dist/Logger.d.ts",
-            "require": "./dist/Logger.js",
-            "import": "./dist/Logger.js",
-            "default": "./dist/Logger.js"
+        "./src/BrowserLogger": {
+            "types": "./dist/src/BrowserLogger.d.ts",
+            "import": "./dist/src/BrowserLogger.js",
+            "require": "./dist/src/BrowserLogger.js",
+            "default": "./dist/src/BrowserLogger.js"
+        },
+        "./src/AwsLambdaLogger": {
+            "types": "./dist/src/AwsLambdaLogger.d.ts",
+            "import": "./dist/src/AwsLambdaLogger.js",
+            "require": "./dist/src/AwsLambdaLogger.js",
+            "default": "./dist/src/AwsLambdaLogger.js"
         }
     },
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
     "files": [
         "dist/**"
     ],
     "scripts": {
-        "build": "pnpm createEntryPoints && pnpm tsup && cp src/decycle.cjs dist/",
+        "build": "pnpm create-entry-points -i \"src/**/*.ts\" && pnpm tsup && cp src/decycle.cjs dist/",
         "check-all": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run build",
         "ci:publish": "pnpm publish -r",
-        "createEntryPoints": "pnpm vite-node ./src/scripts/createEntryPoints.ts -i \"src/**/*.ts\"",
         "format": "prettier --write \"**/*.{ts,tsx,md,json,js,cjs,mjs}\"",
         "lint": "eslint src/",
         "lint:fix": "eslint src/ --fix",
@@ -61,6 +64,7 @@
         "@oclif/core": "^4.2.9",
         "@smooai/config-eslint": "^1.0.6",
         "@smooai/config-typescript": "^1.0.10",
+        "@smooai/utils": "^1.0.1",
         "@types/aws-lambda": "^8.10.119",
         "@types/lodash": "^4.14.195",
         "@types/node": "^18.11.9",
