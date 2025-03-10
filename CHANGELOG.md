@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.14
+
+### Patch Changes
+
+- 6bf4674: Update author / bugs / homepage.
+
 ## 1.0.13
 
 ### Patch Changes
