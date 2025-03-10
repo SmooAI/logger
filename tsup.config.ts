@@ -1,7 +1,7 @@
 import { defineConfig, type Options } from 'tsup';
 
 export default defineConfig((options: Options) => ({
-    entry: ['src/index.ts', 'src/env.ts', 'src/Logger.ts', 'src/BrowserLogger.ts', 'src/AwsLambdaLogger.ts', 'src/scripts/createEntryPoints.ts'],
+    entry: ['src/index.ts', 'src/env.ts', 'src/Logger.ts', 'src/BrowserLogger.ts', 'src/AwsLambdaLogger.ts'],
     clean: true,
     dts: true,
     format: ['cjs'],
