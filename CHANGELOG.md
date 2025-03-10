@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.13
+
+### Patch Changes
+
+- 1c05cca: Use pnpm create-entry-points from @smooai/utils.
+
 ## 1.0.12
 
 ### Patch Changes
