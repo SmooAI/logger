@@ -13,6 +13,11 @@ jobs:
   version:
     timeout-minutes: 15
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      id-token: write
+      actions: write
     steps:
       - name: Checkout code repository
         uses: actions/checkout@v4
@@ -50,6 +55,7 @@ jobs:
           commit: "🦋 New version release"  
           title: "🦋 New version release"  
           publish: pnpm ci:publish  
+          createGithubReleases: true
         env:  
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  
           NPM_TOKEN: ${{ secrets.SMOOAI_NPM_TOKEN }}  
