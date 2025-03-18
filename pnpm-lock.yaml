@@ -53,8 +53,8 @@ importers:
         specifier: ^1.0.10
         version: 1.0.10(typescript@5.8.2)
       '@smooai/utils':
-        specifier: ^1.0.11
-        version: 1.0.11(@types/node@20.17.24)(typescript@5.8.2)
+        specifier: ^1.0.12
+        version: 1.0.12(@types/node@20.17.24)(typescript@5.8.2)
       '@types/aws-lambda':
         specifier: ^8.10.119
         version: 8.10.147
@@ -1104,8 +1104,8 @@ packages:
     resolution: {integrity: sha512-0BmFi9IzgmlDKmqk4aFoYy5bg8aj5QLtFD0hheC5NLaW9ArKTMtmZJYVM+2g56M/5qXsJO7zAV6+t3A+ApTQ+Q==}
     engines: {node: '>=20.0.0'}
 
-  '@smooai/utils@1.0.11':
-    resolution: {integrity: sha512-QFS949O8wuLGdRhOuksR1c7/yWmPAAwlsQG85o+NZ2I+5A+ftM7RQfVmZb4x0ihZBoUMaOiGiRFrPAa0UDrx4g==}
+  '@smooai/utils@1.0.12':
+    resolution: {integrity: sha512-WtTKxFBTrM5BCZkpNqBGZHV8s7TPiwoBFn79rhfudoMZxsItsyd1HobxYj8mKdLnFNMV3iuHCsxYuHFNGRZKhQ==}
     engines: {node: '>=20.0.0'}
     hasBin: true
 
@@ -5163,7 +5163,7 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@smooai/utils@1.0.11(@types/node@20.17.24)(typescript@5.8.2)':
+  '@smooai/utils@1.0.12(@types/node@20.17.24)(typescript@5.8.2)':
     dependencies:
       '@oclif/core': 2.16.0(@types/node@20.17.24)(typescript@5.8.2)
       '@oclif/plugin-help': 6.2.27
