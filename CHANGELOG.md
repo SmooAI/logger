@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.15
+
+### Patch Changes
+
+- ac6a1fd: Fix publish for Github releases.
+
 ## 1.0.14
 
 ### Patch Changes
