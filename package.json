@@ -19,25 +19,25 @@
     "exports": {
         "./src/env": {
             "types": "./dist/src/env.d.ts",
-            "import": "./dist/src/env.js",
+            "import": "./dist/src/env.mjs",
             "require": "./dist/src/env.js",
             "default": "./dist/src/env.js"
         },
         "./src/Logger": {
             "types": "./dist/src/Logger.d.ts",
-            "import": "./dist/src/Logger.js",
+            "import": "./dist/src/Logger.mjs",
             "require": "./dist/src/Logger.js",
             "default": "./dist/src/Logger.js"
         },
         "./src/BrowserLogger": {
             "types": "./dist/src/BrowserLogger.d.ts",
-            "import": "./dist/src/BrowserLogger.js",
+            "import": "./dist/src/BrowserLogger.mjs",
             "require": "./dist/src/BrowserLogger.js",
             "default": "./dist/src/BrowserLogger.js"
         },
         "./src/AwsLambdaLogger": {
             "types": "./dist/src/AwsLambdaLogger.d.ts",
-            "import": "./dist/src/AwsLambdaLogger.js",
+            "import": "./dist/src/AwsLambdaLogger.mjs",
             "require": "./dist/src/AwsLambdaLogger.js",
             "default": "./dist/src/AwsLambdaLogger.js"
         }
@@ -48,7 +48,7 @@
     "scripts": {
         "build": "pnpm create-entry-points -i \"src/**/*.ts\" && pnpm tsup && cp src/decycle.cjs dist/",
         "check-all": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run build",
-        "ci:publish": "pnpm publish -r",
+        "ci:publish": "pnpm build && pnpm changeset publish",
         "format": "prettier --write \"**/*.{ts,tsx,md,json,js,cjs,mjs}\"",
         "lint": "eslint src/",
         "lint:fix": "eslint src/ --fix",
@@ -73,7 +73,7 @@
         "@oclif/core": "^4.2.9",
         "@smooai/config-eslint": "^1.0.6",
         "@smooai/config-typescript": "^1.0.10",
-        "@smooai/utils": "^1.0.1",
+        "@smooai/utils": "^1.0.12",
         "@types/aws-lambda": "^8.10.119",
         "@types/lodash": "^4.14.195",
         "@types/node": "^20.13.0",
