@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.17
+
+### Patch Changes
+
+- 20bdb04: Upgraded to Node 22.
+
 ## 1.0.16
 
 ### Patch Changes
