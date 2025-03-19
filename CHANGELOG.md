@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.16
+
+### Patch Changes
+
+- 0fdb32d: Fix exports.
+
 ## 1.0.15
 
 ### Patch Changes
