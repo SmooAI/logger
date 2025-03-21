@@ -1,5 +1,12 @@
 # @smooai/logger
 
+## 1.0.18
+
+### Patch Changes
+
+- aed2567: Upgrade node types to v22.
+- 3d6ab6b: Change from lodash to lodash.merge.
+
 ## 1.0.17
 
 ### Patch Changes
