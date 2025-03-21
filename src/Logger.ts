@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { v4 as uuidv4 } from 'uuid';
-import merge from 'lodash/merge';
+import merge from 'lodash.merge';
 import { serializeError, ErrorObject } from 'serialize-error';
 import stableStringify from 'json-stable-stringify';
 import chalk from 'chalk';
