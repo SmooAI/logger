@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import merge from 'lodash/merge';
+import merge from 'lodash.merge';
 import BrowserDetector from 'browser-dtector';
 
 import Logger, {

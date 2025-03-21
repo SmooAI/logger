@@ -17,7 +17,7 @@ import Logger, {
     ContextKeyUser,
 } from './Logger';
 import createEsmUtils from 'esm-utils';
-import merge from 'lodash/merge';
+import merge from 'lodash.merge';
 import * as api from '@opentelemetry/api';
 import { isLocal } from './env';
 
