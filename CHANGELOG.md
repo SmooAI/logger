@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.19
+
+### Patch Changes
+
+- 5d85b5c: Update @smooai/utils.
+
 ## 1.0.18
 
 ### Patch Changes
