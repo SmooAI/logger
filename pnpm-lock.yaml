@@ -53,8 +53,8 @@ importers:
         specifier: ^1.0.16
         version: 1.0.16(typescript@5.8.2)
       '@smooai/utils':
-        specifier: ^1.0.16
-        version: 1.0.16(@types/node@22.13.10)(typescript@5.8.2)
+        specifier: ^1.0.18
+        version: 1.0.18(@types/node@22.13.10)(typescript@5.8.2)
       '@types/aws-lambda':
         specifier: ^8.10.119
         version: 8.10.147
@@ -1100,12 +1100,12 @@ packages:
     peerDependencies:
       typescript: ^5.8.2
 
-  '@smooai/logger@1.0.17':
-    resolution: {integrity: sha512-zlfWPTZFMKLDM9DSYvu4XBmIRzyIYFNDg+dAenx4nPiKYXA7neHOV4itiAQ3BvR975BI2ossW9bbqe/BxTVQLA==}
+  '@smooai/logger@1.0.18':
+    resolution: {integrity: sha512-hbCs81K8VAZimEcRaxqym5JjdTgx51FAdBY7M+2FX60D7lfP9Yhlr0ca/yky6ayDr6Yl+BtblOs6aH5WATlVyQ==}
     engines: {node: '>=20.0.0'}
 
-  '@smooai/utils@1.0.16':
-    resolution: {integrity: sha512-ipNDTETruAB9UTyiq2io6UdDGUn4Uvp79S98YaebkJ6EjadQ/dg8z0LSNeK9BIBixxM4yLtU6tKsMhpFge+CrA==}
+  '@smooai/utils@1.0.18':
+    resolution: {integrity: sha512-VTTHIHJoIzzQ6K9TpGZvYv2qwh8Tlya0B3Hx6b4pGD3BUSfqr0MCba6C9oCvXjZ6eQcOA5KfpVkXl5DevvnOPg==}
     engines: {node: '>=20.0.0'}
     hasBin: true
 
@@ -2266,8 +2266,8 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
-  hono@4.7.4:
-    resolution: {integrity: sha512-Pst8FuGqz3L7tFF+u9Pu70eI0xa5S3LPUmrNd5Jm8nTHze9FxLTK9Kaj5g/k4UcwuJSXTP65SyHOPLrffpcAJg==}
+  hono@4.7.5:
+    resolution: {integrity: sha512-fDOK5W2C1vZACsgLONigdZTRZxuBqFtcKh7bUQ5cVSbwI2RWjloJDcgFOVzbQrlI6pCmhlTsVYZ7zpLj4m4qMQ==}
     engines: {node: '>=16.9.0'}
 
   hosted-git-info@2.8.9:
@@ -2611,9 +2611,6 @@ packages:
 
   lodash.startcase@4.4.0:
     resolution: {integrity: sha512-+WKqsK294HMSc2jEbNgpHpd0JfIBhp7rEV4aqXWqFr6AlXov+SlcgB1Fv01y2kGe3Gc8nMW7VA0SrGuSkRfIEg==}
-
-  lodash@4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
 
   log-update@6.1.0:
     resolution: {integrity: sha512-9ie8ItPR6tjY5uYJh8K/Zrv/RMZ5VOlOWvtZdEHYSTFKZfIBPQa9tOAEeAWhd+AnIneLJ22w5fjOYtoutpWq5w==}
@@ -3419,8 +3416,8 @@ packages:
     peerDependencies:
       typescript: '>=4.2.0'
 
-  ts-api-utils@2.0.1:
-    resolution: {integrity: sha512-dnlgjFSVetynI8nzgJ+qF62efpglpWRk8isUEWZGWlJYySCTD6aKvbUDu+zbPeDakk3bg5H4XpitHukgfL1m9w==}
+  ts-api-utils@2.1.0:
+    resolution: {integrity: sha512-CUgTZL1irw8u29bzrOD/nH85jqyc74D6SshFgujOIA7osm2Rz7dYH77agkx7H4FBNxDq7Cjf+IjaX/8zwFW+ZQ==}
     engines: {node: '>=18.12'}
     peerDependencies:
       typescript: '>=4.8.4'
@@ -3766,8 +3763,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  yocto-queue@1.2.0:
-    resolution: {integrity: sha512-KHBC7z61OJeaMGnF3wqNZj+GGNXOyypZviiKpQeiHirG5Ib1ImwcLBH70rbMSkKfSmUNBsdf2PwaEJtKvgmkNw==}
+  yocto-queue@1.2.1:
+    resolution: {integrity: sha512-AyeEbWOu/TAXdxlV9wmGcR0+yh2j3vYPGOECcIj2S7MkrLyC7ne+oye2BKTItt0ii2PHk4cDy+95+LshzbXnGg==}
     engines: {node: '>=12.20'}
 
   zod-validation-error@3.4.0:
@@ -5151,7 +5148,7 @@ snapshots:
     dependencies:
       typescript: 5.8.2
 
-  '@smooai/logger@1.0.17':
+  '@smooai/logger@1.0.18':
     dependencies:
       '@aws-sdk/client-sqs': 3.758.0
       '@opentelemetry/api': 1.9.0
@@ -5159,21 +5156,21 @@ snapshots:
       dayjs: 1.11.13
       esm-utils: 4.3.0
       json-stable-stringify: 1.2.1
-      lodash: 4.17.21
+      lodash.merge: 4.6.2
       serialize-error: 11.0.3
       source-map-support: 0.5.21
       uuid: 9.0.1
     transitivePeerDependencies:
       - aws-crt
 
-  '@smooai/utils@1.0.16(@types/node@22.13.10)(typescript@5.8.2)':
+  '@smooai/utils@1.0.18(@types/node@22.13.10)(typescript@5.8.2)':
     dependencies:
       '@oclif/core': 2.16.0(@types/node@22.13.10)(typescript@5.8.2)
       '@oclif/plugin-help': 6.2.27
       '@oclif/plugin-plugins': 5.4.36
-      '@smooai/logger': 1.0.17
+      '@smooai/logger': 1.0.18
       find-up: 7.0.0
-      hono: 4.7.4
+      hono: 4.7.5
       http-status-codes: 2.3.0
       libphonenumber-js: 1.12.6
       zod: 3.24.2
@@ -5258,7 +5255,7 @@ snapshots:
       graphemer: 1.4.0
       ignore: 5.3.2
       natural-compare: 1.4.0
-      ts-api-utils: 2.0.1(typescript@5.8.2)
+      ts-api-utils: 2.1.0(typescript@5.8.2)
       typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
@@ -5321,7 +5318,7 @@ snapshots:
       '@typescript-eslint/utils': 8.26.0(eslint@9.22.0)(typescript@5.8.2)
       debug: 4.4.0(supports-color@8.1.1)
       eslint: 9.22.0
-      ts-api-utils: 2.0.1(typescript@5.8.2)
+      ts-api-utils: 2.1.0(typescript@5.8.2)
       typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
@@ -5370,7 +5367,7 @@ snapshots:
       is-glob: 4.0.3
       minimatch: 9.0.5
       semver: 7.7.1
-      ts-api-utils: 2.0.1(typescript@5.8.2)
+      ts-api-utils: 2.1.0(typescript@5.8.2)
       typescript: 5.8.2
     transitivePeerDependencies:
       - supports-color
@@ -6593,7 +6590,7 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hono@4.7.4: {}
+  hono@4.7.5: {}
 
   hosted-git-info@2.8.9: {}
 
@@ -6928,8 +6925,6 @@ snapshots:
 
   lodash.startcase@4.4.0: {}
 
-  lodash@4.17.21: {}
-
   log-update@6.1.0:
     dependencies:
       ansi-escapes: 7.0.0
@@ -7119,7 +7114,7 @@ snapshots:
 
   p-limit@4.0.0:
     dependencies:
-      yocto-queue: 1.2.0
+      yocto-queue: 1.2.1
 
   p-locate@4.1.0:
     dependencies:
@@ -7685,7 +7680,7 @@ snapshots:
     dependencies:
       typescript: 5.8.2
 
-  ts-api-utils@2.0.1(typescript@5.8.2):
+  ts-api-utils@2.1.0(typescript@5.8.2):
     dependencies:
       typescript: 5.8.2
 
@@ -8049,7 +8044,7 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  yocto-queue@1.2.0: {}
+  yocto-queue@1.2.1: {}
 
   zod-validation-error@3.4.0(zod@3.24.2):
     dependencies:
