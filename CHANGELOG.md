@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.20
+
+### Patch Changes
+
+- be42715: Added browser logs for error and or message after context object.
+
 ## 1.0.19
 
 ### Patch Changes
