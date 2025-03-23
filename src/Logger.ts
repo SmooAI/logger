@@ -591,6 +591,15 @@ export default class Logger {
             process.stdout.write(`${skipStringify ? arg : this.stringify(JSON.decycle(arg))}\n`);
         } else {
             console.log(arg);
+            // If the log contains an error, log it directly for better browser debugging
+            if (typeof arg === 'object' && arg !== null && ContextKey.Error in arg) {
+                console.error(arg[ContextKey.Error]);
+            }
+
+            // If the log contains a message, log it directly for better browser debugging
+            if (typeof arg === 'object' && arg !== null && ContextKey.Message in arg) {
+                console.log(arg[ContextKey.Message]);
+            }
         }
     };
 
