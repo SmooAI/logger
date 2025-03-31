@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.21
+
+### Patch Changes
+
+- 7caf010: Updated all vite dependencies.
+
 ## 1.0.20
 
 ### Patch Changes
