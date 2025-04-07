@@ -1,16 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import merge from 'lodash.merge';
 import BrowserDetector from 'browser-dtector';
-
+import merge from 'lodash.merge';
 import Logger, {
-    ContextConfig as BaseContextConfig,
-    ContextKeyConfig as BaseContextKeyConfig,
     CONFIG_MINIMAL as BASE_CONFIG_MINIMAL,
-    Level,
-    Context as BaseContext,
     CONTEXT as BASE_CONTEXT,
+    Context as BaseContext,
+    ContextConfig as BaseContextConfig,
     ContextKey as BaseContextKey,
+    ContextKeyConfig as BaseContextKeyConfig,
     global,
+    Level,
 } from './Logger';
 
 export * from './Logger';

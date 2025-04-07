@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-
 import Logger, { ContextKey, Level } from './Logger';
 
 class TestLogger extends Logger {

@@ -1,25 +1,25 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import * as sourceMapSupport from 'source-map-support';
-import { APIGatewayProxyEventV2, Context as LambdaContext, SQSRecord } from 'aws-lambda';
 import type { MessageAttributeValue } from '@aws-sdk/client-sqs';
-import Logger, {
-    ContextConfig as BaseContextConfig,
-    ContextKeyConfig as BaseContextKeyConfig,
-    CONFIG_MINIMAL as BASE_CONFIG_MINIMAL,
-    Level,
-    Context as BaseContext,
-    CONTEXT as BASE_CONTEXT,
-    ContextKey as BaseContextKey,
-    ContextKeyHttp,
-    ContextKeyHttpRequest,
-    ContextHeader,
-    ContextKeyUser,
-} from './Logger';
+import * as api from '@opentelemetry/api';
+import { APIGatewayProxyEventV2, Context as LambdaContext, SQSRecord } from 'aws-lambda';
 import createEsmUtils from 'esm-utils';
 import merge from 'lodash.merge';
-import * as api from '@opentelemetry/api';
+import * as sourceMapSupport from 'source-map-support';
 import { isLocal } from './env';
+import Logger, {
+    CONFIG_MINIMAL as BASE_CONFIG_MINIMAL,
+    CONTEXT as BASE_CONTEXT,
+    Context as BaseContext,
+    ContextConfig as BaseContextConfig,
+    ContextKey as BaseContextKey,
+    ContextKeyConfig as BaseContextKeyConfig,
+    ContextHeader,
+    ContextKeyHttp,
+    ContextKeyHttpRequest,
+    ContextKeyUser,
+    Level,
+} from './Logger';
 
 export * from './Logger';
 
