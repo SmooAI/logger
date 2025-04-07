@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { v4 as uuidv4 } from 'uuid';
-import merge from 'lodash.merge';
-import { serializeError, ErrorObject } from 'serialize-error';
-import stableStringify from 'json-stable-stringify';
 import chalk from 'chalk';
 import dayjs from 'dayjs';
+import stableStringify from 'json-stable-stringify';
+import merge from 'lodash.merge';
+import { ErrorObject, serializeError } from 'serialize-error';
+import { v4 as uuidv4 } from 'uuid';
+import { isBuild, isLocal } from './env';
+import './decycle.cjs';
 
 export const global = (globalThis ?? ({} as any)) as any;
 
@@ -15,9 +17,6 @@ if (!global?.process) {
     } as any;
 }
 
-import { isLocal, isBuild } from './env';
-
-import './decycle.cjs';
 // json-decycle.d.ts
 declare global {
     interface JSON {

@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-
 import BrowserLogger, { ContextKey, Level } from './BrowserLogger';
 
 class TestLogger extends BrowserLogger {
