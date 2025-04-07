@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.22
+
+### Patch Changes
+
+- 7101205: Update prettier plugins.
+
 ## 1.0.21
 
 ### Patch Changes
