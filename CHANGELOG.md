@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.23
+
+### Patch Changes
+
+- 0e2da13: Update readme.
+
 ## 1.0.22
 
 ### Patch Changes
