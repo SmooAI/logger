@@ -31,7 +31,7 @@
 
 ## About SmooAI
 
-SmooAI is a platform for building and deploying AI-powered apps.
+SmooAI is an AI-powered platform for helping businesses multiply their customer, employee, and developer experience.
 
 Learn more on [smoo.ai](https://smoo.ai)
 
