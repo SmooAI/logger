@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.0.24
+
+### Patch Changes
+
+- 880cf11: Fix local logging.
+
 ## 1.0.23
 
 ### Patch Changes
