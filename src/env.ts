@@ -10,7 +10,7 @@ export enum Level {
 export const MAIN_ENVIRONMENTS = ['development', 'staging', 'production'];
 
 export function getEnvironment(stage = process.env.SST_STAGE ?? 'local'): string {
-    if (process.env.IS_LOCAL || process.env.SST_DEV) {
+    if (process.env.IS_LOCAL || process.env.SST_DEV || process.env.IS_DEPLOYED_STAGE !== 'true') {
         return 'local';
     } else {
         return stage;
@@ -25,7 +25,7 @@ export function isGithubActions() {
     return Boolean(process.env.GITHUB_ACTIONS);
 }
 
-export function isLocal(stage = process.env.SST_STAGE ?? 'local') {
+export function isLocal(stage = process.env.SST_STAGE ?? '') {
     return getEnvironment(stage) === 'local';
 }
 
