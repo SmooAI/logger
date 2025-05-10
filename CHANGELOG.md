@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.2.1
+
+### Patch Changes
+
+- f2c5c5e: Fixed build issue with .d.ts files.
+
 ## 1.2.0
 
 ### Minor Changes
