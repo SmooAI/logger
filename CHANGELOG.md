@@ -1,5 +1,12 @@
 # @smooai/logger
 
+## 1.2.2
+
+### Patch Changes
+
+- 4b028b8: Fix BrowserLogger build.
+- 4b028b8: Fixed build issue with .d.ts files.
+
 ## 1.2.1
 
 ### Patch Changes
