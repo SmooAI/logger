@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.2.0
+
+### Minor Changes
+
+- 46b8c91: Fix the BrowserLogger build and replace chalk with picocolors to fix issue with using BrowserLogger.
+
 ## 1.1.0
 
 ### Minor Changes
