@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.1.0
+
+### Minor Changes
+
+- deee649: Fix package exports.
+
 ## 1.0.24
 
 ### Patch Changes
