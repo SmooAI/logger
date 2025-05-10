@@ -30,6 +30,9 @@ importers:
       lodash.merge:
         specifier: ^4.6.2
         version: 4.6.2
+      picocolors:
+        specifier: ^1.1.1
+        version: 1.1.1
       serialize-error:
         specifier: ^11.0.3
         version: 11.0.3
@@ -56,8 +59,8 @@ importers:
         specifier: ^1.0.16
         version: 1.0.16(typescript@5.8.2)
       '@smooai/utils':
-        specifier: ^1.2.1
-        version: 1.2.1(@types/node@22.13.10)(typescript@5.8.2)
+        specifier: ^1.2.2
+        version: 1.2.2(@types/node@22.13.10)(typescript@5.8.2)
       '@types/aws-lambda':
         specifier: ^8.10.119
         version: 8.10.147
@@ -76,9 +79,6 @@ importers:
       '@vercel/style-guide':
         specifier: ^6.0.0
         version: 6.0.0(@next/eslint-plugin-next@14.2.24)(eslint@9.22.0)(prettier@3.5.3)(typescript@5.8.2)(vitest@3.1.1(@types/node@22.13.10)(yaml@2.7.0))
-      chalk:
-        specifier: ^5.3.0
-        version: 5.4.1
       eslint:
         specifier: ^9.21.0
         version: 9.22.0
@@ -1230,12 +1230,12 @@ packages:
     peerDependencies:
       typescript: ^5.8.2
 
-  '@smooai/logger@1.0.24':
-    resolution: {integrity: sha512-KvCd+Kvq00Wx67+iXleOG/HpnAFvsdPZ3Mci/wWbqguDCygfgyHHYD4ZUlwSeqVyyfYGa2iv/MV+zlGAboPgyQ==}
+  '@smooai/logger@1.1.0':
+    resolution: {integrity: sha512-ks8gbfZOsW6jlRXCdT0WTyXVS2tWzmJChu5UrjmEbN/Rj4z5Jt9lKYQvVZck3CHbkpFmlToOjV4/pifYt57Ykg==}
     engines: {node: '>=20.0.0'}
 
-  '@smooai/utils@1.2.1':
-    resolution: {integrity: sha512-N9TGfPn18RA7yJieNKS8rHA7SKmEG8gOhfk9J6FlrlUHA9Tq/ipHeqLKY+nuJ1UmTTlcvZF+9R7q8ew8+LUUog==}
+  '@smooai/utils@1.2.2':
+    resolution: {integrity: sha512-eMxE0OnmkMrg1PPkGlsQQ49S+Nx2nJU1DmEcIUfwiGlGnRoc+3zYhIUtnAU7HW0rN45HvlsRfyt7OWLLmLWxIQ==}
     engines: {node: '>=20.0.0'}
     hasBin: true
 
@@ -5457,7 +5457,7 @@ snapshots:
     dependencies:
       typescript: 5.8.2
 
-  '@smooai/logger@1.0.24':
+  '@smooai/logger@1.1.0':
     dependencies:
       '@aws-sdk/client-sqs': 3.758.0
       '@opentelemetry/api': 1.9.0
@@ -5472,12 +5472,12 @@ snapshots:
     transitivePeerDependencies:
       - aws-crt
 
-  '@smooai/utils@1.2.1(@types/node@22.13.10)(typescript@5.8.2)':
+  '@smooai/utils@1.2.2(@types/node@22.13.10)(typescript@5.8.2)':
     dependencies:
       '@oclif/core': 2.16.0(@types/node@22.13.10)(typescript@5.8.2)
       '@oclif/plugin-help': 6.2.28
       '@oclif/plugin-plugins': 5.4.37
-      '@smooai/logger': 1.0.24
+      '@smooai/logger': 1.1.0
       '@standard-schema/spec': 1.0.0
       '@standard-schema/utils': 0.3.0
       find-up: 7.0.0

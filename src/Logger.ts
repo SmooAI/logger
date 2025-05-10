@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import chalk from 'chalk';
 import dayjs from 'dayjs';
 import stableStringify from 'json-stable-stringify';
 import merge from 'lodash.merge';
+import picocolors from 'picocolors';
 import { ErrorObject, serializeError } from 'serialize-error';
 import { v4 as uuidv4 } from 'uuid';
 import { isBuild, isLocal } from './env';
@@ -570,8 +570,8 @@ export default class Logger {
                     return a.key < b.key ? -1 : 1;
                 },
             }) ?? '{}';
-        str = str.replace(/"msg": "(.*?)",\n/g, `"msg": "${chalk.bold(chalk.green('$1'))}",\n`);
-        str = str.replace(/"time": "(.*?)",\n/g, `"time": "${chalk.blue('$1')}",\n`);
+        str = str.replace(/"msg": "(.*?)",\n/g, `"msg": "${picocolors.bold(picocolors.green('$1'))}",\n`);
+        str = str.replace(/"time": "(.*?)",\n/g, `"time": "${picocolors.blue('$1')}",\n`);
         this.logFunc('----------------------------------------------------------------------------------------------------', true);
         this.logFunc('----------------------------------------------------------------------------------------------------', true);
         this.logFunc('----------------------------------------------------------------------------------------------------', true);
