@@ -7,6 +7,7 @@ const coreConfig: Options = {
     format: ['cjs', 'esm'],
     sourcemap: true,
     target: 'es2022',
+    treeshake: true,
 };
 
 const browserConfig: Options = {
