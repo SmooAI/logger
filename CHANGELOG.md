@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.2.3
+
+### Patch Changes
+
+- 2681743: Fix treeshaking.
+
 ## 1.2.2
 
 ### Patch Changes
