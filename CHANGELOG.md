@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 1.2.4
+
+### Patch Changes
+
+- 1710c6f: Fix false local environment.
+
 ## 1.2.3
 
 ### Patch Changes
