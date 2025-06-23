@@ -603,7 +603,7 @@ export default class Logger {
     }
 
     protected logFunc = (args: any[]) => {
-        if (typeof global.window === 'undefined') {
+        if (typeof global.window === 'undefined' || isLocal()) {
             for (const arg of args) {
                 const toWrite =
                     `${this.stringify(arg)}\n` +
@@ -616,7 +616,9 @@ export default class Logger {
                 }
             }
         } else {
-            console.log(args);
+            for (const arg of args) {
+                console.log(arg);
+            }
         }
     };
 

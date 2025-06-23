@@ -42,3 +42,5 @@ yarn.lock
 
 # ignore package-lock.json
 package-lock.json
+
+.smooai-logs
