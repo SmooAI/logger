@@ -409,7 +409,7 @@ logger.resetCorrelationId();
 
 You can add custom context at any time:
 
-````typescript
+```typescript
 // Add user context
 logger.addUserContext({
     id: 'user123',
@@ -429,6 +429,7 @@ logger.addTelemetryFields({
     duration: 150,
     namespace: 'payment-service',
 });
+```
 
 ### Configuration
 
@@ -446,7 +447,6 @@ The logger supports different configuration presets:
 - OpenTelemetry
 - UUID for correlation
 
-
 #### Log Rotation
 
 The logger supports file-based logging with automatic log rotation using the [rotating-file-stream](https://www.npmjs.com/package/rotating-file-stream) package. This is useful for server environments where you want to persist logs to disk with automatic file management.
@@ -460,27 +460,27 @@ The logger supports file-based logging with automatic log rotation using the [ro
 
 ```typescript
 type RotationOptions = {
-    path: string;           // Directory path for log files (default: '.smooai-logs')
+    path: string; // Directory path for log files (default: '.smooai-logs')
     filenamePrefix: string; // Prefix for log file names (default: 'output')
-    extension: string;      // File extension (default: 'log')
-    generator?: Generator;  // Custom filename generator function
-    size?: string;          // File size limit (e.g., '1M', '10K', '1G')
-    interval?: string;      // Time-based rotation (e.g., '1d', '2h', '30m', '1M')
-    maxFiles?: number;      // Maximum number of rotated files to keep
-    maxSize?: string;       // Maximum total size of rotated files
+    extension: string; // File extension (default: 'log')
+    generator?: Generator; // Custom filename generator function
+    size?: string; // File size limit (e.g., '1M', '10K', '1G')
+    interval?: string; // Time-based rotation (e.g., '1d', '2h', '30m', '1M')
+    maxFiles?: number; // Maximum number of rotated files to keep
+    maxSize?: string; // Maximum total size of rotated files
     compress?: boolean | string | Compressor; // Compression method
-    immutable?: boolean;    // Use immutable file names
+    immutable?: boolean; // Use immutable file names
     intervalBoundary?: boolean; // Use interval boundaries for time-based rotation
-    intervalUTC?: boolean;  // Use UTC time for interval boundaries
+    intervalUTC?: boolean; // Use UTC time for interval boundaries
     initialRotation?: boolean; // Perform initial rotation check on startup
-    history?: string;       // Custom history file name
-    mode?: number;          // File permissions (Unix file mode)
+    history?: string; // Custom history file name
+    mode?: number; // File permissions (Unix file mode)
     encoding?: BufferEncoding; // File encoding
     omitExtension?: boolean; // Don't add compression extension
 };
 
 type Generator = (time: number | Date, index?: number) => string;
-````
+```
 
 **Basic Usage:**
 
