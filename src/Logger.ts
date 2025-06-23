@@ -352,7 +352,7 @@ export default class Logger {
             {
                 path: '.smooai-logs',
                 filenamePrefix: 'output',
-                extension: 'log',
+                extension: 'ansi',
                 size: '1M',
                 interval: '1d',
                 maxSize: '100M',
