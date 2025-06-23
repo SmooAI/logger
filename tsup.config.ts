@@ -1,7 +1,7 @@
 import { defineConfig, type Options } from 'tsup';
 
 const coreConfig: Options = {
-    entry: ['src/index.ts', 'src/env.ts', 'src/Logger.ts', 'src/AwsLambdaLogger.ts', 'src/BrowserLogger.ts'],
+    entry: ['src/index.ts', 'src/env.ts', 'src/Logger.ts', 'src/AwsServerLogger.ts', 'src/BrowserLogger.ts'],
     clean: true,
     dts: true,
     format: ['cjs', 'esm'],

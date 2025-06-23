@@ -85,7 +85,7 @@ pnpm add @smooai/logger
     - Error context capture
     - Source map support for accurate stack traces
 
-#### AWS Lambda Logger
+#### AWS Server Logger
 
 - Automatic AWS Lambda context extraction
 - SQS message context tracking
@@ -133,7 +133,7 @@ The logger automatically captures the call stack for every log entry, helping yo
 
 ```typescript
 // Simple initialization with no additional context
-const logger = new AwsLambdaLogger();
+const logger = new AwsServerLogger();
 
 // In some deep service method
 class UserService {
@@ -148,10 +148,10 @@ class UserService {
   "time": "2024-03-20T15:30:00.000Z",
   "level": 30,
   "logLevel": "info",
-  "name": "AwsLambdaLogger",
+  "name": "AwsServerLogger",
   "correlationId": "123e4567-e89b-12d3-a456-426614174000",
   "callerContext": {
-    "loggerName": "AwsLambdaLogger",
+    "loggerName": "AwsServerLogger",
     "stack": [
       "at UserService.createUser (/src/services/UserService.ts:12:16)",
       "at processRequest (/src/handlers/userHandler.ts:25:31)",
@@ -180,12 +180,12 @@ This is particularly useful for:
 - Understanding which code paths led to specific log entries
 - Correlating logs across different services and functions
 
-#### AWS Lambda Logger
+#### AWS Server Logger
 
 Basic initialization and usage:
 
 ```typescript
-const logger = new AwsLambdaLogger({
+const logger = new AwsServerLogger({
     name: 'MyLambdaService',
     level: Level.Debug,
     prettyPrint: true, // Pretty printing for local development
@@ -409,7 +409,7 @@ logger.resetCorrelationId();
 
 You can add custom context at any time:
 
-```typescript
+````typescript
 // Add user context
 logger.addUserContext({
     id: 'user123',
@@ -429,7 +429,6 @@ logger.addTelemetryFields({
     duration: 150,
     namespace: 'payment-service',
 });
-```
 
 ### Configuration
 
@@ -446,6 +445,164 @@ The logger supports different configuration presets:
 - Browser Detection
 - OpenTelemetry
 - UUID for correlation
+
+
+#### Log Rotation
+
+The logger supports file-based logging with automatic log rotation using the [rotating-file-stream](https://www.npmjs.com/package/rotating-file-stream) package. This is useful for server environments where you want to persist logs to disk with automatic file management.
+
+**Configuration Options:**
+
+- `logToFile`: `boolean` - Enable file logging (default: `true` in local environments, `false` in production)
+- `rotation`: `RotationOptions` - Log rotation configuration
+
+**Rotation Options:**
+
+```typescript
+type RotationOptions = {
+    path: string;           // Directory path for log files (default: '.smooai-logs')
+    filenamePrefix: string; // Prefix for log file names (default: 'output')
+    extension: string;      // File extension (default: 'log')
+    generator?: Generator;  // Custom filename generator function
+    size?: string;          // File size limit (e.g., '1M', '10K', '1G')
+    interval?: string;      // Time-based rotation (e.g., '1d', '2h', '30m', '1M')
+    maxFiles?: number;      // Maximum number of rotated files to keep
+    maxSize?: string;       // Maximum total size of rotated files
+    compress?: boolean | string | Compressor; // Compression method
+    immutable?: boolean;    // Use immutable file names
+    intervalBoundary?: boolean; // Use interval boundaries for time-based rotation
+    intervalUTC?: boolean;  // Use UTC time for interval boundaries
+    initialRotation?: boolean; // Perform initial rotation check on startup
+    history?: string;       // Custom history file name
+    mode?: number;          // File permissions (Unix file mode)
+    encoding?: BufferEncoding; // File encoding
+    omitExtension?: boolean; // Don't add compression extension
+};
+
+type Generator = (time: number | Date, index?: number) => string;
+````
+
+**Basic Usage:**
+
+```typescript
+// Enable file logging with default settings
+const logger = new AwsServerLogger({
+    name: 'MyService',
+    logToFile: true,
+});
+
+// Custom rotation configuration
+const logger = new AwsServerLogger({
+    name: 'MyService',
+    logToFile: true,
+    rotation: {
+        path: './logs',
+        filenamePrefix: 'app',
+        extension: 'txt',
+        size: '10M', // Rotate at 10MB
+        interval: '2h', // Rotate every 2 hours
+        maxFiles: 5, // Keep only 5 rotated files
+        compress: 'gzip', // Compress rotated files
+    },
+});
+```
+
+**Custom Filename Generator:**
+
+```typescript
+// Custom filename pattern: logs/2024/03/app-2024-03-20-001.log
+const customGenerator = (time: Date, index?: number) => {
+    if (!time) return 'app.log';
+
+    const year = time.getFullYear();
+    const month = String(time.getMonth() + 1).padStart(2, '0');
+    const day = String(time.getDate()).padStart(2, '0');
+    const fileIndex = index ? String(index).padStart(3, '0') : '001';
+
+    return `${year}/${month}/app-${year}-${month}-${day}-${fileIndex}.log`;
+};
+
+const logger = new AwsServerLogger({
+    name: 'MyService',
+    logToFile: true,
+    rotation: {
+        path: './logs',
+        filenamePrefix: 'app',
+        extension: 'log',
+        generator: customGenerator,
+        size: '5M',
+        interval: '1d',
+    },
+});
+```
+
+**Available Rotation Options:**
+
+All options from [rotating-file-stream](https://www.npmjs.com/package/rotating-file-stream) are supported:
+
+- `size`: File size limit (e.g., '1M', '10K', '1G')
+- `interval`: Time-based rotation (e.g., '1d', '2h', '30m', '1M')
+- `maxFiles`: Maximum number of rotated files to keep
+- `maxSize`: Maximum total size of rotated files
+- `compress`: Compression method ('gzip', 'brotli', or custom function)
+- `immutable`: Use immutable file names (useful for log aggregation)
+- `intervalBoundary`: Use interval boundaries for time-based rotation
+- `intervalUTC`: Use UTC time for interval boundaries
+- `initialRotation`: Perform initial rotation check on startup
+- `history`: Custom history file name
+- `mode`: File permissions (Unix file mode)
+- `encoding`: File encoding
+- `omitExtension`: Don't add compression extension
+
+**File Structure Example:**
+
+With default settings, your logs will be organized like this:
+
+```
+.smooai-logs/
+├── output.log          # Current log file
+├── output-2024-03-20-1.log.gz  # Yesterday's log (compressed)
+├── output-2024-03-19-1.log.gz  # Day before (compressed)
+└── output-2024-03-18-1.log.gz  # Older log (compressed)
+```
+
+**Default Settings and Environment Detection:**
+
+**Default Rotation Settings:**
+
+- `size`: `'1M'` - Rotate when file reaches 1MB
+- `interval`: `'1d'` - Rotate daily at midnight
+- `maxSize`: `'100M'` - Keep maximum 100MB of rotated files
+- `path`: `'.smooai-logs'` - Log directory
+- `filenamePrefix`: `'output'` - File prefix
+- `extension`: `'log'` - File extension
+
+**Automatic Local Environment Detection:**
+
+The `logToFile` option is automatically enabled when running in a local development environment. The logger detects local environments using the following environment variables:
+
+- `SST_DEV`: Set to `true` when running with SST development mode
+- `IS_LOCAL`: Set to `true` for local development environments
+- `IS_DEPLOYED_STAGE`: When set to any value other than `'true'`, indicates a non-production environment
+
+```typescript
+// Automatic detection function
+export function isRunningLocally(): boolean {
+    return (
+        Boolean(process.env.SST_DEV) || Boolean(process.env.IS_LOCAL) || (Boolean(process.env.IS_DEPLOYED_STAGE) && process.env.IS_DEPLOYED_STAGE !== 'true')
+    );
+}
+```
+
+When `isRunningLocally()` returns `true`, `logToFile` defaults to `true`. In production environments, `logToFile` defaults to `false` unless explicitly enabled.
+
+**Best Practices:**
+
+1. **Use appropriate size limits** based on your log volume and storage constraints
+2. **Enable compression** to save disk space for historical logs
+3. **Set reasonable retention** with `maxFiles` or `maxSize` to prevent disk space issues
+4. **Use custom generators** for better log organization in production environments
+5. **Consider log aggregation** tools that can read from specific file patterns
 
 ## Contributing
 

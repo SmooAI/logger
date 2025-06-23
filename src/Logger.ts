@@ -2,12 +2,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import dayjs from 'dayjs';
 import stableStringify from 'json-stable-stringify';
-import merge from 'lodash.merge';
-import picocolors from 'picocolors';
+import { merge } from 'merge-anything';
+import { createColors } from 'picocolors';
 import { ErrorObject, serializeError } from 'serialize-error';
 import { v4 as uuidv4 } from 'uuid';
 import { isBuild, isLocal } from './env';
 import './decycle.cjs';
+import { logToFile, type RotationOptions } from './utils/rotation';
+
+const picocolors = createColors(true);
 
 export const global = (globalThis ?? ({} as any)) as any;
 
@@ -228,6 +231,8 @@ export default class Logger {
         FULL: CONFIG_FULL,
     };
     private prettyPrint = false;
+    private rotation!: RotationOptions;
+    private logToFile = false;
 
     public get name(): string {
         return this._name;
@@ -319,7 +324,7 @@ export default class Logger {
                 }
             }
             if (Object.keys(newObj).length === 0) {
-                return undefined;
+                return {};
             }
             return newObj;
         } else {
@@ -334,6 +339,8 @@ export default class Logger {
             level?: Level;
             contextConfig?: ContextConfig;
             prettyPrint?: boolean;
+            logToFile?: boolean;
+            rotation?: RotationOptions;
         } = {},
     ) {
         options.name = options.name ?? this.name;
@@ -341,6 +348,18 @@ export default class Logger {
         this.level = options.level;
         options.prettyPrint = options.prettyPrint ?? (isLocal() || isBuild());
         this.prettyPrint = options.prettyPrint;
+        this.rotation = merge(
+            {
+                path: '.smooai-logs',
+                filenamePrefix: 'output',
+                extension: 'log',
+                size: '1M',
+                interval: '1d',
+                maxSize: '100M',
+            },
+            options.rotation ?? {},
+        );
+        this.logToFile = options.logToFile ?? isLocal();
         this.setContextConfig(options.contextConfig);
         if (options.context) {
             this.context = merge(this.context, this.removeUndefinedValuesRecursively(options.context));
@@ -528,7 +547,7 @@ export default class Logger {
         this.addBaseContext(fields);
     }
 
-    protected buildLogObject(level: Level, args: any[]): any {
+    protected buildLogObject(level: Level, args: any[]): any[] {
         const object = this.cloneDeep(this.context);
         for (const arg of args) {
             if (arg instanceof Error) {
@@ -551,7 +570,7 @@ export default class Logger {
         object[ContextKey.LogLevel] = level;
         object[ContextKey.Time] = dayjs().toISOString();
         object[ContextKey.Name] = this.name;
-        return this.removeUndefinedValuesRecursively(this.applyContextConfig(object));
+        return [this.removeUndefinedValuesRecursively(this.applyContextConfig(object))];
     }
 
     private prettyStringify(object: any): string {
@@ -570,11 +589,9 @@ export default class Logger {
                     return a.key < b.key ? -1 : 1;
                 },
             }) ?? '{}';
-        str = str.replace(/"msg": "(.*?)",\n/g, `"msg": "${picocolors.bold(picocolors.green('$1'))}",\n`);
-        str = str.replace(/"time": "(.*?)",\n/g, `"time": "${picocolors.blue('$1')}",\n`);
-        this.logFunc('----------------------------------------------------------------------------------------------------', true);
-        this.logFunc('----------------------------------------------------------------------------------------------------', true);
-        this.logFunc('----------------------------------------------------------------------------------------------------', true);
+
+        str = str.replace(/"msg": "(.*?)",\n/g, (_, msg) => `"msg": "${picocolors.bold(picocolors.green(msg))}",\n`);
+        str = str.replace(/"time": "(.*?)",\n/g, (_, time) => `"time": "${picocolors.blue(time)}",\n`);
         return str;
     }
 
@@ -585,20 +602,21 @@ export default class Logger {
         return JSON.stringify(JSON.decycle(object));
     }
 
-    protected logFunc = (arg: any, skipStringify = false) => {
+    protected logFunc = (args: any[]) => {
         if (typeof global.window === 'undefined') {
-            process.stdout.write(`${skipStringify ? arg : this.stringify(JSON.decycle(arg))}\n`);
+            for (const arg of args) {
+                const toWrite =
+                    `${this.stringify(arg)}\n` +
+                    (this.prettyPrint ? '----------------------------------------------------------------------------------------------------\n' : '') +
+                    (this.prettyPrint ? '----------------------------------------------------------------------------------------------------\n' : '') +
+                    (this.prettyPrint ? '----------------------------------------------------------------------------------------------------\n' : '');
+                process.stdout.write(toWrite);
+                if (this.logToFile) {
+                    logToFile(this.rotation, toWrite);
+                }
+            }
         } else {
-            console.log(arg);
-            // If the log contains an error, log it directly for better browser debugging
-            if (typeof arg === 'object' && arg !== null && ContextKey.Error in arg) {
-                console.error(arg[ContextKey.Error]);
-            }
-
-            // If the log contains a message, log it directly for better browser debugging
-            if (typeof arg === 'object' && arg !== null && ContextKey.Message in arg) {
-                console.log(arg[ContextKey.Message]);
-            }
+            console.log(args);
         }
     };
 

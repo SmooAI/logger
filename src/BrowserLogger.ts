@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import BrowserDetector from 'browser-dtector';
-import merge from 'lodash.merge';
+import { merge } from 'merge-anything';
+import { createColors } from 'picocolors';
 import Logger, {
     CONFIG_MINIMAL as BASE_CONFIG_MINIMAL,
     CONTEXT as BASE_CONTEXT,
@@ -11,6 +12,8 @@ import Logger, {
     global,
     Level,
 } from './Logger';
+
+const picocolors = createColors(true);
 
 export * from './Logger';
 
@@ -146,7 +149,15 @@ export default class BrowserLogger extends Logger {
         }
     }
 
-    protected buildLogObject(level: Level, args: any[]): any {
-        return merge(merge(super.buildLogObject(level, args), this.addCallerContext()), this.addBrowserContext());
+    protected buildLogObject(level: Level, args: any[]): any[] {
+        this.addCallerContext();
+        this.addBrowserContext();
+        const objects = super.buildLogObject(level, args);
+        const obj = objects.reduce((acc, obj) => merge(acc, obj), {});
+        return [
+            picocolors.bold(picocolors.green(obj[ContextKey.Message] ?? 'No Message')),
+            ...(obj[ContextKey.Error] ? [picocolors.bold(picocolors.red('Error: ')), obj[ContextKey.Error]] : []),
+            obj,
+        ];
     }
 }
