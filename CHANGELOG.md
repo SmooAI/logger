@@ -1,5 +1,16 @@
 # @smooai/logger
 
+## 2.3.0
+
+### Minor Changes
+
+- ec16cbd: Switched to using .ansi as log extension for ansi colors iliazeus.vscode-ansi.
+
+### Patch Changes
+
+- ec16cbd: Fix build issue.
+- ec16cbd: Fix minor issue with log output.
+
 ## 2.2.0
 
 ### Minor Changes
