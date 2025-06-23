@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 2.0.1
+
+### Patch Changes
+
+- a060fc7: Fix readme issue.
+
 ## 2.0.0
 
 ### Major Changes
