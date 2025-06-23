@@ -2,9 +2,9 @@
 import { APIGatewayEventRequestContextV2, APIGatewayProxyEventV2, Context as LambdaContext } from 'aws-lambda';
 import { v4 as uuidv4 } from 'uuid';
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import AwsLambdaLogger, { ContextKey, Level } from './AwsLambdaLogger';
+import AwsServerLogger, { ContextKey, Level } from './AwsServerLogger';
 
-class TestLogger extends AwsLambdaLogger {
+class TestLogger extends AwsServerLogger {
     public removeUndefinedValuesRecursively(value: any): any {
         return super.removeUndefinedValuesRecursively(value);
     }
@@ -19,6 +19,7 @@ describe('Test Server Logger', () => {
             level: Level.Info,
         };
         logger = new TestLogger(options);
+        process.env.SST_DEV = 'true';
     });
 
     afterEach(() => {

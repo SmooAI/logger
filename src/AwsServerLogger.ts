@@ -4,7 +4,7 @@ import type { MessageAttributeValue } from '@aws-sdk/client-sqs';
 import * as api from '@opentelemetry/api';
 import { APIGatewayProxyEventV2, Context as LambdaContext, SQSRecord } from 'aws-lambda';
 import createEsmUtils from 'esm-utils';
-import merge from 'lodash.merge';
+import { merge } from 'merge-anything';
 import * as sourceMapSupport from 'source-map-support';
 import { isLocal } from './env';
 import Logger, {
@@ -195,8 +195,8 @@ type CallerContext = {
     [ContextKeyCaller.Stack]?: string[];
 };
 
-export default class AwsLambdaLogger extends Logger {
-    private _serverName = 'AwsLambdaLogger';
+export default class AwsServerLogger extends Logger {
+    private _serverName = 'AwsServerLogger';
     private _serverContextConfig!: ContextConfig;
     private _serverConfigSettings: Record<string, ContextConfig> = CONFIG_SETTINGS;
 
@@ -477,12 +477,13 @@ export default class AwsLambdaLogger extends Logger {
         return obj;
     }
 
-    protected buildLogObject(level: Level, args: any[]): any {
+    protected buildLogObject(level: Level, args: any[]): any[] {
         this.addCallerContext();
         this.addTraceContext();
-        const obj = super.buildLogObject(level, args);
+        const objects = super.buildLogObject(level, args);
+        const obj = objects.reduce((acc, obj) => merge(acc, obj), {});
         this.addLambdaKeys(level, obj);
         if (isLocal()) this.slimDownLocally(obj);
-        return obj;
+        return [obj];
     }
 }
