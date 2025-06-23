@@ -1,7 +1,7 @@
 /// <reference lib="dom" />
 import dayjs from 'dayjs';
 import { merge } from 'merge-anything';
-import { createStream, RotatingFileStream, type Generator, type Options } from 'rotating-file-stream';
+import { createStream, type Generator, type Options, type RotatingFileStream } from 'rotating-file-stream';
 
 export type RotationOptions = Omit<Options, 'path' | 'compress' | 'teeToStdout'> & {
     path: string;

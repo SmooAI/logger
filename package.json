@@ -51,6 +51,7 @@
         "@opentelemetry/api": "^1.8.0",
         "browser-dtector": "^4.1.0",
         "dayjs": "^1.11.13",
+        "esbuild-plugin-alias": "^0.2.1",
         "esm-utils": "^4.2.1",
         "json-stable-stringify": "^1.2.1",
         "merge-anything": "^6.0.6",
