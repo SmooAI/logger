@@ -510,16 +510,16 @@ const logger = new AwsServerLogger({
 **Custom Filename Generator:**
 
 ```typescript
-// Custom filename pattern: logs/2024/03/app-2024-03-20-001.log
+// Custom filename pattern: logs/2024/03/app-2024-03-20-001.ansi
 const customGenerator = (time: Date, index?: number) => {
-    if (!time) return 'app.log';
+    if (!time) return 'app.ansi';
 
     const year = time.getFullYear();
     const month = String(time.getMonth() + 1).padStart(2, '0');
     const day = String(time.getDate()).padStart(2, '0');
     const fileIndex = index ? String(index).padStart(3, '0') : '001';
 
-    return `${year}/${month}/app-${year}-${month}-${day}-${fileIndex}.log`;
+    return `${year}/${month}/app-${year}-${month}-${day}-${fileIndex}.ansi`;
 };
 
 const logger = new AwsServerLogger({
@@ -528,7 +528,7 @@ const logger = new AwsServerLogger({
     rotation: {
         path: './logs',
         filenamePrefix: 'app',
-        extension: 'log',
+        extension: 'ansi',
         generator: customGenerator,
         size: '5M',
         interval: '1d',
@@ -560,11 +560,17 @@ With default settings, your logs will be organized like this:
 
 ```
 .smooai-logs/
-├── output.log          # Current log file
-├── output-2024-03-20-1.log.gz  # Yesterday's log (compressed)
-├── output-2024-03-19-1.log.gz  # Day before (compressed)
-└── output-2024-03-18-1.log.gz  # Older log (compressed)
+├── output.ansi          # Current log file
+├── output-2024-03-20-1.ansi.gz  # Yesterday's log (compressed)
+├── output-2024-03-19-1.ansi.gz  # Day before (compressed)
+└── output-2024-03-18-1.ansi.gz  # Older log (compressed)
 ```
+
+**ANSI Color Output:**
+
+By default, the logger outputs to `.ansi` files with ANSI color codes to help make log messages easier to read when scrolling through large log files. The colors provide visual distinction between different log levels and message types.
+
+This works seamlessly with the [iliazeus.vscode-ansi](https://open-vsx.org/extension/iliazeus/vscode-ansi) extension in VS Code, which automatically displays ANSI colors in `.ansi` files by default. Simply install the extension and your log files will be displayed with proper color formatting, making it much easier to scan through logs and identify different message types at a glance.
 
 **Default Settings and Environment Detection:**
 
@@ -575,7 +581,7 @@ With default settings, your logs will be organized like this:
 - `maxSize`: `'100M'` - Keep maximum 100MB of rotated files
 - `path`: `'.smooai-logs'` - Log directory
 - `filenamePrefix`: `'output'` - File prefix
-- `extension`: `'log'` - File extension
+- `extension`: `'ansi'` - File extension
 
 **Automatic Local Environment Detection:**
 
