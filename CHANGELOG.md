@@ -1,5 +1,15 @@
 # @smooai/logger
 
+## 2.2.0
+
+### Minor Changes
+
+- 4b9d54a: Switched to using .ansi as log extension for ansi colors iliazeus.vscode-ansi.
+
+### Patch Changes
+
+- 4b9d54a: Fix minor issue with log output.
+
 ## 2.1.0
 
 ### Minor Changes
