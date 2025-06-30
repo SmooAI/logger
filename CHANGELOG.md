@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 3.0.1
+
+### Patch Changes
+
+- ae928d2: Update readme.
+
 ## 3.0.0
 
 ### Major Changes
