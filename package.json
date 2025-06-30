@@ -1,6 +1,6 @@
 {
     "name": "@smooai/logger",
-    "version": "2.3.0",
+    "version": "3.0.0",
     "description": "A powerful contextual logging system designed for AWS Lambda and Browser environments, with built-in support for structured logging, correlation tracking, and automatic context gathering.",
     "homepage": "https://github.com/SmooAI/logger#readme",
     "bugs": {
