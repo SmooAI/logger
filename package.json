@@ -27,6 +27,11 @@
             "types": "./dist/*.d.ts",
             "import": "./dist/*.mjs",
             "require": "./dist/*.js"
+        },
+        "./browser/*": {
+            "types": "./dist/browser/*.d.ts",
+            "import": "./dist/browser/*.mjs",
+            "require": "./dist/browser/*.js"
         }
     },
     "main": "./dist/index.js",
