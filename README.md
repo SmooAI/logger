@@ -127,6 +127,20 @@ The logger automatically collects context from various sources:
 
 ### Usage Examples
 
+#### Import Paths
+
+The logger provides different import paths for different environments:
+
+```typescript
+// For AWS Lambda/Server environments
+import { AwsServerLogger, Level } from '@smooai/logger/AwsServerLogger';
+
+// For Browser environments
+import { BrowserLogger, Level } from '@smooai/logger/browser/BrowserLogger';
+```
+
+**Important:** Always use the browser-specific import path (`@smooai/logger/browser/BrowserLogger`) for browser environments to ensure proper compatibility and avoid server-side dependencies.
+
 #### Automatic Call Stack Tracking
 
 The logger automatically captures the call stack for every log entry, helping you trace where logs originate from:
@@ -185,6 +199,8 @@ This is particularly useful for:
 Basic initialization and usage:
 
 ```typescript
+import { AwsServerLogger, Level } from '@smooai/logger';
+
 const logger = new AwsServerLogger({
     name: 'MyLambdaService',
     level: Level.Debug,
@@ -296,11 +312,16 @@ try {
 Basic initialization and usage:
 
 ```typescript
+// Import from the browser-specific path
+import { BrowserLogger, Level } from '@smooai/logger/browser/BrowserLogger';
+
 const logger = new BrowserLogger({
     name: 'MyWebApp',
     level: Level.Info,
 });
 ```
+
+**Note:** BrowserLogger should be imported from the browser-specific path `@smooai/logger/browser/BrowserLogger` to ensure proper browser compatibility and avoid server-side dependencies.
 
 Adding request context:
 
