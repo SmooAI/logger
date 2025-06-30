@@ -1,5 +1,12 @@
 # @smooai/logger
 
+## 3.0.2
+
+### Patch Changes
+
+- a8be379: Update readme.
+- a8be379: Updated dependencies.
+
 ## 3.0.1
 
 ### Patch Changes
