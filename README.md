@@ -50,7 +50,6 @@ A powerful contextual logging system designed for AWS Lambda and Browser environ
 - ☁️ AWS Lambda and CloudWatch integration
 - 🌐 Browser environment support
 - 🔍 Advanced error tracking with stack traces
-- 📊 OpenTelemetry integration
 
 ![NPM Version](https://img.shields.io/npm/v/%40smooai%2Flogger?style=for-the-badge)
 ![NPM Downloads](https://img.shields.io/npm/dw/%40smooai%2Flogger?style=for-the-badge)
@@ -76,7 +75,6 @@ pnpm add @smooai/logger
 - Context preservation across asynchronous operations
 - Pretty printing support for local development
 - Telemetry fields support (requestId, duration, traceId, etc.)
-- OpenTelemetry integration
 - Circular reference handling in JSON serialization
 - Advanced error tracking
     - Automatic error serialization
@@ -123,7 +121,6 @@ The logger automatically collects context from various sources:
 - User Context
 - Request/Response Data
 - Error Stack Traces
-- OpenTelemetry Traces
 
 ### Usage Examples
 
@@ -465,7 +462,6 @@ The logger supports different configuration presets:
 - TypeScript
 - AWS Lambda Integration
 - Browser Detection
-- OpenTelemetry
 - UUID for correlation
 
 #### Log Rotation

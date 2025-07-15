@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import type { MessageAttributeValue } from '@aws-sdk/client-sqs';
-import * as api from '@opentelemetry/api';
 import { APIGatewayProxyEventV2, Context as LambdaContext, SQSRecord } from 'aws-lambda';
 import createEsmUtils from 'esm-utils';
 import { merge } from 'merge-anything';
@@ -420,16 +419,6 @@ export default class AwsServerLogger extends Logger {
         });
     }
 
-    private addTraceContext() {
-        const span = api.trace.getActiveSpan();
-        if (span && span.spanContext) {
-            const { traceId } = span.spanContext();
-            this.addTelemetryFields({
-                traceId,
-            });
-        }
-    }
-
     protected slimDownLocally(object: any): any {
         if (ContextKey.User in object && ContextKeyUser.Context in object[ContextKey.User]) {
             delete object[ContextKey.User][ContextKeyUser.Context];
@@ -479,7 +468,6 @@ export default class AwsServerLogger extends Logger {
 
     protected buildLogObject(level: Level, args: any[]): any[] {
         this.addCallerContext();
-        this.addTraceContext();
         const objects = super.buildLogObject(level, args);
         const obj = objects.reduce((acc, obj) => merge(acc, obj), {});
         this.addLambdaKeys(level, obj);
