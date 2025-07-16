@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 3.0.3
+
+### Patch Changes
+
+- 2310c54: Improved README.md to tell a better story about the tool.
+
 ## 3.0.2
 
 ### Patch Changes
