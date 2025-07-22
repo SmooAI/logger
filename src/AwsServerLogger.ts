@@ -302,6 +302,8 @@ export default class AwsServerLogger extends Logger {
             ),
         );
 
+        this.setNamespace(`${event?.requestContext?.http?.method?.toUpperCase() ?? ''} ${event?.rawPath}`);
+
         this.info({ event }, 'lambda:trigger');
     }
 

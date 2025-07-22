@@ -471,6 +471,10 @@ export default class Logger {
         }
     }
 
+    public setNamespace(namespace: string) {
+        this.addBaseContextKey(ContextKey.Namespace, namespace);
+    }
+
     public addRequestContext(request: Partial<Request>) {
         if (!request) return;
         const url = request.url ? new URL(request.url) : undefined;
@@ -488,8 +492,8 @@ export default class Logger {
                     [ContextKeyHttpRequest.Headers]: headersObject,
                 },
             },
-            [ContextKey.Namespace]: url?.pathname,
         });
+        this.setNamespace(`${request.method?.toUpperCase() ?? ''} ${url?.pathname}`);
 
         const correlationIdHeader = this.getHeaderValue(request.headers, ContextHeader.CorrelationId);
         if (correlationIdHeader) {
