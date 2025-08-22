@@ -74,6 +74,9 @@ export type Context = BaseContext<{
     [ContextKey.BrowserContext]?: Partial<Record<ContextKeyBrowser | string, any>>;
 }>;
 
+/**
+ * Browser-specific logger that extends the base Logger with browser context information
+ */
 export default class BrowserLogger extends Logger {
     private _browserName = 'BrowserLogger';
     private _browserContextConfig!: ContextConfig;
