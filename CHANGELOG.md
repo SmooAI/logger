@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 3.0.8
+
+### Patch Changes
+
+- 37e2c86: Fix response body handling.
+
 ## 3.0.7
 
 ### Patch Changes
