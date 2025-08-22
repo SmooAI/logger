@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 3.0.7
+
+### Patch Changes
+
+- 9cadf35: Fix issue with cloneAndAddResponseContext.
+
 ## 3.0.6
 
 ### Patch Changes
