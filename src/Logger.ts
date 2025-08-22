@@ -562,10 +562,14 @@ export default class Logger {
 
     /**
      * Clones and adds HTTP response context to the logger, including response body
-     * @param {Partial<Response> & { clone: () => Promise<Response> }} context - The response object with clone method
+     * @param {Partial<Response>} context - The response object
      * @returns {Promise<void>}
      */
-    public async cloneAndAddResponseContext(context: Partial<Response> & { clone: () => Promise<Response> }) {
+    public async cloneAndAddResponseContext(context: Partial<Response>) {
+        if (!context.clone) {
+            this.addResponseContext(context);
+            return;
+        }
         const response = await context.clone();
         const body = await response.text();
         let bodyJson: any;
