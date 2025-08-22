@@ -149,4 +149,120 @@ describe('Test Logger', () => {
 
         expect(result).toEqual(expected);
     });
+
+    test('addResponseContext method adds response context without body', () => {
+        logger.resetContext(); // Reset context to start fresh
+        const mockResponse = {
+            status: 200,
+            headers: new Headers({
+                'content-type': 'application/json',
+                'x-custom-header': 'value',
+            }),
+        };
+
+        logger.addResponseContext(mockResponse as any);
+
+        const context = logger.context;
+        expect(context[ContextKey.Http]).toBeDefined();
+        expect(context[ContextKey.Http]?.response).toBeDefined();
+        expect(context[ContextKey.Http]?.response?.statusCode).toBe(200);
+        expect(context[ContextKey.Http]?.response?.headers).toBeDefined();
+        expect(context[ContextKey.Http]?.response?.headers?.['content-type']).toBe('application/json');
+        expect(context[ContextKey.Http]?.response?.headers?.['x-custom-header']).toBe('value');
+        expect(context[ContextKey.Http]?.response?.body).toBeUndefined();
+    });
+
+    test('cloneAndAddResponseContext method adds response context with body', async () => {
+        logger.resetContext(); // Reset context to start fresh
+        const mockResponseBody = JSON.stringify({ message: 'Success', data: { id: 123 } });
+        const mockResponse = {
+            status: 201,
+            headers: new Headers({
+                'content-type': 'application/json',
+            }),
+            clone: async () => ({
+                text: async () => mockResponseBody,
+                status: 201,
+                headers: new Headers({
+                    'content-type': 'application/json',
+                }),
+            }),
+        };
+
+        await logger.cloneAndAddResponseContext(mockResponse as any);
+
+        const context = logger.context;
+        expect(context[ContextKey.Http]).toBeDefined();
+        expect(context[ContextKey.Http]?.response).toBeDefined();
+        expect(context[ContextKey.Http]?.response?.statusCode).toBe(201);
+        expect(context[ContextKey.Http]?.response?.headers).toBeDefined();
+        expect(context[ContextKey.Http]?.response?.headers?.['content-type']).toBe('application/json');
+        expect(context[ContextKey.Http]?.response?.body).toBe(mockResponseBody);
+    });
+
+    test('cloneAndAddResponseContext handles non-JSON response body', async () => {
+        logger.resetContext(); // Reset context to start fresh
+        const mockResponseBody = 'Plain text response';
+        const mockResponse = {
+            status: 200,
+            headers: new Headers({
+                'content-type': 'text/plain',
+            }),
+            clone: async () => ({
+                text: async () => mockResponseBody,
+                status: 200,
+                headers: new Headers({
+                    'content-type': 'text/plain',
+                }),
+            }),
+        };
+
+        await logger.cloneAndAddResponseContext(mockResponse as any);
+
+        const context = logger.context;
+        expect(context[ContextKey.Http]).toBeDefined();
+        expect(context[ContextKey.Http]?.response).toBeDefined();
+        expect(context[ContextKey.Http]?.response?.body).toBe(mockResponseBody);
+    });
+
+    test('addResponseContext handles missing headers', () => {
+        logger.resetContext(); // Reset context to start fresh
+        const mockResponse = {
+            status: 404,
+        };
+
+        logger.addResponseContext(mockResponse as any);
+
+        const context = logger.context;
+        expect(context[ContextKey.Http]).toBeDefined();
+        expect(context[ContextKey.Http]?.response).toBeDefined();
+        expect(context[ContextKey.Http]?.response?.statusCode).toBe(404);
+        expect(context[ContextKey.Http]?.response?.headers).toEqual({});
+    });
+
+    test('cloneAndAddResponseContext handles error responses', async () => {
+        logger.resetContext(); // Reset context to start fresh
+        const mockErrorBody = JSON.stringify({ error: 'Internal Server Error' });
+        const mockResponse = {
+            status: 500,
+            headers: new Headers({
+                'content-type': 'application/json',
+            }),
+            clone: async () => ({
+                text: async () => mockErrorBody,
+                status: 500,
+                headers: new Headers({
+                    'content-type': 'application/json',
+                }),
+            }),
+        };
+
+        await logger.cloneAndAddResponseContext(mockResponse as any);
+
+        const context = logger.context;
+        expect(context[ContextKey.Http]).toBeDefined();
+        expect(context[ContextKey.Http]?.response).toBeDefined();
+        expect(context[ContextKey.Http]?.response?.statusCode).toBe(500);
+        expect(context[ContextKey.Http]?.response?.body).toBe(mockErrorBody);
+    });
 });

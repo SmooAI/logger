@@ -249,6 +249,10 @@ export default class AwsServerLogger extends Logger {
         super(options);
     }
 
+    /**
+     * Retrieves AWS Lambda environment context from environment variables
+     * @returns {Object} Lambda environment context containing function details, region, and node environment
+     */
     public getLambdaEnvironmentContext() {
         return {
             [ContextKey.Lambda]: {
@@ -265,6 +269,12 @@ export default class AwsServerLogger extends Logger {
         };
     }
 
+    /**
+     * Adds AWS Lambda context and HTTP request details to the logger
+     * @param {APIGatewayProxyEventV2} [event] - API Gateway proxy event containing request details
+     * @param {LambdaContext} [context] - AWS Lambda context with function and invocation details
+     * @returns {void}
+     */
     public addLambdaContext(event?: APIGatewayProxyEventV2, context?: LambdaContext) {
         this.resetContext();
         const correlationId = event?.headers?.[ContextHeader.CorrelationId];
@@ -333,6 +343,11 @@ export default class AwsServerLogger extends Logger {
         };
     }
 
+    /**
+     * Adds SQS record context to the logger
+     * @param {SQSRecord} record - SQS record containing message details and attributes
+     * @returns {void}
+     */
     public addSQSRecordContext(record: SQSRecord) {
         this.addBaseContext({
             [ContextKey.Queue]: {
@@ -360,6 +375,10 @@ export default class AwsServerLogger extends Logger {
         }, {} as SQSBatchMessageAttributes);
     }
 
+    /**
+     * Writes partial context to SQS message attributes for message forwarding
+     * @returns {SQSBatchMessageAttributes} Message attributes containing correlation ID and filtered HTTP context
+     */
     public writePartialContextToSQSMessageAttributes(): SQSBatchMessageAttributes {
         const httpContext = this.baseContextKey(ContextKey.Http);
         return {
@@ -387,6 +406,10 @@ export default class AwsServerLogger extends Logger {
         };
     }
 
+    /**
+     * Writes partial context to batch SQS message attributes with minimal HTTP context
+     * @returns {SQSBatchMessageAttributes} Message attributes containing correlation ID and user agent/source IP
+     */
     public writePartialContextToBatchSQSMessageAttributes(): SQSBatchMessageAttributes {
         const httpContext = this.baseContextKey(ContextKey.Http);
         return {

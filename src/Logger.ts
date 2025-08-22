@@ -40,7 +40,9 @@ declare global {
 export {};
 
 type Request = globalThis.Request;
-export { type Request };
+type Response = globalThis.Response;
+type Headers = globalThis.Headers;
+export { type Request, type Response, type Headers };
 
 if (!global?.process) {
     global.process = {
@@ -405,45 +407,84 @@ export default class Logger {
         return newContext;
     }
 
+    /**
+     * Retrieves a value from the base context by key
+     * @param {ContextKey | string} key - The context key to retrieve
+     * @returns {any | undefined} The value associated with the key, or undefined if not found
+     */
     public baseContextKey(key: ContextKey | string): any | undefined {
         return this.context[key];
     }
 
+    /**
+     * Adds a key-value pair to the base context
+     * @param {ContextKey | string} key - The context key to add
+     * @param {any} value - The value to associate with the key
+     * @returns {void}
+     */
     public addBaseContextKey(key: ContextKey | string, value: any) {
         this.context[key] = value;
     }
 
+    /**
+     * Resets the context to an empty state and generates a new correlation ID
+     * @returns {void}
+     */
     public resetContext() {
         this.context = {};
         this.resetCorrelationId();
     }
 
     /**
-     * Add context to the context['context'] object
-     * @param context
+     * Adds context to the nested context['context'] object
+     * @param {Context} context - The context object to merge into the nested context
+     * @returns {void}
      */
     public addContext(context: Context) {
         this.context[ContextKey.Context] = merge(this.context[ContextKey.Context] ?? {}, context);
     }
 
+    /**
+     * Adds context directly to the base context object
+     * @param {Context} context - The context object to merge into the base context
+     * @returns {void}
+     */
     public addBaseContext(context: Context) {
         this.context = merge(this.context, context);
     }
 
+    /**
+     * Retrieves the current correlation ID from the context
+     * @returns {string} The correlation ID
+     */
     public correlationId(): string {
         return this.baseContextKey(ContextKey.CorrelationId);
     }
 
+    /**
+     * Generates and sets a new correlation ID
+     * @returns {void}
+     */
     public resetCorrelationId() {
         this.setCorrelationId(uuidv4());
     }
 
+    /**
+     * Sets the correlation ID and related tracking IDs
+     * @param {string} correlationId - The correlation ID to set
+     * @returns {void}
+     */
     public setCorrelationId(correlationId: string) {
         this.addBaseContextKey(ContextKey.CorrelationId, correlationId);
         this.addBaseContextKey(ContextKey.RequestId, correlationId);
         this.addBaseContextKey(ContextKey.TraceId, correlationId);
     }
 
+    /**
+     * Adds user context to the logger
+     * @param {User | null} user - The user object containing user details
+     * @returns {void}
+     */
     public addUserContext(user: User | null) {
         if (user) {
             this.addBaseContext({
@@ -471,10 +512,20 @@ export default class Logger {
         }
     }
 
+    /**
+     * Sets the namespace for the current logging context
+     * @param {string} namespace - The namespace to set
+     * @returns {void}
+     */
     public setNamespace(namespace: string) {
         this.addBaseContextKey(ContextKey.Namespace, namespace);
     }
 
+    /**
+     * Adds HTTP request context to the logger
+     * @param {Partial<Request>} request - The request object containing HTTP request details
+     * @returns {void}
+     */
     public addRequestContext(request: Partial<Request>) {
         if (!request) return;
         const url = request.url ? new URL(request.url) : undefined;
@@ -501,18 +552,65 @@ export default class Logger {
         }
     }
 
-    public addResponseContext(context: Partial<HttpResponse>) {
+    private getHeadersObject(headers: Headers) {
+        const headersObject: Record<string, string> = {};
+        headers.forEach((value: string, key: string) => {
+            headersObject[key] = value;
+        });
+        return headersObject;
+    }
+
+    /**
+     * Clones and adds HTTP response context to the logger, including response body
+     * @param {Partial<Response> & { clone: () => Promise<Response> }} context - The response object with clone method
+     * @returns {Promise<void>}
+     */
+    public async cloneAndAddResponseContext(context: Partial<Response> & { clone: () => Promise<Response> }) {
+        const response = await context.clone();
+        const body = await response.text();
+        let bodyJson: any;
+        try {
+            bodyJson = JSON.parse(body);
+        } catch (error) {
+            /* empty */
+        } finally {
+            bodyJson = body;
+        }
         this.addBaseContext({
             [ContextKey.Http]: {
                 [ContextKeyHttp.Response]: {
-                    [ContextKeyHttpResponse.StatusCode]: context.statusCode,
-                    [ContextKeyHttpResponse.Body]: context.body,
-                    [ContextKeyHttpResponse.Headers]: context.headers,
+                    [ContextKeyHttpResponse.StatusCode]: response.status,
+                    [ContextKeyHttpResponse.Headers]: response.headers ? this.getHeadersObject(response.headers) : {},
+                    [ContextKeyHttpResponse.Body]: bodyJson,
                 },
             },
         });
     }
 
+    /**
+     * Adds HTTP response context to the logger without including the response body
+     *
+     * NOTE: This method does not log the response body. If you want to log the response body,
+     * use the async cloneAndAddResponseContext method instead.
+     * @param {Partial<Response>} context - The response object containing HTTP response details
+     * @returns {void}
+     */
+    public addResponseContext(context: Partial<Response>) {
+        this.addBaseContext({
+            [ContextKey.Http]: {
+                [ContextKeyHttp.Response]: {
+                    [ContextKeyHttpResponse.StatusCode]: context.status ?? undefined,
+                    [ContextKeyHttpResponse.Headers]: context.headers ? this.getHeadersObject(context.headers) : {},
+                },
+            },
+        });
+    }
+
+    /**
+     * Adds HTTP request details to the context
+     * @param {HttpRequest} httpRequest - The HTTP request details object
+     * @returns {void}
+     */
     public addHttpRequest(httpRequest: HttpRequest) {
         this.addBaseContext({
             [ContextKey.Http]: {
@@ -521,6 +619,10 @@ export default class Logger {
         });
     }
 
+    /**
+     * Retrieves the origin domain from the HTTP request headers
+     * @returns {string | undefined} The origin domain hostname, or undefined if not found
+     */
     public getHttpRequestOriginDomain(): string | undefined {
         const originUrl =
             this.baseContextKey(ContextKey.Http)?.[ContextKeyHttp.Request]?.[ContextKeyHttpRequest.Headers]?.['origin'] ||
@@ -539,6 +641,11 @@ export default class Logger {
         return origin;
     }
 
+    /**
+     * Adds HTTP response details to the context
+     * @param {HttpResponse} httpResponse - The HTTP response details object
+     * @returns {void}
+     */
     public addHttpResponse(httpResponse: HttpResponse) {
         this.addBaseContext({
             [ContextKey.Http]: {
@@ -547,6 +654,11 @@ export default class Logger {
         });
     }
 
+    /**
+     * Adds telemetry fields to the base context
+     * @param {TelemetryFields} fields - The telemetry fields to add
+     * @returns {void}
+     */
     public addTelemetryFields(fields: TelemetryFields) {
         this.addBaseContext(fields);
     }
@@ -630,24 +742,59 @@ export default class Logger {
         this.logFunc(this.buildLogObject(level, args));
     }
 
+    /**
+     * Logs a trace level message
+     * @param {...any} args - The arguments to log (strings, objects, or errors)
+     * @returns {void}
+     */
     public trace(...args: any[]): void {
         if (this.isLogLevelEnabled(Level.Trace)) this.doLog(Level.Trace, args);
     }
+    /**
+     * Logs a debug level message
+     * @param {...any} args - The arguments to log (strings, objects, or errors)
+     * @returns {void}
+     */
     public debug(...args: any[]): void {
         if (this.isLogLevelEnabled(Level.Debug)) this.doLog(Level.Debug, args);
     }
+    /**
+     * Logs an info level message
+     * @param {...any} args - The arguments to log (strings, objects, or errors)
+     * @returns {void}
+     */
     public info(...args: any[]): void {
         if (this.isLogLevelEnabled(Level.Info)) this.doLog(Level.Info, args);
     }
+    /**
+     * Logs a warning level message
+     * @param {...any} args - The arguments to log (strings, objects, or errors)
+     * @returns {void}
+     */
     public warn(...args: any[]): void {
         if (this.isLogLevelEnabled(Level.Warn)) this.doLog(Level.Warn, args);
     }
+    /**
+     * Logs an error level message
+     * @param {...any} args - The arguments to log (strings, objects, or errors)
+     * @returns {void}
+     */
     public error(...args: any[]): void {
         if (this.isLogLevelEnabled(Level.Error)) this.doLog(Level.Error, args);
     }
+    /**
+     * Logs a fatal level message
+     * @param {...any} args - The arguments to log (strings, objects, or errors)
+     * @returns {void}
+     */
     public fatal(...args: any[]): void {
         if (this.isLogLevelEnabled(Level.Fatal)) this.doLog(Level.Fatal, args);
     }
+    /**
+     * Silent logging method that does not output anything
+     * @param {...any} _args - Arguments are accepted but not processed
+     * @returns {void}
+     */
     public silent(..._args: any[]): void {
         // No console equivalent for silent
     }
