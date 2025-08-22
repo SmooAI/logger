@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 3.0.5
+
+### Patch Changes
+
+- d577148: Remove some automatically added log context in addLambdaContext.
+
 ## 3.0.4
 
 ### Patch Changes
