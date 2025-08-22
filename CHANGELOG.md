@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 3.0.6
+
+### Patch Changes
+
+- 3188183: Add proper response logging.
+
 ## 3.0.5
 
 ### Patch Changes
