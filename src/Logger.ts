@@ -578,7 +578,9 @@ export default class Logger {
         } catch (error) {
             /* empty */
         } finally {
-            bodyJson = body;
+            if (!bodyJson) {
+                bodyJson = body;
+            }
         }
         this.addBaseContext({
             [ContextKey.Http]: {

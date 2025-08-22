@@ -197,7 +197,7 @@ describe('Test Logger', () => {
         expect(context[ContextKey.Http]?.response?.statusCode).toBe(201);
         expect(context[ContextKey.Http]?.response?.headers).toBeDefined();
         expect(context[ContextKey.Http]?.response?.headers?.['content-type']).toBe('application/json');
-        expect(context[ContextKey.Http]?.response?.body).toBe(mockResponseBody);
+        expect(context[ContextKey.Http]?.response?.body).toEqual(JSON.parse(mockResponseBody));
     });
 
     test('cloneAndAddResponseContext handles non-JSON response body', async () => {
@@ -263,6 +263,6 @@ describe('Test Logger', () => {
         expect(context[ContextKey.Http]).toBeDefined();
         expect(context[ContextKey.Http]?.response).toBeDefined();
         expect(context[ContextKey.Http]?.response?.statusCode).toBe(500);
-        expect(context[ContextKey.Http]?.response?.body).toBe(mockErrorBody);
+        expect(context[ContextKey.Http]?.response?.body).toEqual(JSON.parse(mockErrorBody));
     });
 });
