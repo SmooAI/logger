@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 3.1.0
+
+### Minor Changes
+
+- 51296f1: Upgrade from zod 3 to zod 4.
+
 ## 3.0.8
 
 ### Patch Changes
