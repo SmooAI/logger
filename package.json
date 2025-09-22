@@ -45,6 +45,7 @@
         "check-all": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run build",
         "ci:publish": "pnpm build && pnpm changeset publish",
         "format": "prettier --write \"**/*.{ts,tsx,md,json,js,cjs,mjs}\"",
+        "generate-git-branch": "pnpm generate-git-branch",
         "lint": "eslint src/",
         "lint:fix": "eslint src/ --fix",
         "pre-commit-check": "(zsh .husky/pre-commit)",
