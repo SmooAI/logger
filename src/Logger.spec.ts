@@ -265,4 +265,93 @@ describe('Test Logger', () => {
         expect(context[ContextKey.Http]?.response?.statusCode).toBe(500);
         expect(context[ContextKey.Http]?.response?.body).toEqual(JSON.parse(mockErrorBody));
     });
+
+    test('handles error in context object and adds to error and errorDetails', async () => {
+        logger.resetContext();
+        const testError = new Error('Test error in context');
+        const contextWithError = {
+            data: { someValue: 'test' },
+            errorInstance: testError,
+            message: 'Processing failed',
+        };
+
+        // Spy on the logFunc to capture what gets logged
+        const logSpy = vi.spyOn(logger as any, 'logFunc') as any;
+
+        logger.info(contextWithError);
+
+        expect(logSpy).toHaveBeenCalledTimes(1);
+        const loggedObject = logSpy.mock.calls[0][0][0] as any;
+
+        expect(loggedObject[ContextKey.Error]).toBe('Test error in context');
+        expect(loggedObject[ContextKey.ErrorDetails]).toBeDefined();
+        expect(loggedObject[ContextKey.ErrorDetails]).toHaveLength(1);
+        expect(loggedObject[ContextKey.ErrorDetails]?.[0]).toEqual(
+            expect.objectContaining({
+                name: 'Error',
+                message: 'Test error in context',
+                stack: expect.any(String),
+            }),
+        );
+        expect(loggedObject[ContextKey.Context]).toEqual(
+            expect.objectContaining({
+                data: { someValue: 'test' },
+                errorInstance: {}, // Error objects get serialized to empty objects
+                message: 'Processing failed',
+            }),
+        );
+    });
+
+    test('handles multiple errors in context object', async () => {
+        logger.resetContext();
+        const error1 = new Error('First error');
+        const error2 = new Error('Second error');
+        const contextWithErrors = {
+            firstError: error1,
+            nested: {
+                secondError: error2,
+            },
+            data: 'some data',
+        };
+
+        const logSpy = vi.spyOn(logger as any, 'logFunc') as any;
+
+        logger.error(contextWithErrors);
+
+        expect(logSpy).toHaveBeenCalledTimes(1);
+        const loggedObject = logSpy.mock.calls[0][0][0] as any;
+
+        // Note: The current implementation only checks top-level values, not nested objects
+        expect(loggedObject[ContextKey.Error]).toBe('First error');
+        expect(loggedObject[ContextKey.ErrorDetails]).toBeDefined();
+        expect(loggedObject[ContextKey.ErrorDetails]).toHaveLength(1);
+        expect(loggedObject[ContextKey.ErrorDetails]?.[0]).toEqual(
+            expect.objectContaining({
+                name: 'Error',
+                message: 'First error',
+            }),
+        );
+    });
+
+    test('handles mix of error argument and error in context object', async () => {
+        logger.resetContext();
+        const directError = new Error('Direct error argument');
+        const contextError = new Error('Error in context');
+        const contextWithError = {
+            errorInContext: contextError,
+            data: 'test data',
+        };
+
+        const logSpy = vi.spyOn(logger as any, 'logFunc') as any;
+
+        logger.warn(directError, contextWithError, 'Additional message');
+
+        expect(logSpy).toHaveBeenCalledTimes(1);
+        const loggedObject = logSpy.mock.calls[0][0][0] as any;
+
+        expect(loggedObject[ContextKey.Error]).toBe('Direct error argument; Error in context');
+        expect(loggedObject[ContextKey.ErrorDetails]).toBeDefined();
+        expect(loggedObject[ContextKey.ErrorDetails]).toHaveLength(2);
+        expect(loggedObject[ContextKey.Message]).toBe('Additional message');
+    });
 });

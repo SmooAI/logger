@@ -669,16 +669,28 @@ export default class Logger {
         this.addBaseContext(fields);
     }
 
+    private handleError(arg: any, object: any) {
+        if (arg instanceof Error) {
+            object[ContextKey.Error] = object[ContextKey.Error] ? `${object[ContextKey.Error]}; ${arg.message}` : arg.message;
+            object[ContextKey.ErrorDetails] = [...(object[ContextKey.ErrorDetails] ?? []), serializeError(arg)];
+            this.addTelemetryFields({
+                error: arg.message,
+            });
+        }
+    }
+
     protected buildLogObject(level: Level, args: any[]): any[] {
         const object = this.cloneDeep(this.context);
         for (const arg of args) {
             if (arg instanceof Error) {
-                object[ContextKey.Error] = object[ContextKey.Error] ? `${object[ContextKey.Error]}; ${arg.message}` : arg.message;
-                object[ContextKey.ErrorDetails] = [...(object[ContextKey.ErrorDetails] ?? []), serializeError(arg)];
-                this.addTelemetryFields({
-                    error: arg.message,
-                });
+                this.handleError(arg, object);
             } else if (typeof arg === 'object') {
+                for (const value of Object.values(arg)) {
+                    if (value instanceof Error) {
+                        this.handleError(value, object);
+                    }
+                }
+
                 object[ContextKey.Context] = merge(object[ContextKey.Context] ?? {}, arg);
             } else if (typeof arg === 'string') {
                 object[ContextKey.Message] = object[ContextKey.Message] ? `${object[ContextKey.Message]}; ${arg}` : arg;
