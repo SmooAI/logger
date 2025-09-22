@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 3.1.2
+
+### Patch Changes
+
+- ab25cc4: Fixed error handling in context objects so error values are captured and added to error / errorDetails.
+
 ## 3.1.1
 
 ### Patch Changes
