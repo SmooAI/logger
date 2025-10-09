@@ -91,7 +91,10 @@ jobs:
 
       - name: Publish smooai-logger to crates.io
         if: steps.changesets.outputs.published == 'true'
-        run: cargo publish --locked --manifest-path rust/logger/Cargo.toml
+        uses: actions-rs/cargo@v1
+        with:
+          command: publish
+          args: --locked --manifest-path rust/logger/Cargo.toml
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.SMOOAI_CARGO_REGISTRY_TOKEN }}
 
