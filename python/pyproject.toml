@@ -1,0 +1,81 @@
+[project]
+name = "smooai-logger"
+version = "3.1.2"
+description = "Context-aware structured logging utilities for Python that mirror the @smooai/logger toolkit."
+readme = "README.md"
+authors = [
+    { name = "SmooAI", email = "brent@smooai.com" }
+]
+license = { text = "MIT" }
+requires-python = ">=3.12"
+dependencies = [
+    "colorist>=1.5.2",
+    "pendulum>=3.0.0",
+    "pydantic>=2.7.0",
+    "pydantic-extra-types>=2.0.0",
+    "rich>=13.0.0",
+]
+classifiers = [
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+keywords = ["logging", "aws", "structured-logging", "smooai", "observability"]
+
+[project.urls]
+Homepage = "https://github.com/SmooAI/logger"
+Repository = "https://github.com/SmooAI/logger"
+Issues = "https://github.com/SmooAI/logger/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = [
+    "poethepoet>=0.29.0",
+    "pytest>=8.3.0",
+    "ruff>=0.11.6,<0.12",
+    "basedpyright>=1.29.2",
+]
+
+
+[tool.poe.tasks.install-dev]
+cmd = "uv sync --locked --group dev"
+
+[tool.poe.tasks.build]
+cmd = "uv build --wheel --sdist"
+
+[tool.poe.tasks.publish]
+cmd = "uv publish"
+
+[tool.poe.tasks.typecheck]
+cmd = "basedpyright"
+
+[tool.poe.tasks.typecheck-errors]
+cmd = "basedpyright --level error"
+
+[tool.poe.tasks.format]
+cmd = "ruff format"
+
+[tool.poe.tasks.lint]
+cmd = "ruff check"
+
+[tool.poe.tasks."lint:fix"]
+cmd = "ruff check --fix --select I,B,F401"
+
+[tool.poe.tasks.test]
+cmd = "uv run pytest"
+
+[tool.pytest.ini_options]
+addopts = "-ra"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 160
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
