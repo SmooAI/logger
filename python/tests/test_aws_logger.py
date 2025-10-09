@@ -232,7 +232,7 @@ class TestAwsLambdaLogger:
         logger.add_request_context(request)
 
         # Set correlation ID using the proper method
-        logger.correlationId = "test-correlation-123"
+        logger.correlation_id = "test-correlation-123"
 
         result = logger.write_partial_sqs_attributes()
 
@@ -248,7 +248,7 @@ class TestAwsLambdaLogger:
         logger = AwsServerLogger()
 
         # Set correlation ID only using the proper method
-        logger.correlationId = "test-correlation-456"
+        logger.correlation_id = "test-correlation-456"
 
         result = logger.write_partial_sqs_attributes()
 
