@@ -46,3 +46,12 @@ package-lock.json
 .smooai-logs
 
 .envrc
+# Python build artifacts
+python/.venv/
+python/dist/
+python/.pytest_cache/
+python/**/__pycache__/
+
+# Rust build artifacts
+log-viewer/target/
+rust/logger/target/

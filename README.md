@@ -80,6 +80,33 @@ Ever spent hours debugging an AWS service in production, only to realize you're 
 pnpm add @smooai/logger
 ```
 
+### Python Package
+
+The Python port mirrors the TypeScript API for backend services. Install it from PyPI:
+
+```sh
+pip install smooai-logger
+```
+
+or with [uv](https://docs.astral.sh/uv/):
+
+```sh
+uv add smooai-logger
+```
+
+See `python/README.md` for usage examples aligned with the TypeScript docs below.
+
+### Rust Crate
+
+Need the same structured logging features in Rust? A parity crate now lives in `rust/logger/`:
+
+```toml
+[dependencies]
+smooai-logger = { git = "https://github.com/SmooAI/logger", package = "smooai-logger" }
+```
+
+Usage examples and API notes are documented in `rust/logger/README.md`.
+
 ## The Power of Automatic Context
 
 ### See Where Your Logs Come From

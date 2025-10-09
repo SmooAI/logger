@@ -673,9 +673,6 @@ export default class Logger {
         if (arg instanceof Error) {
             object[ContextKey.Error] = object[ContextKey.Error] ? `${object[ContextKey.Error]}; ${arg.message}` : arg.message;
             object[ContextKey.ErrorDetails] = [...(object[ContextKey.ErrorDetails] ?? []), serializeError(arg)];
-            this.addTelemetryFields({
-                error: arg.message,
-            });
         }
     }
 

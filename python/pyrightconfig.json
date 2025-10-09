@@ -1,0 +1,15 @@
+{
+    "include": ["src/**/*.py"],
+    "extraPaths": ["./src/**"],
+    "stubPath": "./typings",
+    "pythonVersion": "3.13",
+    "failOnWarnings": false,
+    "reportUnusedCallResult": false,
+    "reportExplicitAny": false,
+    "reportAny": false,
+    "reportUnknownMemberType": false,
+    "reportUntypedFunctionDecorator": false,
+    "reportUnnecessaryIsInstance": false,
+    "reportMissingTypeStubs": false,
+    "reportUnnecessaryTypeIgnoreComment": false
+}
