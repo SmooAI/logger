@@ -39,6 +39,12 @@ jobs:
       - name: Setup Rust toolchain
         uses: dtolnay/rust-toolchain@stable
 
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: rust/logger -> rust/logger/target
+          cache-on-failure: true
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
