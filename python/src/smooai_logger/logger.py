@@ -427,15 +427,6 @@ class Logger:
             context["correlationId"] = str(v)
         _set_global_context(context)
 
-    @property
-    def correlationId(self) -> str | None:
-        """CamelCase alias to match the TypeScript Logger API."""
-        return self.correlation_id
-
-    @correlationId.setter
-    def correlationId(self, v: str | None) -> None:
-        self.correlation_id = v
-
     def _parse_level(self, lvl: str | None) -> Level:
         if not lvl:
             return Level.INFO

@@ -64,7 +64,7 @@ cmd = "ruff format"
 cmd = "ruff check"
 
 [tool.poe.tasks."lint:fix"]
-cmd = "ruff check --fix --select I,B,F401"
+cmd = "ruff check --fix"
 
 [tool.poe.tasks.test]
 cmd = "uv run pytest"
