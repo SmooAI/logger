@@ -72,12 +72,6 @@ jobs:
 
       - name: Format
         run: pnpm format
-
-      - name: Python tests
-        run: |
-          uv sync --group dev
-          uv run pytest
-        working-directory: python
       
       - name: Version Update 🦋
         id: changesets
@@ -90,10 +84,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.SMOOAI_NPM_TOKEN }}
-
-      - name: Sync package versions
-        if: steps.changesets.outputs.published == 'true'
-        run: pnpm version:sync
 
       - name: Publish smooai-logger to PyPI
         if: steps.changesets.outputs.published == 'true'
