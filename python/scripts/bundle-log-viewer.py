@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Bundle the log-viewer binary for Python distribution."""
 
-import os
 import platform
 import shutil
 import subprocess

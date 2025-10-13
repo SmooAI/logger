@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """Python wrapper for the smooai-log-viewer binary."""
 
-import os
 import platform
 import subprocess
 import sys
