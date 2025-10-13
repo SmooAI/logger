@@ -103,6 +103,11 @@ enum IndexEvent {
     Finished(Result<Catalog>),
 }
 
+enum WatchEvent {
+    FileChanged(PathBuf),
+    FileRemoved(PathBuf),
+}
+
 #[derive(Debug, Clone)]
 struct FileEntry {
     path: PathBuf,
@@ -256,10 +261,12 @@ struct App {
     index_rx: Option<mpsc::Receiver<IndexEvent>>,
     indexing: bool,
     show_startup_modal: bool,
-    watch_rx: Option<mpsc::Receiver<()>>,
+    watch_rx: Option<mpsc::Receiver<WatchEvent>>,
     watch_handle: Option<thread::JoinHandle<()>>,
     watch_stop: Option<Arc<AtomicBool>>,
     pending_reindex: bool,
+    live_mode: bool,
+    pending_watch_events: Vec<WatchEvent>,
     visible_columns: Vec<String>,
     column_search: String,
     expanded_rows: HashSet<usize>,
@@ -299,6 +306,8 @@ impl Default for App {
             watch_handle: None,
             watch_stop: None,
             pending_reindex: false,
+            live_mode: true,
+            pending_watch_events: Vec::new(),
             visible_columns: vec!["traceId".into(), "requestId".into()],
             column_search: String::new(),
             expanded_rows: HashSet::new(),
@@ -312,6 +321,7 @@ impl App {
     fn start_index(&mut self, path: PathBuf, ctx: &egui::Context) {
         self.status = format!("Indexing {}…", path.display());
         self.index_progress = None;
+        self.pending_watch_events.clear();
         let (tx, rx) = mpsc::channel();
         self.index_rx = Some(rx);
         self.indexing = true;
@@ -592,6 +602,163 @@ impl App {
     fn remove_visible_column(&mut self, column: &str) {
         self.visible_columns
             .retain(|existing| !existing.eq_ignore_ascii_case(column));
+    }
+
+    fn process_live_events(&mut self, ctx: &egui::Context) {
+        if !self.live_mode || self.indexing || self.pending_watch_events.is_empty() {
+            return;
+        }
+
+        let mut changed = BTreeSet::new();
+        let mut removed = BTreeSet::new();
+
+        for event in self.pending_watch_events.drain(..) {
+            match event {
+                WatchEvent::FileChanged(path) => {
+                    if !removed.contains(&path) {
+                        changed.insert(path);
+                    }
+                }
+                WatchEvent::FileRemoved(path) => {
+                    changed.remove(&path);
+                    removed.insert(path);
+                }
+            }
+        }
+
+        if changed.is_empty() && removed.is_empty() {
+            return;
+        }
+
+        let extractor = Extractor::new();
+        let mut updated_files = 0usize;
+        let mut removed_files = 0usize;
+        let mut errors = Vec::new();
+
+        for path in removed {
+            if self.remove_file_by_path(&path) {
+                removed_files += 1;
+            }
+        }
+
+        for path in changed {
+            match self.refresh_file_from_disk(&path, &extractor) {
+                Ok(true) => {
+                    updated_files += 1;
+                }
+                Ok(false) => {}
+                Err(error) => {
+                    errors.push((path, error));
+                }
+            }
+        }
+
+        if updated_files > 0 || removed_files > 0 {
+            self.sync_after_catalog_changes();
+            let mut parts = Vec::new();
+            if updated_files > 0 {
+                parts.push(format!(
+                    "updated {} file{}",
+                    updated_files,
+                    if updated_files == 1 { "" } else { "s" }
+                ));
+            }
+            if removed_files > 0 {
+                parts.push(format!(
+                    "removed {} file{}",
+                    removed_files,
+                    if removed_files == 1 { "" } else { "s" }
+                ));
+            }
+            self.status = format!("Live update: {}", parts.join(", "));
+            ctx.request_repaint();
+        }
+
+        if let Some((path, error)) = errors.first() {
+            self.status = format!("Live update error for {}: {:#}", path.display(), error);
+        }
+    }
+
+    fn refresh_file_from_disk(&mut self, path: &Path, extractor: &Extractor) -> Result<bool> {
+        let existing_index = self
+            .catalog
+            .files
+            .iter()
+            .position(|file| file.path == *path);
+        let file_id = existing_index.unwrap_or(self.catalog.files.len());
+
+        let (sanitized_lines, mut rows) = index_single_file(file_id, path, extractor)?;
+        for row in &mut rows {
+            row.file_id = file_id;
+        }
+
+        if let Some(idx) = existing_index {
+            if self.catalog.files[idx].sanitized_lines == sanitized_lines {
+                return Ok(false);
+            }
+        }
+
+        self.catalog.rows.retain(|row| row.file_id != file_id);
+
+        if let Some(idx) = existing_index {
+            self.catalog.files[idx].sanitized_lines = sanitized_lines;
+        } else {
+            self.catalog.files.push(FileEntry {
+                path: path.to_path_buf(),
+                sanitized_lines,
+            });
+        }
+
+        self.catalog.rows.extend(rows);
+        Ok(true)
+    }
+
+    fn remove_file_by_path(&mut self, path: &Path) -> bool {
+        if let Some(index) = self
+            .catalog
+            .files
+            .iter()
+            .position(|file| file.path == *path)
+        {
+            self.catalog.files.remove(index);
+            self.catalog.rows.retain(|row| row.file_id != index);
+            for row in &mut self.catalog.rows {
+                if row.file_id > index {
+                    row.file_id -= 1;
+                }
+            }
+            true
+        } else {
+            false
+        }
+    }
+
+    fn sync_after_catalog_changes(&mut self) {
+        self.catalog.rows.sort_by(|left, right| {
+            left.ts
+                .cmp(&right.ts)
+                .then_with(|| left.file_id.cmp(&right.file_id))
+                .then_with(|| left.line_start.cmp(&right.line_start))
+        });
+        if self.sort_desc {
+            self.catalog.rows.reverse();
+        }
+
+        let mut column_set = BTreeSet::new();
+        for row in &self.catalog.rows {
+            for key in row.flat.keys() {
+                column_set.insert(key.clone());
+            }
+        }
+        self.catalog.columns = column_set.into_iter().collect();
+        self.prune_visible_columns();
+        self.filtered.clear();
+        self.apply_filters();
+        self.selected = None;
+        self.page = 0;
+        if let Some(old_db) = self.catalog.duckdb_path.take() {
+            let _ = std::fs::remove_file(old_db);
+        }
     }
 
     fn open_file_with_dialog(&mut self, row: &Row) {
@@ -1128,12 +1295,12 @@ impl App {
         let thread_flag = stop_flag.clone();
 
         let handle = thread::spawn(move || {
-            let mut known: HashMap<PathBuf, SystemTime> = HashMap::new();
+            let mut known: HashMap<PathBuf, (SystemTime, u64)> = HashMap::new();
             for dir in find_smooai_log_dirs(&path) {
                 for file in list_log_files(&dir) {
                     if let Ok(metadata) = std::fs::metadata(&file) {
                         if let Ok(modified) = metadata.modified() {
-                            known.insert(file.clone(), modified);
+                            known.insert(file.clone(), (modified, metadata.len()));
                         }
                     }
                 }
@@ -1146,11 +1313,13 @@ impl App {
                         seen.insert(file.clone());
                         if let Ok(metadata) = std::fs::metadata(&file) {
                             if let Ok(modified) = metadata.modified() {
+                                let len = metadata.len();
                                 match known.get(&file) {
-                                    Some(prev) if *prev >= modified => {}
+                                    Some((prev_mod, prev_len))
+                                        if *prev_mod >= modified && *prev_len == len => {}
                                     _ => {
-                                        known.insert(file.clone(), modified);
-                                        let _ = tx.send(());
+                                        known.insert(file.clone(), (modified, len));
+                                        let _ = tx.send(WatchEvent::FileChanged(file.clone()));
                                     }
                                 }
                             }
@@ -1164,7 +1333,7 @@ impl App {
                     .collect();
                 for path in removed {
                     known.remove(&path);
-                    let _ = tx.send(());
+                    let _ = tx.send(WatchEvent::FileRemoved(path));
                 }
                 thread::sleep(Duration::from_secs(2));
             }
@@ -1173,16 +1342,22 @@ impl App {
         self.watch_stop = Some(stop_flag);
         self.watch_handle = Some(handle);
     }
-}
 
-impl Drop for App {
-    fn drop(&mut self) {
+    fn stop_watch(&mut self) {
         if let Some(stop) = self.watch_stop.take() {
             stop.store(false, Ordering::SeqCst);
         }
         if let Some(handle) = self.watch_handle.take() {
             let _ = handle.join();
         }
+        self.watch_rx = None;
+        self.pending_watch_events.clear();
+    }
+}
+
+impl Drop for App {
+    fn drop(&mut self) {
+        self.stop_watch();
         if let Some(path) = self.catalog.duckdb_path.take() {
             let _ = std::fs::remove_file(path);
         }
@@ -1195,8 +1370,13 @@ impl eframe::App for App {
         self.ensure_logo_texture(ctx);
 
         if let Some(rx) = &self.watch_rx {
-            while rx.try_recv().is_ok() {
-                self.pending_reindex = true;
+            while let Ok(event) = rx.try_recv() {
+                if self.live_mode {
+                    self.pending_watch_events.push(event);
+                } else {
+                    self.status =
+                        "Log changes detected while live mode is off. Reindex to refresh.".into();
+                }
             }
         }
 
@@ -1256,6 +1436,10 @@ impl eframe::App for App {
             self.start_index(root, ctx);
         }
 
+        if !self.indexing {
+            self.process_live_events(ctx);
+        }
+
         if self.show_startup_modal {
             egui::Window::new("Choose log directory")
                 .anchor(egui::Align2::CENTER_CENTER, [0.0, 0.0])
@@ -1276,7 +1460,11 @@ impl eframe::App for App {
                     if ui.button("Start watching").clicked() {
                         self.root = self.pending_root.clone();
                         self.show_startup_modal = false;
-                        self.watch_root(self.root.clone());
+                        if self.live_mode {
+                            self.watch_root(self.root.clone());
+                        } else {
+                            self.stop_watch();
+                        }
                         self.start_index(self.root.clone(), ctx);
                     }
                 });
@@ -1300,12 +1488,29 @@ impl eframe::App for App {
                     if let Some(dir) = FileDialog::new().set_directory(&self.root).pick_folder() {
                         self.pending_root = dir.clone();
                         self.root = dir.clone();
-                        self.watch_root(dir.clone());
+                        if self.live_mode {
+                            self.watch_root(dir.clone());
+                        } else {
+                            self.stop_watch();
+                        }
                         self.start_index(dir, ctx);
                     }
                 }
                 if ui.button("Reindex").clicked() {
                     self.start_index(self.root.clone(), ctx);
+                }
+                let was_live_mode = self.live_mode;
+                if ui.checkbox(&mut self.live_mode, "Live mode").changed() {
+                    if self.live_mode {
+                        self.watch_root(self.root.clone());
+                        self.status = "Live mode enabled. Watching for log deltas.".into();
+                    } else {
+                        self.stop_watch();
+                        self.status = "Live mode disabled.".into();
+                    }
+                }
+                if was_live_mode != self.live_mode {
+                    ui.ctx().request_repaint();
                 }
                 ui.separator();
                 ui.label(
@@ -1657,6 +1862,18 @@ fn open_file_with_app(_path: &Path, _app: &Path) -> Result<()> {
     Err(anyhow!(
         "opening files with specific app is not supported on this platform"
     ))
+}
+
+fn index_single_file(
+    file_id: usize,
+    path: &Path,
+    extractor: &Extractor,
+) -> Result<(Vec<String>, Vec<Row>)> {
+    let mmap = mmap_file(path)?;
+    let lines = scan_lines(&mmap);
+    let sanitized_lines = sanitize_lines(&mmap, &lines);
+    let (rows, _columns) = parse_rows(file_id, path, &lines, &sanitized_lines, extractor);
+    Ok((sanitized_lines, rows))
 }
 
 fn index_monorepo(root: &Path, progress_tx: Option<mpsc::Sender<IndexEvent>>) -> Result<Catalog> {

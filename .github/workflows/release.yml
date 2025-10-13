@@ -11,7 +11,7 @@ env:
 
 jobs:
   version:
-    timeout-minutes: 15
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -42,7 +42,9 @@ jobs:
       - name: Cache Rust build artifacts
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: rust/logger -> rust/logger/target
+          workspaces: |
+            rust/logger -> rust/logger/target
+            log-viewer -> log-viewer/target
           cache-on-failure: true
 
       - name: Set up Python
