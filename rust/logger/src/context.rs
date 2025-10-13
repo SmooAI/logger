@@ -122,9 +122,10 @@ pub struct TelemetryFields {
 }
 
 /// Context configuration tree used to filter log payloads.
-#[derive(Debug, Clone, PartialEq, Eq)]
+#[derive(Debug, Clone, PartialEq, Eq, Default)]
 pub enum ContextConfig {
     /// Include everything in the target branch.
+    #[default]
     AllowAll,
     /// Remove the target branch entirely.
     Deny,
@@ -132,12 +133,6 @@ pub enum ContextConfig {
     OnlyKeys(Vec<String>),
     /// Apply nested configuration rules to object children.
     Nested(HashMap<String, ContextConfig>),
-}
-
-impl Default for ContextConfig {
-    fn default() -> Self {
-        ContextConfig::AllowAll
-    }
 }
 
 pub static CONFIG_MINIMAL: Lazy<ContextConfig> = Lazy::new(|| {
@@ -377,7 +372,7 @@ mod tests {
             "namespace": "test"
         });
 
-        let filtered = apply_context_config(&value, &*CONFIG_MINIMAL);
+        let filtered = apply_context_config(&value, &CONFIG_MINIMAL);
         let http = filtered.get("http").unwrap().as_object().unwrap();
         let request = http.get("request").unwrap().as_object().unwrap();
         assert_eq!(request.get("method").unwrap(), "GET");

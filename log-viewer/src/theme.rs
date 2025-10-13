@@ -175,7 +175,7 @@ pub fn grid_stroke(dark: bool) -> Stroke {
 }
 
 pub fn level_color(level: &str) -> Color32 {
-    match Level::from_str(level) {
+    match Level::parse_level(level) {
         Some(Level::Error) | Some(Level::Fatal) => smoo::RED,
         Some(Level::Warn) => smoo::ORANGE,
         Some(Level::Info) => smoo::BLUE_400,

@@ -311,8 +311,10 @@ mod tests {
     #[test]
     fn rotating_writer_creates_file() {
         let dir = tempdir().unwrap();
-        let mut options = RotationOptions::default();
-        options.path = dir.path().into();
+        let options = RotationOptions {
+            path: dir.path().into(),
+            ..Default::default()
+        };
         let writer = RotatingFileWriter::new(options).unwrap();
         writer.write("test line\n").unwrap();
     }
