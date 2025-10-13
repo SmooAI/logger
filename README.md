@@ -37,7 +37,7 @@ Learn more on [smoo.ai](https://smoo.ai)
 
 ## SmooAI Packages
 
-Check out other SmooAI packages at [npmjs.com/org/smooai](https://www.npmjs.com/org/smooai)
+Check out other SmooAI packages at [smoo.ai/open-source](https://smoo.ai/open-source)
 
 ## About @smooai/logger
 

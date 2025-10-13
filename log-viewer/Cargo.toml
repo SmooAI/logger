@@ -2,8 +2,14 @@
 name = "smooai-log-viewer"
 version = "3.1.2"
 edition = "2021"
-description = "SmooAI Contextual Log Viewer"
+description = "A desktop application for viewing and analyzing SmooAI contextual logs with rich filtering and visualization capabilities"
 license = "MIT"
+repository = "https://github.com/SmooAI/logger"
+homepage = "https://github.com/SmooAI/logger"
+keywords = ["logging", "log-viewer", "smooai", "observability", "gui"]
+categories = ["development-tools::debugging", "gui", "visualization"]
+readme = "ABOUT.md"
+authors = ["SmooAI <brent@smoo.ai>"]
 
 [dependencies]
 smooai-logger = { path = "../rust/logger" }
