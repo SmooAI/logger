@@ -11,6 +11,7 @@ env:
 
 jobs:
   version:
+    timeout-minutes: 30
     runs-on: ubuntu-latest
     permissions:
       contents: write
