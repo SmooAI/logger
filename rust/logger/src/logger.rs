@@ -52,7 +52,7 @@ impl Level {
         }
     }
 
-    pub fn from_str(level: &str) -> Option<Self> {
+    pub fn parse_level(level: &str) -> Option<Self> {
         match level.to_ascii_lowercase().as_str() {
             "trace" => Some(Level::Trace),
             "debug" => Some(Level::Debug),
@@ -116,14 +116,14 @@ impl Logger {
             .or_else(|| {
                 std::env::var("LOG_LEVEL")
                     .ok()
-                    .and_then(|lvl| Level::from_str(&lvl))
+                    .and_then(|lvl| Level::parse_level(&lvl))
             })
             .unwrap_or(Level::Info);
         let pretty_print = options
             .pretty_print
             .unwrap_or_else(|| is_local() || is_build());
 
-        let rotation = options.rotation.unwrap_or_else(RotationOptions::default);
+        let rotation = options.rotation.unwrap_or_default();
 
         let mut config_settings = options
             .config_settings
