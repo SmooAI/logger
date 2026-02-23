@@ -65,6 +65,16 @@ const updates = [
       return content.replace(pattern, `$1${version}$3`);
     },
   },
+  {
+    path: "go/version.go",
+    apply(content) {
+      const pattern = /(const Version = ")([^"]+)(")/;
+      if (!pattern.test(content)) {
+        throw new Error("Version line not found in go/version.go");
+      }
+      return content.replace(pattern, `$1${version}$3`);
+    },
+  },
 ];
 
 let touched = 0;
