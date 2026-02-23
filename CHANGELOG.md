@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 3.2.3
+
+### Patch Changes
+
+- 3758f86: Update README Built With section to include Python, Rust, Go implementations and the Log Viewer desktop application.
+
 ## 3.2.2
 
 ### Patch Changes
