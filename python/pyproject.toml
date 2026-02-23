@@ -1,6 +1,6 @@
 [project]
 name = "smooai-logger"
-version = "3.1.2"
+version = "3.2.3"
 description = "Context-aware structured logging utilities for Python that mirror the @smooai/logger toolkit."
 readme = "README.md"
 authors = [{ name = "SmooAI", email = "brent@smooai.com" }]
@@ -45,10 +45,17 @@ cmd = "uv sync --locked --group dev"
 cmd = "python scripts/bundle-log-viewer.py"
 
 [tool.poe.tasks.build]
-cmd = "python scripts/bundle-log-viewer.py && uv build --wheel --sdist"
+sequence = [
+  { cmd = "python scripts/bundle-log-viewer.py" },
+  { cmd = "uv build --wheel --sdist" },
+]
 
 [tool.poe.tasks.publish]
-cmd = "uv publish"
+sequence = [
+  { cmd = "python scripts/bundle-log-viewer.py" },
+  { cmd = "uv build --wheel --sdist" },
+  { cmd = "uv publish" },
+]
 
 [tool.poe.tasks.typecheck]
 cmd = "basedpyright"
