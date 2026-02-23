@@ -1,4 +1,4 @@
-module github.com/smooai/logger
+module github.com/SmooAI/logger/go/v3
 
 go 1.22
 
