@@ -99,11 +99,7 @@ pub fn dark_theme() -> SmooTheme {
 pub fn apply_visuals(ctx: &egui::Context, dark: bool) {
     let theme = if dark { dark_theme() } else { light_theme() };
 
-    let mut visuals = if dark {
-        Visuals::dark()
-    } else {
-        Visuals::light()
-    };
+    let mut visuals = if dark { Visuals::dark() } else { Visuals::light() };
     visuals.extreme_bg_color = theme.background;
     visuals.faint_bg_color = stripe_background(dark);
     visuals.panel_fill = theme.background;
@@ -144,11 +140,7 @@ pub fn apply_visuals(ctx: &egui::Context, dark: bool) {
 
 pub fn stripe_background(dark: bool) -> Color32 {
     let theme = if dark { dark_theme() } else { light_theme() };
-    lerp(
-        theme.background,
-        theme.muted,
-        if dark { 0.14 } else { 0.08 },
-    )
+    lerp(theme.background, theme.muted, if dark { 0.14 } else { 0.08 })
 }
 
 pub fn selection_background(dark: bool) -> Color32 {
@@ -158,11 +150,7 @@ pub fn selection_background(dark: bool) -> Color32 {
 
 pub fn header_background(dark: bool) -> Color32 {
     let theme = if dark { dark_theme() } else { light_theme() };
-    lerp(
-        theme.background,
-        theme.muted,
-        if dark { 0.12 } else { 0.10 },
-    )
+    lerp(theme.background, theme.muted, if dark { 0.12 } else { 0.10 })
 }
 
 pub fn grid_stroke(dark: bool) -> Stroke {

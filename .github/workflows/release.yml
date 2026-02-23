@@ -54,6 +54,12 @@ jobs:
 
       - name: Set up uv
         uses: astral-sh/setup-uv@v3
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: go/go.sum
       
       - name: Install dependencies
         run: pnpm install

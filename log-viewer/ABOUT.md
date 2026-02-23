@@ -134,9 +134,9 @@ Below the table, `render_context_panel` shows the source file, surrounding lines
 
 ---
 
-## 7. File watching & reindex scheduling
+## 7. File watching & live mode
 
-`watch_root` spawns a thread that scans `.smooai-logs` directories and tracks file modification times. When it sees a change, it sends an empty `()` down `watch_rx`. The main thread sets `pending_reindex`, and the next frame calls `start_index(...)`, ensuring the reindex runs off the UI thread. (Currently the reindex is a full rebuild; incremental support would require richer per-file metadata and append-only DuckDB updates.)
+`watch_root` spawns a thread that scans `.smooai-logs` directories, tracking file modification times and sizes. When it detects a change it sends a `WatchEvent::FileChanged(path)` or `WatchEvent::FileRemoved(path)` over `watch_rx`. In **live mode** (the default) the main thread collects these events and `process_live_events` incrementally re-parses only the changed files—avoiding a full reindex. When live mode is disabled, changes are noted in the status bar but not applied until the user clicks **Reindex**. A full reindex can still be triggered manually at any time.
 
 ---
 

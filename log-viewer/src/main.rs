@@ -12,10 +12,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 use anyhow::{anyhow, Context, Result};
 use chrono::{DateTime, Utc};
 use duckdb::{params, Connection};
-use eframe::egui::{
-    self, Color32, ColorImage, IconData, Image, Key, RichText, Sense, TextEdit, TextWrapMode,
-    TextureHandle, TextureOptions, Vec2,
-};
+use eframe::egui::{self, Color32, ColorImage, IconData, Image, Key, RichText, Sense, TextEdit, TextWrapMode, TextureHandle, TextureOptions, Vec2};
 use egui_extras::{Column, TableBuilder};
 use memmap2::Mmap;
 use rayon::prelude::*;
@@ -24,7 +21,6 @@ use rfd::FileDialog;
 use serde_json::{json, Value};
 use walkdir::WalkDir;
 
-#[allow(dead_code)]
 mod keys {
     pub const LEVEL: &str = "level";
     pub const LOG_LEVEL: &str = "LogLevel";
@@ -67,9 +63,7 @@ const BASE_COLUMN_DEFAULT_WIDTHS: &[(&str, f32)] = &[
 ];
 
 fn is_base_column(name: &str) -> bool {
-    BASE_COLUMNS
-        .iter()
-        .any(|(key, _)| key.eq_ignore_ascii_case(name))
+    BASE_COLUMNS.iter().any(|(key, _)| key.eq_ignore_ascii_case(name))
 }
 
 fn default_column_widths() -> HashMap<String, f32> {
@@ -163,8 +157,7 @@ impl Extractor {
     }
 
     fn pick_level<'a>(&self, obj: &'a Value) -> Option<&'a str> {
-        self.pick_str(obj, keys::LEVEL)
-            .or_else(|| self.pick_str(obj, keys::LOG_LEVEL))
+        self.pick_str(obj, keys::LEVEL).or_else(|| self.pick_str(obj, keys::LOG_LEVEL))
     }
 
     fn pick_ts(&self, obj: &Value) -> Option<DateTime<Utc>> {
@@ -205,18 +198,14 @@ impl Extractor {
     ) {
         let ts = self.pick_ts(obj);
         let level = self.pick_level(obj).map(|s| s.to_string());
-        let corr = self
-            .pick_str(obj, keys::CORRELATION_ID)
-            .map(|s| s.to_string());
+        let corr = self.pick_str(obj, keys::CORRELATION_ID).map(|s| s.to_string());
         let name = self.pick_str(obj, keys::NAME).map(|s| s.to_string());
         let msg = self.pick_str(obj, keys::MESSAGE).map(|s| s.to_string());
         let service = self.pick_str(obj, keys::SERVICE).map(|s| s.to_string());
         let namespace = self.pick_str(obj, keys::NAMESPACE).map(|s| s.to_string());
         let trace_id = self.pick_str(obj, keys::TRACE_ID).map(|s| s.to_string());
         let request_id = self.pick_str(obj, keys::REQUEST_ID).map(|s| s.to_string());
-        (
-            ts, level, corr, name, msg, service, namespace, trace_id, request_id,
-        )
+        (ts, level, corr, name, msg, service, namespace, trace_id, request_id)
     }
 }
 
@@ -337,41 +326,13 @@ impl App {
     fn apply_filters(&mut self) {
         let filters = self.filters.clone();
 
-        let re_text = if filters.regex_mode {
-            self.compile(&filters.text)
-        } else {
-            None
-        };
-        let re_level = if filters.regex_mode {
-            self.compile(&filters.level)
-        } else {
-            None
-        };
-        let re_corr = if filters.regex_mode {
-            self.compile(&filters.corr)
-        } else {
-            None
-        };
-        let re_service = if filters.regex_mode {
-            self.compile(&filters.service)
-        } else {
-            None
-        };
-        let re_namespace = if filters.regex_mode {
-            self.compile(&filters.namespace)
-        } else {
-            None
-        };
-        let re_trace = if filters.regex_mode {
-            self.compile(&filters.trace)
-        } else {
-            None
-        };
-        let re_request = if filters.regex_mode {
-            self.compile(&filters.request)
-        } else {
-            None
-        };
+        let re_text = if filters.regex_mode { self.compile(&filters.text) } else { None };
+        let re_level = if filters.regex_mode { self.compile(&filters.level) } else { None };
+        let re_corr = if filters.regex_mode { self.compile(&filters.corr) } else { None };
+        let re_service = if filters.regex_mode { self.compile(&filters.service) } else { None };
+        let re_namespace = if filters.regex_mode { self.compile(&filters.namespace) } else { None };
+        let re_trace = if filters.regex_mode { self.compile(&filters.trace) } else { None };
+        let re_request = if filters.regex_mode { self.compile(&filters.request) } else { None };
 
         let lowercase = |input: &str| input.to_ascii_lowercase();
         let text = lowercase(&filters.text);
@@ -568,13 +529,7 @@ impl App {
             if is_base_column(column) {
                 continue;
             }
-            if let Some(canonical) = self
-                .catalog
-                .columns
-                .iter()
-                .find(|candidate| candidate.eq_ignore_ascii_case(column))
-                .cloned()
-            {
+            if let Some(canonical) = self.catalog.columns.iter().find(|candidate| candidate.eq_ignore_ascii_case(column)).cloned() {
                 let lower = canonical.to_ascii_lowercase();
                 if seen.insert(lower) {
                     normalized.push(canonical);
@@ -588,11 +543,7 @@ impl App {
         if is_base_column(column) {
             return false;
         }
-        if self
-            .visible_columns
-            .iter()
-            .any(|existing| existing.eq_ignore_ascii_case(column))
-        {
+        if self.visible_columns.iter().any(|existing| existing.eq_ignore_ascii_case(column)) {
             return false;
         }
         self.visible_columns.push(column.to_string());
@@ -600,8 +551,7 @@ impl App {
     }
 
     fn remove_visible_column(&mut self, column: &str) {
-        self.visible_columns
-            .retain(|existing| !existing.eq_ignore_ascii_case(column));
+        self.visible_columns.retain(|existing| !existing.eq_ignore_ascii_case(column));
     }
 
     fn process_live_events(&mut self, ctx: &egui::Context) {
@@ -657,18 +607,10 @@ impl App {
             self.sync_after_catalog_changes();
             let mut parts = Vec::new();
             if updated_files > 0 {
-                parts.push(format!(
-                    "updated {} file{}",
-                    updated_files,
-                    if updated_files == 1 { "" } else { "s" }
-                ));
+                parts.push(format!("updated {} file{}", updated_files, if updated_files == 1 { "" } else { "s" }));
             }
             if removed_files > 0 {
-                parts.push(format!(
-                    "removed {} file{}",
-                    removed_files,
-                    if removed_files == 1 { "" } else { "s" }
-                ));
+                parts.push(format!("removed {} file{}", removed_files, if removed_files == 1 { "" } else { "s" }));
             }
             self.status = format!("Live update: {}", parts.join(", "));
             ctx.request_repaint();
@@ -680,11 +622,7 @@ impl App {
     }
 
     fn refresh_file_from_disk(&mut self, path: &Path, extractor: &Extractor) -> Result<bool> {
-        let existing_index = self
-            .catalog
-            .files
-            .iter()
-            .position(|file| file.path == *path);
+        let existing_index = self.catalog.files.iter().position(|file| file.path == *path);
         let file_id = existing_index.unwrap_or(self.catalog.files.len());
 
         let (sanitized_lines, mut rows) = index_single_file(file_id, path, extractor)?;
@@ -714,12 +652,7 @@ impl App {
     }
 
     fn remove_file_by_path(&mut self, path: &Path) -> bool {
-        if let Some(index) = self
-            .catalog
-            .files
-            .iter()
-            .position(|file| file.path == *path)
-        {
+        if let Some(index) = self.catalog.files.iter().position(|file| file.path == *path) {
             self.catalog.files.remove(index);
             self.catalog.rows.retain(|row| row.file_id != index);
             for row in &mut self.catalog.rows {
@@ -761,16 +694,12 @@ impl App {
         }
     }
 
-    fn open_file_with_dialog(&mut self, row: &Row) {
-        let file = &self.catalog.files[row.file_id];
-        if let Some(app_path) = FileDialog::new()
-            .set_title("Choose application")
-            .pick_file()
-        {
+    fn open_file_with_dialog(&mut self, file_id: usize) {
+        let file = &self.catalog.files[file_id];
+        if let Some(app_path) = FileDialog::new().set_title("Choose application").pick_file() {
             match open_file_with_app(&file.path, &app_path) {
                 Ok(_) => {
-                    self.status =
-                        format!("Opened {} with {}", file.path.display(), app_path.display());
+                    self.status = format!("Opened {} with {}", file.path.display(), app_path.display());
                 }
                 Err(error) => {
                     self.status = format!("Failed to open with app: {error}");
@@ -791,12 +720,7 @@ impl App {
         }
     }
 
-    fn handle_header_response(
-        &mut self,
-        ctx: &egui::Context,
-        key: &str,
-        response: &egui::Response,
-    ) {
+    fn handle_header_response(&mut self, ctx: &egui::Context, key: &str, response: &egui::Response) {
         let width = response.rect.width().max(60.0);
         self.update_column_width_entry(key, width);
         if response.double_clicked() {
@@ -813,20 +737,14 @@ impl App {
         let sample = rows.len().min(1500);
         ctx.fonts(|fonts| {
             let font_id = ctx.style().text_styles[&egui::TextStyle::Body].clone();
-            max_width = fonts
-                .layout_no_wrap(header_text.clone(), font_id.clone(), Color32::WHITE)
-                .rect
-                .width();
+            max_width = fonts.layout_no_wrap(header_text.clone(), font_id.clone(), Color32::WHITE).rect.width();
 
             for row in rows.iter().take(sample) {
                 let value = resolve_row_value(row, key);
                 if value.is_empty() {
                     continue;
                 }
-                let width = fonts
-                    .layout_no_wrap(value, font_id.clone(), Color32::WHITE)
-                    .rect
-                    .width();
+                let width = fonts.layout_no_wrap(value, font_id.clone(), Color32::WHITE).rect.width();
                 if width > max_width {
                     max_width = width;
                 }
@@ -839,255 +757,218 @@ impl App {
     fn render_log_table(&mut self, ui: &mut egui::Ui, ctx: &egui::Context) {
         let extra_columns = self.dynamic_columns();
 
-        egui::ScrollArea::both()
-            .auto_shrink([false, false])
-            .show(ui, |ui| {
-                ui.set_width(ui.available_width());
-                let available = ui.available_height();
+        egui::ScrollArea::both().auto_shrink([false, false]).show(ui, |ui| {
+            ui.set_width(ui.available_width());
+            let available = ui.available_height();
 
-                let mut table = TableBuilder::new(ui)
-                    .striped(true)
-                    .min_scrolled_height(available.max(200.0));
-                table = table.column(Column::initial(28.0).resizable(false).clip(true));
-                table = table.sense(egui::Sense::click());
+            let mut table = TableBuilder::new(ui).striped(true).min_scrolled_height(available.max(200.0));
+            table = table.column(Column::initial(28.0).resizable(false).clip(true));
+            table = table.sense(egui::Sense::click());
 
-                for (key, _) in BASE_COLUMNS.iter() {
-                    let width = self.column_width_for(key);
-                    let min_width = match *key {
-                        "msg" => 220.0,
-                        "name" => 160.0,
-                        _ => 110.0,
-                    };
-                    table = table.column(
-                        Column::initial(width)
-                            .resizable(true)
-                            .clip(true)
-                            .at_least(min_width),
-                    );
-                }
+            for (key, _) in BASE_COLUMNS.iter() {
+                let width = self.column_width_for(key);
+                let min_width = match *key {
+                    "msg" => 220.0,
+                    "name" => 160.0,
+                    _ => 110.0,
+                };
+                table = table.column(Column::initial(width).resizable(true).clip(true).at_least(min_width));
+            }
 
-                for column in &extra_columns {
-                    let width = self.column_width_for(column.as_str());
-                    table = table.column(
-                        Column::initial(width)
-                            .resizable(true)
-                            .clip(true)
-                            .at_least(140.0),
-                    );
-                }
+            for column in &extra_columns {
+                let width = self.column_width_for(column.as_str());
+                table = table.column(Column::initial(width).resizable(true).clip(true).at_least(140.0));
+            }
 
-                let header_bg = theme::header_background(self.dark_mode);
-                let grid_stroke = theme::grid_stroke(self.dark_mode);
+            let header_bg = theme::header_background(self.dark_mode);
+            let grid_stroke = theme::grid_stroke(self.dark_mode);
 
-                table
-                    .header(28.0, |mut header| {
+            table
+                .header(28.0, |mut header| {
+                    header.col(|ui| {
+                        let response = ui.label(RichText::new(" ").background_color(header_bg));
+                        ui.painter().rect_stroke(response.rect, 0.0, grid_stroke);
+                    });
+
+                    for (key, label) in BASE_COLUMNS.iter() {
                         header.col(|ui| {
-                            let response = ui.label(RichText::new(" ").background_color(header_bg));
+                            let response = ui.add(egui::Label::new(RichText::new(*label).strong().background_color(header_bg)).sense(Sense::click()));
                             ui.painter().rect_stroke(response.rect, 0.0, grid_stroke);
+                            self.handle_header_response(ctx, key, &response);
                         });
+                    }
 
-                        for (key, label) in BASE_COLUMNS.iter() {
-                            header.col(|ui| {
-                                let response = ui.add(
-                                    egui::Label::new(
-                                        RichText::new(*label).strong().background_color(header_bg),
-                                    )
-                                    .sense(Sense::click()),
-                                );
-                                ui.painter().rect_stroke(response.rect, 0.0, grid_stroke);
-                                self.handle_header_response(ctx, key, &response);
+                    for column in &extra_columns {
+                        header.col(|ui| {
+                            let response = ui.add(egui::Label::new(RichText::new(column).strong().background_color(header_bg)).sense(Sense::click()));
+                            ui.painter().rect_stroke(response.rect, 0.0, grid_stroke);
+                            self.handle_header_response(ctx, column.as_str(), &response);
+                        });
+                    }
+                })
+                .body(|mut body| {
+                    let start = self.page * self.page_size;
+                    let end = (start + self.page_size).min(self.filtered.len());
+                    let indices: Vec<usize> = self.filtered[start..end].to_vec();
+
+                    for (row_offset, row_idx) in indices.into_iter().enumerate() {
+                        let filtered_idx = start + row_offset;
+
+                        // Pre-extract all values from the row by reference to
+                        // avoid cloning the entire Row struct.
+                        let row = &self.catalog.rows[row_idx];
+                        let file_id = row.file_id;
+                        let ts_value = resolve_row_value(row, "time");
+                        let level_value = resolve_row_value(row, "level");
+                        let corr_value = resolve_row_value(row, "correlationId");
+                        let name_value = resolve_row_value(row, "name");
+                        let namespace_value = resolve_row_value(row, "namespace");
+                        let service_value = resolve_row_value(row, "service");
+                        let msg_value = resolve_row_value(row, "msg");
+                        let msg_display = shorten_for_display(&msg_value, 180);
+                        let error_value = resolve_row_value(row, "error");
+                        let error_display = shorten_for_display(&error_value, 160);
+                        let error_details_value = resolve_row_value(row, "errorDetails");
+                        let error_details_display = shorten_for_display(&error_details_value, 160);
+                        let extra_values: Vec<(String, String)> = extra_columns
+                            .iter()
+                            .map(|column| {
+                                let full = resolve_row_value(row, column);
+                                let short = shorten_for_display(&full, 160);
+                                (full, short)
+                            })
+                            .collect();
+
+                        let is_expanded = self.expanded_rows.contains(&row_idx);
+                        let (pretty_json, json_lines) = if is_expanded {
+                            let (formatted, lines) = format_json_for_display(&row.raw_json);
+                            (Some(formatted), lines)
+                        } else {
+                            (None, 0)
+                        };
+                        let extra_height = if is_expanded {
+                            ((json_lines as f32) * 18.0 + 12.0).clamp(54.0, 360.0)
+                        } else {
+                            0.0
+                        };
+                        let row_height = 22.0 + extra_height;
+
+                        let mut open_file_request = false;
+                        let mut open_with_request = false;
+
+                        body.row(row_height, |mut row_ui| {
+                            let mut row_clicked = false;
+
+                            row_ui.col(|ui| {
+                                let symbol = if is_expanded { "⌄" } else { "›" };
+                                let response = ui.add(egui::Label::new(RichText::new(symbol).color(Color32::from_gray(180))).sense(Sense::click()));
+                                if response.clicked() {
+                                    if is_expanded {
+                                        self.expanded_rows.remove(&row_idx);
+                                    } else {
+                                        self.expanded_rows.insert(row_idx);
+                                    }
+                                }
                             });
-                        }
 
-                        for column in &extra_columns {
-                            header.col(|ui| {
-                                let response = ui.add(
-                                    egui::Label::new(
-                                        RichText::new(column).strong().background_color(header_bg),
-                                    )
-                                    .sense(Sense::click()),
-                                );
-                                ui.painter().rect_stroke(response.rect, 0.0, grid_stroke);
-                                self.handle_header_response(ctx, column.as_str(), &response);
-                            });
-                        }
-                    })
-                    .body(|mut body| {
-                        let start = self.page * self.page_size;
-                        let end = (start + self.page_size).min(self.filtered.len());
-                        let indices: Vec<usize> = self.filtered[start..end].to_vec();
-
-                        for (row_offset, row_idx) in indices.into_iter().enumerate() {
-                            let filtered_idx = start + row_offset;
-                            let _is_selected = self.selected == Some(filtered_idx);
-                            let row = self.catalog.rows[row_idx].clone();
-
-                            let ts_value = resolve_row_value(&row, "time");
-                            let level_value = resolve_row_value(&row, "level");
-                            let corr_value = resolve_row_value(&row, "correlationId");
-                            let name_value = resolve_row_value(&row, "name");
-                            let namespace_value = resolve_row_value(&row, "namespace");
-                            let service_value = resolve_row_value(&row, "service");
-                            let msg_value = resolve_row_value(&row, "msg");
-                            let msg_display = shorten_for_display(&msg_value, 180);
-                            let error_value = resolve_row_value(&row, "error");
-                            let error_display = shorten_for_display(&error_value, 160);
-                            let error_details_value = resolve_row_value(&row, "errorDetails");
-                            let error_details_display =
-                                shorten_for_display(&error_details_value, 160);
-
-                            let is_expanded = self.expanded_rows.contains(&row_idx);
-                            let (pretty_json, json_lines) = if is_expanded {
-                                let (formatted, lines) = format_json_for_display(&row.raw_json);
-                                (Some(formatted), lines)
-                            } else {
-                                (None, 0)
+                            let mut process_response = |response: egui::Response, row_clicked: &mut bool| {
+                                if response.clicked() {
+                                    *row_clicked = true;
+                                }
+                                if response.secondary_clicked() {
+                                    open_file_request = true;
+                                }
+                                let _ = response.context_menu(|ui| {
+                                    if ui.button("Open file").clicked() {
+                                        open_file_request = true;
+                                        ui.close_menu();
+                                    }
+                                    if ui.button("Open with…").clicked() {
+                                        open_with_request = true;
+                                        ui.close_menu();
+                                    }
+                                });
                             };
-                            let extra_height = if is_expanded {
-                                ((json_lines as f32) * 18.0 + 12.0).clamp(54.0, 360.0)
-                            } else {
-                                0.0
-                            };
-                            let row_height = 22.0 + extra_height;
 
-                            let mut open_file_request = false;
-                            let mut open_with_request = false;
+                            for (key, _) in BASE_COLUMNS.iter() {
+                                let raw_value = match *key {
+                                    "time" => ts_value.clone(),
+                                    "level" => level_value.clone(),
+                                    "correlationId" => corr_value.clone(),
+                                    "name" => name_value.clone(),
+                                    "namespace" => namespace_value.clone(),
+                                    "service" => service_value.clone(),
+                                    "msg" => msg_value.clone(),
+                                    "error" => error_value.clone(),
+                                    "errorDetails" => error_details_value.clone(),
+                                    _ => String::new(),
+                                };
 
-                            body.row(row_height, |mut row_ui| {
-                                let mut row_clicked = false;
+                                let display_value = match *key {
+                                    "msg" => msg_display.clone(),
+                                    "error" => error_display.clone(),
+                                    "errorDetails" => error_details_display.clone(),
+                                    _ => raw_value.clone(),
+                                };
+
+                                let mut rich = RichText::new(display_value.clone());
+                                if *key == "level" && !raw_value.is_empty() {
+                                    rich = rich.color(theme::level_color(&raw_value));
+                                } else if matches!(*key, "error" | "errorDetails") && !raw_value.trim().is_empty() {
+                                    rich = rich.color(theme::smoo::RED);
+                                }
 
                                 row_ui.col(|ui| {
-                                    let symbol = if is_expanded { "⌄" } else { "›" };
-                                    let response = ui.add(
-                                        egui::Label::new(
-                                            RichText::new(symbol).color(Color32::from_gray(180)),
-                                        )
-                                        .sense(Sense::click()),
-                                    );
-                                    if response.clicked() {
-                                        if is_expanded {
-                                            self.expanded_rows.remove(&row_idx);
-                                        } else {
-                                            self.expanded_rows.insert(row_idx);
+                                    let response = ui.add(egui::Label::new(rich.clone()).truncate().sense(Sense::click()));
+                                    let response = response.on_hover_text(raw_value.clone());
+                                    process_response(response, &mut row_clicked);
+
+                                    if *key == "msg" && is_expanded {
+                                        if let Some(json) = pretty_json.as_ref() {
+                                            ui.add_space(6.0);
+                                            let max_height = ((json_lines as f32) * 18.0 + 12.0).clamp(54.0, 360.0);
+                                            egui::ScrollArea::vertical().max_height(max_height).show(ui, |ui| {
+                                                ui.scope(|ui| {
+                                                    ui.style_mut().wrap_mode = Some(TextWrapMode::Extend);
+                                                    ui.monospace(json);
+                                                });
+                                            });
                                         }
                                     }
                                 });
-
-                                let mut process_response =
-                                    |response: egui::Response, row_clicked: &mut bool| {
-                                        if response.clicked() {
-                                            *row_clicked = true;
-                                        }
-                                        if response.secondary_clicked() {
-                                            open_file_request = true;
-                                        }
-                                        let _ = response.context_menu(|ui| {
-                                            if ui.button("Open file").clicked() {
-                                                open_file_request = true;
-                                                ui.close_menu();
-                                            }
-                                            if ui.button("Open with…").clicked() {
-                                                open_with_request = true;
-                                                ui.close_menu();
-                                            }
-                                        });
-                                    };
-
-                                for (key, _) in BASE_COLUMNS.iter() {
-                                    let raw_value = match *key {
-                                        "time" => ts_value.clone(),
-                                        "level" => level_value.clone(),
-                                        "correlationId" => corr_value.clone(),
-                                        "name" => name_value.clone(),
-                                        "namespace" => namespace_value.clone(),
-                                        "service" => service_value.clone(),
-                                        "msg" => msg_value.clone(),
-                                        "error" => error_value.clone(),
-                                        "errorDetails" => error_details_value.clone(),
-                                        _ => resolve_row_value(&row, key),
-                                    };
-
-                                    let display_value = match *key {
-                                        "msg" => msg_display.clone(),
-                                        "error" => error_display.clone(),
-                                        "errorDetails" => error_details_display.clone(),
-                                        _ => raw_value.clone(),
-                                    };
-
-                                    let mut rich = RichText::new(display_value.clone());
-                                    if matches!(*key, "error" | "errorDetails")
-                                        && !raw_value.trim().is_empty()
-                                    {
-                                        rich = rich.color(theme::smoo::RED);
-                                    }
-
-                                    row_ui.col(|ui| {
-                                        let response = ui.add(
-                                            egui::Label::new(rich.clone())
-                                                .truncate()
-                                                .sense(Sense::click()),
-                                        );
-                                        let response = response.on_hover_text(raw_value.clone());
-                                        process_response(response, &mut row_clicked);
-
-                                        if *key == "msg" && is_expanded {
-                                            if let Some(json) = pretty_json.as_ref() {
-                                                ui.add_space(6.0);
-                                                let max_height = ((json_lines as f32) * 18.0
-                                                    + 12.0)
-                                                    .clamp(54.0, 360.0);
-                                                egui::ScrollArea::vertical()
-                                                    .max_height(max_height)
-                                                    .show(ui, |ui| {
-                                                        ui.scope(|ui| {
-                                                            ui.style_mut().wrap_mode =
-                                                                Some(TextWrapMode::Extend);
-                                                            ui.monospace(json);
-                                                        });
-                                                    });
-                                            }
-                                        }
-                                    });
-                                }
-
-                                for column in &extra_columns {
-                                    let full_value = resolve_row_value(&row, column);
-                                    let value = shorten_for_display(&full_value, 160);
-
-                                    row_ui.col(|ui| {
-                                        let response = ui.add(
-                                            egui::Label::new(RichText::new(value.clone()))
-                                                .truncate()
-                                                .sense(Sense::click()),
-                                        );
-                                        let response = response.on_hover_text(full_value.clone());
-                                        process_response(response, &mut row_clicked);
-                                    });
-                                }
-
-                                if row_clicked {
-                                    self.selected = Some(filtered_idx);
-                                }
-                            });
-
-                            if open_file_request {
-                                let file = &self.catalog.files[row.file_id];
-                                match open_file_with_default(&file.path) {
-                                    Ok(_) => {
-                                        self.status = format!("Opened {}", file.path.display());
-                                    }
-                                    Err(error) => {
-                                        self.status = format!("Failed to open file: {error}");
-                                    }
-                                }
                             }
 
-                            if open_with_request {
-                                self.open_file_with_dialog(&row);
+                            for (full_value, short_value) in &extra_values {
+                                row_ui.col(|ui| {
+                                    let response = ui.add(egui::Label::new(RichText::new(short_value.clone())).truncate().sense(Sense::click()));
+                                    let response = response.on_hover_text(full_value.clone());
+                                    process_response(response, &mut row_clicked);
+                                });
+                            }
+
+                            if row_clicked {
+                                self.selected = Some(filtered_idx);
+                            }
+                        });
+
+                        if open_file_request {
+                            let file = &self.catalog.files[file_id];
+                            match open_file_with_default(&file.path) {
+                                Ok(_) => {
+                                    self.status = format!("Opened {}", file.path.display());
+                                }
+                                Err(error) => {
+                                    self.status = format!("Failed to open file: {error}");
+                                }
                             }
                         }
-                    });
-            });
+
+                        if open_with_request {
+                            self.open_file_with_dialog(file_id);
+                        }
+                    }
+                });
+        });
     }
 
     fn render_context_panel(&mut self, ui: &mut egui::Ui) {
@@ -1107,11 +988,7 @@ impl App {
             egui::ScrollArea::vertical().show(ui, |ui| {
                 ui.monospace(format!("File: {}", file.path.display()));
                 for idx in start..end {
-                    let line = file
-                        .sanitized_lines
-                        .get(idx)
-                        .map(|s| s.as_str())
-                        .unwrap_or("<binary>");
+                    let line = file.sanitized_lines.get(idx).map(|s| s.as_str()).unwrap_or("<binary>");
                     if idx >= row.line_start && idx <= row.line_end {
                         ui.colored_label(highlight, line);
                     } else {
@@ -1156,12 +1033,7 @@ impl App {
             return Some(exact.clone());
         }
 
-        if let Some(case_insensitive) = self
-            .catalog
-            .columns
-            .iter()
-            .find(|column| column.eq_ignore_ascii_case(query))
-        {
+        if let Some(case_insensitive) = self.catalog.columns.iter().find(|column| column.eq_ignore_ascii_case(query)) {
             return Some(case_insensitive.clone());
         }
 
@@ -1187,9 +1059,7 @@ impl App {
             }
         }
 
-        prefix_match
-            .or(substring_match)
-            .or(best_distance.map(|(column, _)| column))
+        prefix_match.or(substring_match).or(best_distance.map(|(column, _)| column))
     }
 
     fn column_suggestions(&self) -> Vec<String> {
@@ -1203,11 +1073,7 @@ impl App {
             if is_base_column(column) {
                 continue;
             }
-            if self
-                .visible_columns
-                .iter()
-                .any(|visible| visible.eq_ignore_ascii_case(column))
-            {
+            if self.visible_columns.iter().any(|visible| visible.eq_ignore_ascii_case(column)) {
                 continue;
             }
             let lowered = column.to_ascii_lowercase();
@@ -1218,12 +1084,7 @@ impl App {
 
         if suggestions.is_empty() && !query.is_empty() {
             if let Some(resolved) = self.resolve_column_name(&self.column_search) {
-                if !is_base_column(&resolved)
-                    && !self
-                        .visible_columns
-                        .iter()
-                        .any(|visible| visible.eq_ignore_ascii_case(&resolved))
-                {
+                if !is_base_column(&resolved) && !self.visible_columns.iter().any(|visible| visible.eq_ignore_ascii_case(&resolved)) {
                     suggestions.push(resolved);
                 }
             }
@@ -1242,11 +1103,7 @@ impl App {
             if is_base_column(&resolved) {
                 return ColumnAddResult::BaseColumn(resolved);
             }
-            if self
-                .visible_columns
-                .iter()
-                .any(|visible| visible.eq_ignore_ascii_case(&resolved))
-            {
+            if self.visible_columns.iter().any(|visible| visible.eq_ignore_ascii_case(&resolved)) {
                 self.column_search.clear();
                 return ColumnAddResult::AlreadyVisible(resolved);
             }
@@ -1315,8 +1172,7 @@ impl App {
                             if let Ok(modified) = metadata.modified() {
                                 let len = metadata.len();
                                 match known.get(&file) {
-                                    Some((prev_mod, prev_len))
-                                        if *prev_mod >= modified && *prev_len == len => {}
+                                    Some((prev_mod, prev_len)) if *prev_mod >= modified && *prev_len == len => {}
                                     _ => {
                                         known.insert(file.clone(), (modified, len));
                                         let _ = tx.send(WatchEvent::FileChanged(file.clone()));
@@ -1326,11 +1182,7 @@ impl App {
                         }
                     }
                 }
-                let removed: Vec<PathBuf> = known
-                    .keys()
-                    .filter(|path| !seen.contains(*path))
-                    .cloned()
-                    .collect();
+                let removed: Vec<PathBuf> = known.keys().filter(|path| !seen.contains(*path)).cloned().collect();
                 for path in removed {
                     known.remove(&path);
                     let _ = tx.send(WatchEvent::FileRemoved(path));
@@ -1374,8 +1226,7 @@ impl eframe::App for App {
                 if self.live_mode {
                     self.pending_watch_events.push(event);
                 } else {
-                    self.status =
-                        "Log changes detected while live mode is off. Reindex to refresh.".into();
+                    self.status = "Log changes detected while live mode is off. Reindex to refresh.".into();
                 }
             }
         }
@@ -1418,11 +1269,7 @@ impl eframe::App for App {
                     self.selected = None;
                     self.page = 0;
                     self.apply_filters();
-                    self.status = format!(
-                        "Indexed {} files, {} rows",
-                        self.catalog.files.len(),
-                        self.catalog.rows.len()
-                    );
+                    self.status = format!("Indexed {} files, {} rows", self.catalog.files.len(), self.catalog.rows.len());
                 }
                 Err(error) => {
                     self.status = format!("Index error: {error:#}");
@@ -1450,10 +1297,7 @@ impl eframe::App for App {
                     let mut path_string = self.pending_root.display().to_string();
                     ui.add_enabled(false, TextEdit::singleline(&mut path_string));
                     if ui.button("Browse…").clicked() {
-                        if let Some(dir) = FileDialog::new()
-                            .set_directory(&self.pending_root)
-                            .pick_folder()
-                        {
+                        if let Some(dir) = FileDialog::new().set_directory(&self.pending_root).pick_folder() {
                             self.pending_root = dir;
                         }
                     }
@@ -1476,9 +1320,7 @@ impl eframe::App for App {
                     let target = 36.0_f32;
                     let scale = target / self.logo_size.x.max(1.0);
                     let display_size = self.logo_size * scale;
-                    let response = ui
-                        .add(Image::new(texture).fit_to_exact_size(display_size))
-                        .on_hover_text("Smoo AI");
+                    let response = ui.add(Image::new(texture).fit_to_exact_size(display_size)).on_hover_text("Smoo AI");
                     if response.clicked() {
                         open_url("https://smoo.ai");
                     }
@@ -1499,7 +1341,6 @@ impl eframe::App for App {
                 if ui.button("Reindex").clicked() {
                     self.start_index(self.root.clone(), ctx);
                 }
-                let was_live_mode = self.live_mode;
                 if ui.checkbox(&mut self.live_mode, "Live mode").changed() {
                     if self.live_mode {
                         self.watch_root(self.root.clone());
@@ -1508,14 +1349,10 @@ impl eframe::App for App {
                         self.stop_watch();
                         self.status = "Live mode disabled.".into();
                     }
-                }
-                if was_live_mode != self.live_mode {
-                    ui.ctx().request_repaint();
+                    ctx.request_repaint();
                 }
                 ui.separator();
-                ui.label(
-                    RichText::new(self.root.display().to_string()).color(Color32::from_gray(170)),
-                );
+                ui.label(RichText::new(self.root.display().to_string()).color(Color32::from_gray(170)));
                 ui.separator();
                 ui.checkbox(&mut self.sort_desc, "Newest first");
                 if ui.button("Apply sort").clicked() {
@@ -1536,126 +1373,109 @@ impl eframe::App for App {
             });
         });
 
-        egui::SidePanel::left("filters")
-            .resizable(true)
-            .default_width(330.0)
-            .show(ctx, |ui| {
-                ui.heading("Filters");
-                ui.add(
-                    TextEdit::singleline(&mut self.filters.text).hint_text("search across fields"),
-                );
-                ui.add(TextEdit::singleline(&mut self.filters.level).hint_text("level / LogLevel"));
-                ui.add(TextEdit::singleline(&mut self.filters.corr).hint_text("correlationId"));
-                ui.add(TextEdit::singleline(&mut self.filters.service).hint_text("service"));
-                ui.add(TextEdit::singleline(&mut self.filters.namespace).hint_text("namespace"));
-                ui.add(TextEdit::singleline(&mut self.filters.trace).hint_text("traceId"));
-                ui.add(TextEdit::singleline(&mut self.filters.request).hint_text("requestId"));
-                ui.checkbox(&mut self.filters.regex_mode, "Regex mode");
-                if ui.button("Apply filters").clicked() {
-                    self.apply_filters();
+        egui::SidePanel::left("filters").resizable(true).default_width(330.0).show(ctx, |ui| {
+            ui.heading("Filters");
+            let mut any_filter_lost_focus = false;
+            let r = ui.add(TextEdit::singleline(&mut self.filters.text).hint_text("search across fields"));
+            any_filter_lost_focus |= r.lost_focus();
+            let r = ui.add(TextEdit::singleline(&mut self.filters.level).hint_text("level / LogLevel"));
+            any_filter_lost_focus |= r.lost_focus();
+            let r = ui.add(TextEdit::singleline(&mut self.filters.corr).hint_text("correlationId"));
+            any_filter_lost_focus |= r.lost_focus();
+            let r = ui.add(TextEdit::singleline(&mut self.filters.service).hint_text("service"));
+            any_filter_lost_focus |= r.lost_focus();
+            let r = ui.add(TextEdit::singleline(&mut self.filters.namespace).hint_text("namespace"));
+            any_filter_lost_focus |= r.lost_focus();
+            let r = ui.add(TextEdit::singleline(&mut self.filters.trace).hint_text("traceId"));
+            any_filter_lost_focus |= r.lost_focus();
+            let r = ui.add(TextEdit::singleline(&mut self.filters.request).hint_text("requestId"));
+            any_filter_lost_focus |= r.lost_focus();
+            ui.checkbox(&mut self.filters.regex_mode, "Regex mode");
+            let enter_pressed = ui.input(|i| i.key_pressed(Key::Enter));
+            if ui.button("Apply filters").clicked() || (any_filter_lost_focus && enter_pressed) {
+                self.apply_filters();
+            }
+
+            ui.separator();
+            ui.heading("Pagination");
+            ui.add(egui::Slider::new(&mut self.page_size, 50..=3000).text("rows/page"));
+            ui.horizontal(|ui| {
+                if ui.button("Prev").clicked() && self.page > 0 {
+                    self.page -= 1;
                 }
-
-                ui.separator();
-                ui.heading("Pagination");
-                ui.add(egui::Slider::new(&mut self.page_size, 50..=3000).text("rows/page"));
-                ui.horizontal(|ui| {
-                    if ui.button("Prev").clicked() && self.page > 0 {
-                        self.page -= 1;
-                    }
-                    let total_pages =
-                        ((self.filtered.len() + self.page_size - 1) / self.page_size.max(1)).max(1);
-                    ui.label(format!("Page {} / {}", self.page + 1, total_pages));
-                    if ui.button("Next").clicked() && self.page + 1 < total_pages {
-                        self.page += 1;
-                    }
-                });
-
-                ui.separator();
-                ui.heading("Context");
-                ui.add(egui::Slider::new(&mut self.ctx_before, 0..=50).text("lines before"));
-                ui.add(egui::Slider::new(&mut self.ctx_after, 0..=50).text("lines after"));
-
-                ui.separator();
-                ui.heading("Columns");
-                ui.label("Select extra fields to render on demand.");
-
-                let mut request_add = false;
-                ui.horizontal(|ui| {
-                    let response = ui.add(
-                        TextEdit::singleline(&mut self.column_search).hint_text("add column…"),
-                    );
-                    if response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
-                        request_add = true;
-                    }
-                    if ui.button("Add").clicked() {
-                        request_add = true;
-                    }
-                });
-
-                let add_feedback = if request_add {
-                    Some(self.try_add_column_from_search())
-                } else {
-                    None
-                };
-
-                if let Some(result) = add_feedback {
-                    match result {
-                        ColumnAddResult::Added(name) => {
-                            ui.colored_label(
-                                Color32::from_rgb(120, 200, 120),
-                                format!("Added column '{name}'."),
-                            );
-                        }
-                        ColumnAddResult::AlreadyVisible(name) => {
-                            ui.colored_label(
-                                Color32::from_rgb(200, 180, 30),
-                                format!("Column '{name}' is already visible."),
-                            );
-                        }
-                        ColumnAddResult::BaseColumn(name) => {
-                            ui.colored_label(
-                                Color32::from_rgb(200, 100, 60),
-                                format!("'{name}' is part of the default view."),
-                            );
-                        }
-                        ColumnAddResult::NotFound(name) => {
-                            ui.colored_label(
-                                Color32::from_rgb(200, 100, 60),
-                                format!("No column matched '{name}'."),
-                            );
-                        }
-                        ColumnAddResult::Empty => {}
-                    }
-                }
-
-                let suggestions = self.column_suggestions();
-                if !suggestions.is_empty() {
-                    ui.label("Suggestions:");
-                    ui.horizontal_wrapped(|ui| {
-                        for suggestion in suggestions {
-                            if ui.button(format!("+ {suggestion}")).clicked()
-                                && self.add_visible_column(&suggestion)
-                            {
-                                self.column_search.clear();
-                            }
-                        }
-                    });
-                }
-
-                let extras = self.dynamic_columns();
-                if extras.is_empty() {
-                    ui.label("No additional columns selected.");
-                } else {
-                    ui.label("Visible extra columns:");
-                    ui.horizontal_wrapped(|ui| {
-                        for column in extras {
-                            if ui.button(format!("{column} ✕")).clicked() {
-                                self.remove_visible_column(&column);
-                            }
-                        }
-                    });
+                let total_pages = ((self.filtered.len() + self.page_size - 1) / self.page_size.max(1)).max(1);
+                ui.label(format!("Page {} / {}", self.page + 1, total_pages));
+                if ui.button("Next").clicked() && self.page + 1 < total_pages {
+                    self.page += 1;
                 }
             });
+
+            ui.separator();
+            ui.heading("Context");
+            ui.add(egui::Slider::new(&mut self.ctx_before, 0..=50).text("lines before"));
+            ui.add(egui::Slider::new(&mut self.ctx_after, 0..=50).text("lines after"));
+
+            ui.separator();
+            ui.heading("Columns");
+            ui.label("Select extra fields to render on demand.");
+
+            let mut request_add = false;
+            ui.horizontal(|ui| {
+                let response = ui.add(TextEdit::singleline(&mut self.column_search).hint_text("add column…"));
+                if response.lost_focus() && ui.input(|i| i.key_pressed(Key::Enter)) {
+                    request_add = true;
+                }
+                if ui.button("Add").clicked() {
+                    request_add = true;
+                }
+            });
+
+            let add_feedback = if request_add { Some(self.try_add_column_from_search()) } else { None };
+
+            if let Some(result) = add_feedback {
+                match result {
+                    ColumnAddResult::Added(name) => {
+                        ui.colored_label(Color32::from_rgb(120, 200, 120), format!("Added column '{name}'."));
+                    }
+                    ColumnAddResult::AlreadyVisible(name) => {
+                        ui.colored_label(Color32::from_rgb(200, 180, 30), format!("Column '{name}' is already visible."));
+                    }
+                    ColumnAddResult::BaseColumn(name) => {
+                        ui.colored_label(Color32::from_rgb(200, 100, 60), format!("'{name}' is part of the default view."));
+                    }
+                    ColumnAddResult::NotFound(name) => {
+                        ui.colored_label(Color32::from_rgb(200, 100, 60), format!("No column matched '{name}'."));
+                    }
+                    ColumnAddResult::Empty => {}
+                }
+            }
+
+            let suggestions = self.column_suggestions();
+            if !suggestions.is_empty() {
+                ui.label("Suggestions:");
+                ui.horizontal_wrapped(|ui| {
+                    for suggestion in suggestions {
+                        if ui.button(format!("+ {suggestion}")).clicked() && self.add_visible_column(&suggestion) {
+                            self.column_search.clear();
+                        }
+                    }
+                });
+            }
+
+            let extras = self.dynamic_columns();
+            if extras.is_empty() {
+                ui.label("No additional columns selected.");
+            } else {
+                ui.label("Visible extra columns:");
+                ui.horizontal_wrapped(|ui| {
+                    for column in extras {
+                        if ui.button(format!("{column} ✕")).clicked() {
+                            self.remove_visible_column(&column);
+                        }
+                    }
+                });
+            }
+        });
 
         egui::CentralPanel::default().show(ctx, |ui| {
             if self.indexing {
@@ -1666,11 +1486,7 @@ impl eframe::App for App {
                         let processed = processed.min(total);
                         let fraction = (processed as f32 / total as f32).clamp(0.0, 1.0);
                         let text = format!("Indexing {processed}/{total} files");
-                        ui.add(
-                            egui::ProgressBar::new(fraction)
-                                .show_percentage()
-                                .text(text),
-                        );
+                        ui.add(egui::ProgressBar::new(fraction).show_percentage().text(text));
                     } else {
                         ui.spinner();
                     }
@@ -1715,21 +1531,13 @@ fn flatten_value(value: &Value, prefix: &str, out: &mut BTreeMap<String, String>
     match value {
         Value::Object(obj) => {
             for (key, val) in obj {
-                let new_prefix = if prefix.is_empty() {
-                    key.to_string()
-                } else {
-                    format!("{prefix}.{key}")
-                };
+                let new_prefix = if prefix.is_empty() { key.to_string() } else { format!("{prefix}.{key}") };
                 flatten_value(val, &new_prefix, out);
             }
         }
         Value::Array(arr) => {
             for (idx, val) in arr.iter().enumerate() {
-                let new_prefix = if prefix.is_empty() {
-                    format!("[{idx}]")
-                } else {
-                    format!("{prefix}[{idx}]")
-                };
+                let new_prefix = if prefix.is_empty() { format!("[{idx}]") } else { format!("{prefix}[{idx}]") };
                 flatten_value(val, &new_prefix, out);
             }
         }
@@ -1859,16 +1667,10 @@ fn open_file_with_default(_path: &Path) -> Result<()> {
 
 #[cfg(not(any(target_os = "macos", target_os = "linux", target_os = "windows")))]
 fn open_file_with_app(_path: &Path, _app: &Path) -> Result<()> {
-    Err(anyhow!(
-        "opening files with specific app is not supported on this platform"
-    ))
+    Err(anyhow!("opening files with specific app is not supported on this platform"))
 }
 
-fn index_single_file(
-    file_id: usize,
-    path: &Path,
-    extractor: &Extractor,
-) -> Result<(Vec<String>, Vec<Row>)> {
+fn index_single_file(file_id: usize, path: &Path, extractor: &Extractor) -> Result<(Vec<String>, Vec<Row>)> {
     let mmap = mmap_file(path)?;
     let lines = scan_lines(&mmap);
     let sanitized_lines = sanitize_lines(&mmap, &lines);
@@ -1884,10 +1686,7 @@ fn index_monorepo(root: &Path, progress_tx: Option<mpsc::Sender<IndexEvent>>) ->
         return Ok(catalog);
     }
 
-    let files: Vec<PathBuf> = log_dirs
-        .iter()
-        .flat_map(|dir| list_log_files(dir))
-        .collect();
+    let files: Vec<PathBuf> = log_dirs.iter().flat_map(|dir| list_log_files(dir)).collect();
 
     let total_files = files.len();
     if let Some(tx) = &progress_tx {
@@ -1928,10 +1727,7 @@ fn index_monorepo(root: &Path, progress_tx: Option<mpsc::Sender<IndexEvent>>) ->
     let mut column_set = BTreeSet::new();
     for (path, sanitized_lines, mut rows, cols) in tmp_files {
         column_set.extend(cols);
-        catalog.files.push(FileEntry {
-            path,
-            sanitized_lines,
-        });
+        catalog.files.push(FileEntry { path, sanitized_lines });
         catalog.rows.append(&mut rows);
     }
 
@@ -1945,10 +1741,7 @@ fn index_monorepo(root: &Path, progress_tx: Option<mpsc::Sender<IndexEvent>>) ->
     catalog.columns = column_set.into_iter().collect();
 
     let mut db_path = std::env::temp_dir();
-    let unique = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap_or_default()
-        .as_millis();
+    let unique = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default().as_millis();
     db_path.push(format!("smooai-log-viewer-{unique}.duckdb"));
 
     let conn = Connection::open(&db_path).context("open duckdb database")?;
@@ -2008,13 +1801,7 @@ fn index_monorepo(root: &Path, progress_tx: Option<mpsc::Sender<IndexEvent>>) ->
     Ok(catalog)
 }
 
-fn parse_rows(
-    file_id: usize,
-    _path: &Path,
-    lines: &[LineHeader],
-    sanitized_lines: &[String],
-    extractor: &Extractor,
-) -> (Vec<Row>, BTreeSet<String>) {
+fn parse_rows(file_id: usize, _path: &Path, lines: &[LineHeader], sanitized_lines: &[String], extractor: &Extractor) -> (Vec<Row>, BTreeSet<String>) {
     let mut rows = Vec::new();
     let mut columns = BTreeSet::new();
     let mut idx = 0;
@@ -2054,8 +1841,7 @@ fn parse_rows(
             (json!({ "msg": raw.clone() }), raw)
         };
 
-        let (ts, level, corr, name, msg, service, namespace, trace_id, request_id) =
-            extractor.extract(&value);
+        let (ts, level, corr, name, msg, service, namespace, trace_id, request_id) = extractor.extract(&value);
         let flat = flatten_json_map(&value);
         for key in flat.keys() {
             columns.insert(key.clone());
@@ -2113,9 +1899,7 @@ fn levenshtein(left: &str, right: &str) -> usize {
         current[0] = i + 1;
         for (j, &right_byte) in right_bytes.iter().enumerate() {
             let cost = if left_byte == right_byte { 0 } else { 1 };
-            current[j + 1] = (current[j] + 1)
-                .min(previous[j + 1] + 1)
-                .min(previous[j] + cost);
+            current[j + 1] = (current[j] + 1).min(previous[j + 1] + 1).min(previous[j] + cost);
         }
         previous.copy_from_slice(&current);
     }
@@ -2248,22 +2032,18 @@ fn render_json_root(ui: &mut egui::Ui, value: &Value) {
 fn render_json_node(ui: &mut egui::Ui, label: String, value: &Value) {
     match value {
         Value::Object(map) => {
-            egui::CollapsingHeader::new(label)
-                .default_open(false)
-                .show(ui, |ui| {
-                    for (key, val) in map {
-                        render_json_node(ui, key.to_string(), val);
-                    }
-                });
+            egui::CollapsingHeader::new(label).default_open(false).show(ui, |ui| {
+                for (key, val) in map {
+                    render_json_node(ui, key.to_string(), val);
+                }
+            });
         }
         Value::Array(items) => {
-            egui::CollapsingHeader::new(label)
-                .default_open(false)
-                .show(ui, |ui| {
-                    for (idx, val) in items.iter().enumerate() {
-                        render_json_node(ui, format!("[{idx}]"), val);
-                    }
-                });
+            egui::CollapsingHeader::new(label).default_open(false).show(ui, |ui| {
+                for (idx, val) in items.iter().enumerate() {
+                    render_json_node(ui, format!("[{idx}]"), val);
+                }
+            });
         }
         _ => {
             ui.label(format!("{label}: {}", value_to_string(value)));
@@ -2295,10 +2075,7 @@ fn load_logo_image() -> Option<(ColorImage, Vec2)> {
     let image = image::load_from_memory(LOGO_BYTES).ok()?.into_rgba8();
     let (width, height) = image.dimensions();
     let size = Vec2::new(width as f32, height as f32);
-    Some((
-        ColorImage::from_rgba_unmultiplied([width as usize, height as usize], &image),
-        size,
-    ))
+    Some((ColorImage::from_rgba_unmultiplied([width as usize, height as usize], &image), size))
 }
 
 fn load_app_icon() -> Option<IconData> {
@@ -2320,11 +2097,6 @@ fn main() -> Result<()> {
         viewport,
         ..Default::default()
     };
-    eframe::run_native(
-        "Smoo AI Log Viewer",
-        native_options,
-        Box::new(|_cc| Ok(Box::new(App::default()))),
-    )
-    .map_err(|err| anyhow!(err.to_string()))?;
+    eframe::run_native("Smoo AI Log Viewer", native_options, Box::new(|_cc| Ok(Box::new(App::default())))).map_err(|err| anyhow!(err.to_string()))?;
     Ok(())
 }
