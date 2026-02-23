@@ -1,0 +1,53 @@
+name: Build Log Viewer Binaries
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            asset_name: smooai-log-viewer-darwin-arm64
+            binary_name: smooai-log-viewer
+          - os: macos-13
+            asset_name: smooai-log-viewer-darwin-x64
+            binary_name: smooai-log-viewer
+          - os: ubuntu-latest
+            asset_name: smooai-log-viewer-linux-x64
+            binary_name: smooai-log-viewer
+          - os: windows-latest
+            asset_name: smooai-log-viewer-win32-x64.exe
+            binary_name: smooai-log-viewer.exe
+
+    runs-on: ${{ matrix.os }}
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache Rust build artifacts
+        uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: log-viewer -> log-viewer/target
+          cache-on-failure: true
+
+      - name: Build log-viewer binary
+        run: cargo build --release --manifest-path log-viewer/Cargo.toml
+
+      - name: Rename binary for upload
+        shell: bash
+        run: cp "log-viewer/target/release/${{ matrix.binary_name }}" "${{ matrix.asset_name }}"
+
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ matrix.asset_name }}

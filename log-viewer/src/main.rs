@@ -261,6 +261,7 @@ struct App {
     expanded_rows: HashSet<usize>,
     column_widths: HashMap<String, f32>,
     index_progress: Option<(usize, usize)>,
+    db_conn: Option<Connection>,
 }
 
 impl Default for App {
@@ -302,6 +303,7 @@ impl Default for App {
             expanded_rows: HashSet::new(),
             column_widths: default_column_widths(),
             index_progress: None,
+            db_conn: None,
         }
     }
 }
@@ -324,6 +326,76 @@ impl App {
     }
 
     fn apply_filters(&mut self) {
+        // Try DuckDB-backed filtering first
+        if let Some(conn) = self.db_conn.take() {
+            let result = Self::duckdb_filter_query(&conn, &self.filters, self.sort_desc);
+            self.db_conn = Some(conn);
+            if let Some(filtered) = result {
+                self.filtered = filtered;
+                self.page = 0;
+                self.selected = None;
+                self.status = format!("{} matches", self.filtered.len());
+                return;
+            }
+        }
+        // Fall back to in-memory filtering
+        self.apply_filters_memory();
+    }
+
+    fn duckdb_filter_query(conn: &Connection, filters: &Filters, sort_desc: bool) -> Option<Vec<usize>> {
+        let escape = |s: &str| s.replace('\'', "''");
+
+        let mut sql = String::from("SELECT row_id FROM logs");
+        let mut conditions: Vec<String> = Vec::new();
+
+        macro_rules! add_column_filter {
+            ($filter_val:expr, $column:expr) => {
+                if !$filter_val.is_empty() {
+                    let escaped = escape(&$filter_val);
+                    if filters.regex_mode {
+                        conditions.push(format!("regexp_matches({}, '{}')", $column, escaped));
+                    } else {
+                        conditions.push(format!("{} ILIKE '%{}%'", $column, escaped));
+                    }
+                }
+            };
+        }
+
+        add_column_filter!(filters.level, "level");
+        add_column_filter!(filters.corr, "corr");
+        add_column_filter!(filters.service, "service");
+        add_column_filter!(filters.namespace, "namespace");
+        add_column_filter!(filters.trace, "trace_id");
+        add_column_filter!(filters.request, "request_id");
+
+        if !filters.text.is_empty() {
+            let escaped = escape(&filters.text);
+            let haystack = "COALESCE(msg,'') || ' ' || COALESCE(corr,'') || ' ' || COALESCE(level,'') || ' ' || COALESCE(service,'') || ' ' || COALESCE(namespace,'') || ' ' || COALESCE(trace_id,'') || ' ' || COALESCE(request_id,'') || ' ' || COALESCE(flat_json,'')";
+            if filters.regex_mode {
+                conditions.push(format!("regexp_matches({haystack}, '{escaped}')"));
+            } else {
+                conditions.push(format!("{haystack} ILIKE '%{escaped}%'"));
+            }
+        }
+
+        if !conditions.is_empty() {
+            sql.push_str(" WHERE ");
+            sql.push_str(&conditions.join(" AND "));
+        }
+
+        if sort_desc {
+            sql.push_str(" ORDER BY ts DESC NULLS LAST, file_id ASC, line_start ASC");
+        } else {
+            sql.push_str(" ORDER BY ts ASC NULLS FIRST, file_id ASC, line_start ASC");
+        }
+
+        let mut stmt = conn.prepare(&sql).ok()?;
+        let rows = stmt.query_map([], |row| row.get::<_, i64>(0)).ok()?;
+        let filtered: Vec<usize> = rows.filter_map(|r| r.ok()).map(|id| id as usize).collect();
+        Some(filtered)
+    }
+
+    fn apply_filters_memory(&mut self) {
         let filters = self.filters.clone();
 
         let re_text = if filters.regex_mode { self.compile(&filters.text) } else { None };
@@ -469,6 +541,11 @@ impl App {
             }
 
             self.filtered.push(idx);
+        }
+
+        // catalog.rows is always in ASC order; reverse filtered indices for DESC display
+        if self.sort_desc {
+            self.filtered.reverse();
         }
 
         self.page = 0;
@@ -673,9 +750,6 @@ impl App {
                 .then_with(|| left.file_id.cmp(&right.file_id))
                 .then_with(|| left.line_start.cmp(&right.line_start))
         });
-        if self.sort_desc {
-            self.catalog.rows.reverse();
-        }
 
         let mut column_set = BTreeSet::new();
         for row in &self.catalog.rows {
@@ -685,12 +759,32 @@ impl App {
         }
         self.catalog.columns = column_set.into_iter().collect();
         self.prune_visible_columns();
+        self.rebuild_duckdb();
         self.filtered.clear();
         self.apply_filters();
         self.selected = None;
         self.page = 0;
-        if let Some(old_db) = self.catalog.duckdb_path.take() {
-            let _ = std::fs::remove_file(old_db);
+    }
+
+    fn rebuild_duckdb(&mut self) {
+        self.db_conn = None;
+        if let Some(old_path) = self.catalog.duckdb_path.take() {
+            let _ = std::fs::remove_file(old_path);
+        }
+        match populate_duckdb(&self.catalog.rows) {
+            Ok(db_path) => match Connection::open(&db_path) {
+                Ok(conn) => {
+                    self.db_conn = Some(conn);
+                    self.catalog.duckdb_path = Some(db_path);
+                }
+                Err(e) => {
+                    eprintln!("Failed to open rebuilt DuckDB: {e}");
+                    let _ = std::fs::remove_file(db_path);
+                }
+            },
+            Err(e) => {
+                eprintln!("Failed to rebuild DuckDB: {e}");
+            }
         }
     }
 
@@ -1210,6 +1304,7 @@ impl App {
 impl Drop for App {
     fn drop(&mut self) {
         self.stop_watch();
+        self.db_conn = None;
         if let Some(path) = self.catalog.duckdb_path.take() {
             let _ = std::fs::remove_file(path);
         }
@@ -1255,14 +1350,20 @@ impl eframe::App for App {
             self.index_rx = None;
             self.index_progress = None;
             match result {
-                Ok(mut catalog) => {
-                    if self.sort_desc {
-                        catalog.rows.reverse();
-                    }
+                Ok(catalog) => {
+                    // Close old DuckDB connection and file
+                    self.db_conn = None;
                     if let Some(old) = self.catalog.duckdb_path.take() {
                         let _ = std::fs::remove_file(old);
                     }
                     self.catalog = catalog;
+                    // Open DuckDB connection for querying
+                    if let Some(ref path) = self.catalog.duckdb_path {
+                        match Connection::open(path) {
+                            Ok(conn) => self.db_conn = Some(conn),
+                            Err(e) => eprintln!("Failed to open DuckDB: {e}"),
+                        }
+                    }
                     self.prune_visible_columns();
                     self.expanded_rows.clear();
                     self.filtered = (0..self.catalog.rows.len()).collect();
@@ -1356,15 +1457,6 @@ impl eframe::App for App {
                 ui.separator();
                 ui.checkbox(&mut self.sort_desc, "Newest first");
                 if ui.button("Apply sort").clicked() {
-                    if self.sort_desc {
-                        self.catalog.rows.reverse();
-                    } else {
-                        self.catalog.rows.sort_by(|a, b| {
-                            a.ts.cmp(&b.ts)
-                                .then_with(|| a.file_id.cmp(&b.file_id))
-                                .then_with(|| a.line_start.cmp(&b.line_start))
-                        });
-                    }
                     self.apply_filters();
                 }
                 ui.separator();
@@ -1740,6 +1832,12 @@ fn index_monorepo(root: &Path, progress_tx: Option<mpsc::Sender<IndexEvent>>) ->
 
     catalog.columns = column_set.into_iter().collect();
 
+    catalog.duckdb_path = Some(populate_duckdb(&catalog.rows)?);
+
+    Ok(catalog)
+}
+
+fn populate_duckdb(rows: &[Row]) -> Result<PathBuf> {
     let mut db_path = std::env::temp_dir();
     let unique = SystemTime::now().duration_since(UNIX_EPOCH).unwrap_or_default().as_millis();
     db_path.push(format!("smooai-log-viewer-{unique}.duckdb"));
@@ -1767,7 +1865,7 @@ fn index_monorepo(root: &Path, progress_tx: Option<mpsc::Sender<IndexEvent>>) ->
         [],
     )?;
 
-    for (row_id, row) in catalog.rows.iter().enumerate() {
+    for (row_id, row) in rows.iter().enumerate() {
         let ts_string = row.ts.map(|t| t.to_rfc3339());
         let flat_json = serde_json::to_string(&row.flat).unwrap_or_else(|_| "{}".into());
         conn.execute(
@@ -1796,9 +1894,7 @@ fn index_monorepo(root: &Path, progress_tx: Option<mpsc::Sender<IndexEvent>>) ->
         )?;
     }
 
-    catalog.duckdb_path = Some(db_path);
-
-    Ok(catalog)
+    Ok(db_path)
 }
 
 fn parse_rows(file_id: usize, _path: &Path, lines: &[LineHeader], sanitized_lines: &[String], extractor: &Extractor) -> (Vec<Row>, BTreeSet<String>) {
