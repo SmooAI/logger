@@ -2,21 +2,9 @@ use colored::{Color, Colorize};
 use serde_json::Value;
 
 const SEPARATOR: &str = "----------------------------------------------------------------------------------------------------";
-const MESSAGE_COLOR: Color = Color::TrueColor {
-    r: 46,
-    g: 204,
-    b: 113,
-};
-const TIME_COLOR: Color = Color::TrueColor {
-    r: 52,
-    g: 152,
-    b: 219,
-};
-const ERROR_COLOR: Color = Color::TrueColor {
-    r: 231,
-    g: 76,
-    b: 60,
-};
+const MESSAGE_COLOR: Color = Color::TrueColor { r: 46, g: 204, b: 113 };
+const TIME_COLOR: Color = Color::TrueColor { r: 52, g: 152, b: 219 };
+const ERROR_COLOR: Color = Color::TrueColor { r: 231, g: 76, b: 60 };
 
 pub fn pretty_json(object: &Value) -> String {
     let mut output = String::new();

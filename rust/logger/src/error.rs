@@ -45,11 +45,7 @@ where
 }
 
 fn extract_type_name<T>() -> String {
-    type_name::<T>()
-        .rsplit("::")
-        .next()
-        .unwrap_or("Error")
-        .to_string()
+    type_name::<T>().rsplit("::").next().unwrap_or("Error").to_string()
 }
 
 #[cfg(test)]

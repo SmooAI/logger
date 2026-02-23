@@ -12,7 +12,7 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
+
       # Install pnpm CLI
       - name: Install pnpm
         uses: pnpm/action-setup@v2
@@ -43,6 +43,7 @@ jobs:
         with:
           profile: minimal
           toolchain: stable
+          components: rustfmt, clippy
           override: true
 
       - name: Cache Rust build artifacts
@@ -52,6 +53,12 @@ jobs:
             rust/logger -> rust/logger/target
             log-viewer -> log-viewer/target
           cache-on-failure: true
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22'
+          cache-dependency-path: go/go.sum
 
       - name: Install dependencies
         run: pnpm install
@@ -71,8 +78,3 @@ jobs:
 
       - name: Build
         run: pnpm build
-
-      # - name: Require changesets
-      #   run: pnpm changeset status --since=main
-          
-          

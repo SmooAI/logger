@@ -149,10 +149,7 @@ pub static CONFIG_MINIMAL: Lazy<ContextConfig> = Lazy::new(|| {
             "userAgent".into(),
         ]),
     );
-    http_map.insert(
-        "response".to_string(),
-        ContextConfig::OnlyKeys(vec!["statusCode".into(), "headers".into()]),
-    );
+    http_map.insert("response".to_string(), ContextConfig::OnlyKeys(vec!["statusCode".into(), "headers".into()]));
 
     let mut root = HashMap::new();
     root.insert("http".into(), ContextConfig::Nested(http_map));
@@ -161,20 +158,13 @@ pub static CONFIG_MINIMAL: Lazy<ContextConfig> = Lazy::new(|| {
 
 pub const CONFIG_FULL: ContextConfig = ContextConfig::AllowAll;
 
-static GLOBAL_CONTEXT: Lazy<RwLock<ContextValue>> =
-    Lazy::new(|| RwLock::new(Value::Object(default_context_map())));
+static GLOBAL_CONTEXT: Lazy<RwLock<ContextValue>> = Lazy::new(|| RwLock::new(Value::Object(default_context_map())));
 
 fn default_context_map() -> ContextMap {
     let mut map = Map::new();
     let id = Uuid::new_v4().to_string();
-    map.insert(
-        ContextKey::CorrelationId.as_str().to_string(),
-        Value::String(id.clone()),
-    );
-    map.insert(
-        ContextKey::RequestId.as_str().to_string(),
-        Value::String(id.clone()),
-    );
+    map.insert(ContextKey::CorrelationId.as_str().to_string(), Value::String(id.clone()));
+    map.insert(ContextKey::RequestId.as_str().to_string(), Value::String(id.clone()));
     map.insert(ContextKey::TraceId.as_str().to_string(), Value::String(id));
     map
 }
@@ -187,9 +177,7 @@ where
     if !guard.is_object() {
         *guard = Value::Object(default_context_map());
     }
-    let object = guard
-        .as_object_mut()
-        .expect("global context must be an object");
+    let object = guard.as_object_mut().expect("global context must be an object");
     func(object)
 }
 
@@ -343,9 +331,14 @@ pub fn context_value<T: Serialize>(value: T) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::sync::Mutex;
+
+    /// Tests that modify global context must hold this lock.
+    static TEST_LOCK: Mutex<()> = Mutex::new(());
 
     #[test]
     fn default_context_initializes_ids() {
+        let _guard = TEST_LOCK.lock().unwrap();
         reset_global_context();
         let context = global_context();
         let obj = context.as_object().unwrap();

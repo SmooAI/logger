@@ -53,14 +53,8 @@ pub struct RotatingFileWriter {
 impl RotatingFileWriter {
     pub fn new(options: RotationOptions) -> io::Result<Self> {
         let max_bytes = options.size.as_ref().and_then(|s| parse_size(s).ok());
-        let max_total_bytes = options
-            .max_total_size
-            .as_ref()
-            .and_then(|s| parse_size(s).ok());
-        let interval = options
-            .interval
-            .as_ref()
-            .and_then(|s| parse_interval(s).ok());
+        let max_total_bytes = options.max_total_size.as_ref().and_then(|s| parse_size(s).ok());
+        let interval = options.interval.as_ref().and_then(|s| parse_interval(s).ok());
 
         let now = Utc::now();
         let (file, current_dir, current_path) = open_file(&options, &now, 0)?;
@@ -95,12 +89,7 @@ impl RotatingFileWriter {
         state.file.flush()
     }
 
-    fn should_rotate(
-        &self,
-        state: &WriterState,
-        now: &chrono::DateTime<Utc>,
-        additional: u64,
-    ) -> bool {
+    fn should_rotate(&self, state: &WriterState, now: &chrono::DateTime<Utc>, additional: u64) -> bool {
         if let Some(max_bytes) = self.max_bytes {
             if state.bytes_written + additional > max_bytes {
                 return true;
@@ -117,12 +106,7 @@ impl RotatingFileWriter {
     }
 }
 
-fn rotate(
-    options: &RotationOptions,
-    state: &mut WriterState,
-    now: &chrono::DateTime<Utc>,
-    max_total_bytes: Option<u64>,
-) -> io::Result<()> {
+fn rotate(options: &RotationOptions, state: &mut WriterState, now: &chrono::DateTime<Utc>, max_total_bytes: Option<u64>) -> io::Result<()> {
     let mut next_index = state.index + 1;
     let current_dir = log_directory(options, now);
     if current_dir != state.current_dir {
@@ -141,11 +125,7 @@ fn rotate(
     enforce_limits(options, &dir, max_total_bytes)
 }
 
-fn enforce_limits(
-    options: &RotationOptions,
-    directory: &Path,
-    max_total_bytes: Option<u64>,
-) -> io::Result<()> {
+fn enforce_limits(options: &RotationOptions, directory: &Path, max_total_bytes: Option<u64>) -> io::Result<()> {
     if !directory.exists() {
         return Ok(());
     }
@@ -153,13 +133,7 @@ fn enforce_limits(
     let mut entries: Vec<_> = fs::read_dir(directory)?
         .filter_map(|entry| entry.ok())
         .filter(|entry| entry.file_type().map(|ft| ft.is_file()).unwrap_or(false))
-        .filter(|entry| {
-            has_prefix(
-                entry.file_name(),
-                &options.filename_prefix,
-                &options.extension,
-            )
-        })
+        .filter(|entry| has_prefix(entry.file_name(), &options.filename_prefix, &options.extension))
         .collect();
 
     entries.sort_by(|a, b| {
@@ -186,10 +160,7 @@ fn enforce_limits(
     }
 
     if let Some(limit) = max_total_bytes {
-        let mut total: u64 = entries
-            .iter()
-            .filter_map(|entry| entry.metadata().ok().map(|m| m.len()))
-            .sum();
+        let mut total: u64 = entries.iter().filter_map(|entry| entry.metadata().ok().map(|m| m.len())).sum();
         while total > limit && !entries.is_empty() {
             if let Some(entry) = entries.first() {
                 let path = entry.path();
@@ -209,11 +180,7 @@ fn has_prefix(name: std::ffi::OsString, prefix: &str, extension: &str) -> bool {
     name.starts_with(prefix) && name.ends_with(extension)
 }
 
-fn open_file(
-    options: &RotationOptions,
-    now: &chrono::DateTime<Utc>,
-    index: u32,
-) -> io::Result<(File, PathBuf, PathBuf)> {
+fn open_file(options: &RotationOptions, now: &chrono::DateTime<Utc>, index: u32) -> io::Result<(File, PathBuf, PathBuf)> {
     let directory = log_directory(options, now);
     fs::create_dir_all(&directory)?;
     let filename = log_filename(options, now, index);
@@ -242,22 +209,13 @@ fn log_filename(options: &RotationOptions, now: &chrono::DateTime<Utc>, index: u
 fn parse_size(size: &str) -> Result<u64, &'static str> {
     let upper = size.trim().to_uppercase();
     if let Some(stripped) = upper.strip_suffix('K') {
-        return stripped
-            .parse::<u64>()
-            .map(|n| n * 1024)
-            .map_err(|_| "invalid size");
+        return stripped.parse::<u64>().map(|n| n * 1024).map_err(|_| "invalid size");
     }
     if let Some(stripped) = upper.strip_suffix('M') {
-        return stripped
-            .parse::<u64>()
-            .map(|n| n * 1024 * 1024)
-            .map_err(|_| "invalid size");
+        return stripped.parse::<u64>().map(|n| n * 1024 * 1024).map_err(|_| "invalid size");
     }
     if let Some(stripped) = upper.strip_suffix('G') {
-        return stripped
-            .parse::<u64>()
-            .map(|n| n * 1024 * 1024 * 1024)
-            .map_err(|_| "invalid size");
+        return stripped.parse::<u64>().map(|n| n * 1024 * 1024 * 1024).map_err(|_| "invalid size");
     }
     upper.parse::<u64>().map_err(|_| "invalid size")
 }
@@ -265,34 +223,19 @@ fn parse_size(size: &str) -> Result<u64, &'static str> {
 fn parse_interval(interval: &str) -> Result<Duration, &'static str> {
     let lower = interval.trim().to_lowercase();
     if let Some(stripped) = lower.strip_suffix('s') {
-        return stripped
-            .parse::<i64>()
-            .map(Duration::seconds)
-            .map_err(|_| "invalid interval");
+        return stripped.parse::<i64>().map(Duration::seconds).map_err(|_| "invalid interval");
     }
     if let Some(stripped) = lower.strip_suffix('m') {
-        return stripped
-            .parse::<i64>()
-            .map(Duration::minutes)
-            .map_err(|_| "invalid interval");
+        return stripped.parse::<i64>().map(Duration::minutes).map_err(|_| "invalid interval");
     }
     if let Some(stripped) = lower.strip_suffix('h') {
-        return stripped
-            .parse::<i64>()
-            .map(Duration::hours)
-            .map_err(|_| "invalid interval");
+        return stripped.parse::<i64>().map(Duration::hours).map_err(|_| "invalid interval");
     }
     if let Some(stripped) = lower.strip_suffix('d') {
-        return stripped
-            .parse::<i64>()
-            .map(Duration::days)
-            .map_err(|_| "invalid interval");
+        return stripped.parse::<i64>().map(Duration::days).map_err(|_| "invalid interval");
     }
     if let Some(stripped) = lower.strip_suffix('w') {
-        return stripped
-            .parse::<i64>()
-            .map(|weeks| Duration::days(7 * weeks))
-            .map_err(|_| "invalid interval");
+        return stripped.parse::<i64>().map(|weeks| Duration::days(7 * weeks)).map_err(|_| "invalid interval");
     }
     Err("invalid interval")
 }

@@ -107,6 +107,48 @@ smooai-logger = { git = "https://github.com/SmooAI/logger", package = "smooai-lo
 
 Usage examples and API notes are documented in `rust/logger/README.md`.
 
+### Go Package
+
+The Go port provides the same structured logging features for Go services:
+
+```sh
+go get github.com/smooai/logger
+```
+
+```go
+import "github.com/smooai/logger"
+
+l, err := logger.New(logger.Options{
+    Name:  "MyService",
+    Level: logger.LevelInfo,
+})
+if err != nil {
+    log.Fatal(err)
+}
+defer l.Close()
+
+// Add HTTP request context (auto-sets namespace and extracts correlation ID)
+l.AddHTTPRequest(logger.HTTPRequest{
+    Method: "POST",
+    Path:   "/api/users",
+    Headers: map[string]string{"X-Correlation-Id": "abc-123"},
+})
+
+// Structured logging with context maps
+l.Info("User created", logger.Map{"userId": "123"})
+
+// Error logging with automatic stack traces
+l.Error("Operation failed", fmt.Errorf("database timeout"))
+
+// User context, telemetry, and correlation tracking
+l.AddUserContext(logger.User{ID: "user-456", Role: "admin"})
+l.SetCorrelationID("custom-trace-id")
+```
+
+Features: all 6 log levels (TRACE through FATAL), structured JSON output, ANSI pretty-printing in local dev, automatic file rotation to `.smooai-logs/`, global context with correlation/request/trace IDs, HTTP request/response context, user context, and telemetry fields.
+
+See `go/` for the full source and `go/logger_test.go` for comprehensive test coverage (27 tests).
+
 ## The Power of Automatic Context
 
 ### See Where Your Logs Come From

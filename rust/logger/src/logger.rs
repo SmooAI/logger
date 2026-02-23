@@ -10,9 +10,8 @@ use url::Url;
 use uuid::Uuid;
 
 use crate::context::{
-    self, add_base_context, add_nested_context, apply_context_config, base_context_key,
-    context_value, remove_nulls, reset_global_context, set_correlation_id, ContextConfig,
-    ContextKey, HttpRequest, HttpResponse, TelemetryFields, User, CONFIG_FULL, CONFIG_MINIMAL,
+    self, add_base_context, add_nested_context, apply_context_config, base_context_key, context_value, remove_nulls, reset_global_context, set_correlation_id,
+    ContextConfig, ContextKey, HttpRequest, HttpResponse, TelemetryFields, User, CONFIG_FULL, CONFIG_MINIMAL,
 };
 use crate::env::{is_build, is_local};
 use crate::error::{log_error, LoggedError};
@@ -113,27 +112,18 @@ impl Logger {
         let name = options.name.take().unwrap_or_else(|| "Logger".to_string());
         let level = options
             .level
-            .or_else(|| {
-                std::env::var("LOG_LEVEL")
-                    .ok()
-                    .and_then(|lvl| Level::parse_level(&lvl))
-            })
+            .or_else(|| std::env::var("LOG_LEVEL").ok().and_then(|lvl| Level::parse_level(&lvl)))
             .unwrap_or(Level::Info);
-        let pretty_print = options
-            .pretty_print
-            .unwrap_or_else(|| is_local() || is_build());
+        let pretty_print = options.pretty_print.unwrap_or_else(|| is_local() || is_build());
 
         let rotation = options.rotation.unwrap_or_default();
 
-        let mut config_settings = options
-            .config_settings
-            .unwrap_or_else(default_config_settings);
+        let mut config_settings = options.config_settings.unwrap_or_else(default_config_settings);
 
-        let context_config = options.context_config.take().or_else(|| {
-            std::env::var("LOGGER_CONTEXT_CONFIG")
-                .ok()
-                .and_then(|key| config_settings.get(&key).cloned())
-        });
+        let context_config = options
+            .context_config
+            .take()
+            .or_else(|| std::env::var("LOGGER_CONTEXT_CONFIG").ok().and_then(|key| config_settings.get(&key).cloned()));
 
         if !config_settings.contains_key("FULL") {
             config_settings.insert("FULL".into(), CONFIG_FULL.clone());
@@ -154,10 +144,7 @@ impl Logger {
             let mut context = context;
             remove_nulls(&mut context);
             add_base_context(&context);
-            if let Some(Value::String(correlation)) = context
-                .as_object()
-                .and_then(|map| map.get(ContextKey::CorrelationId.as_str()))
-            {
+            if let Some(Value::String(correlation)) = context.as_object().and_then(|map| map.get(ContextKey::CorrelationId.as_str())) {
                 set_correlation_id(correlation);
             }
         }
@@ -199,10 +186,7 @@ impl Logger {
     }
 
     pub fn set_namespace<S: Into<String>>(&self, namespace: S) {
-        self.add_base_context_key(
-            ContextKey::Namespace.as_str(),
-            Value::String(namespace.into()),
-        );
+        self.add_base_context_key(ContextKey::Namespace.as_str(), Value::String(namespace.into()));
     }
 
     pub fn context(&self) -> Value {
@@ -249,8 +233,7 @@ impl Logger {
     }
 
     pub fn correlation_id(&self) -> Option<String> {
-        base_context_key(ContextKey::CorrelationId.as_str())
-            .and_then(|value| value.as_str().map(|s| s.to_string()))
+        base_context_key(ContextKey::CorrelationId.as_str()).and_then(|value| value.as_str().map(|s| s.to_string()))
     }
 
     pub fn reset_correlation_id(&self) {
@@ -270,18 +253,13 @@ impl Logger {
     }
 
     pub fn add_http_request(&self, http_request: HttpRequest) {
-        if let (Some(method), Some(path)) =
-            (http_request.method.as_ref(), http_request.path.as_ref())
-        {
+        if let (Some(method), Some(path)) = (http_request.method.as_ref(), http_request.path.as_ref()) {
             let namespace = format!("{} {}", method.to_uppercase(), path);
             self.set_namespace(namespace);
         }
 
         if let Some(headers) = &http_request.headers {
-            if let Some(correlation) = headers
-                .get("X-Correlation-Id")
-                .or_else(|| headers.get("x-correlation-id"))
-            {
+            if let Some(correlation) = headers.get("X-Correlation-Id").or_else(|| headers.get("x-correlation-id")) {
                 self.set_correlation_id(correlation.as_str());
             }
         }
@@ -322,13 +300,8 @@ impl Logger {
         let http_obj = http_value.as_object()?;
         let request = http_obj.get("request")?.as_object()?;
         let headers = request.get("headers")?.as_object()?;
-        let origin = headers
-            .get("origin")
-            .or_else(|| headers.get("referrer"))
-            .and_then(|value| value.as_str())?;
-        Url::parse(origin)
-            .ok()
-            .and_then(|url| url.host_str().map(|host| host.to_string()))
+        let origin = headers.get("origin").or_else(|| headers.get("referrer")).and_then(|value| value.as_str())?;
+        Url::parse(origin).ok().and_then(|url| url.host_str().map(|host| host.to_string()))
     }
 
     pub fn build_log_object(&self, level: Level, args: &LogArgs) -> Value {
@@ -336,18 +309,14 @@ impl Logger {
         if !payload.is_object() {
             payload = Value::Object(Map::new());
         }
-        let map = payload
-            .as_object_mut()
-            .expect("log payload should be object");
+        let map = payload.as_object_mut().expect("log payload should be object");
 
         if let Some(msg) = args.message() {
             map.insert(ContextKey::Message.as_str().into(), Value::String(msg));
         }
 
         if !args.contexts.is_empty() {
-            let entry = map
-                .entry(ContextKey::Context.as_str().to_string())
-                .or_insert_with(|| Value::Object(Map::new()));
+            let entry = map.entry(ContextKey::Context.as_str().to_string()).or_insert_with(|| Value::Object(Map::new()));
             if let Value::Object(context_map) = entry {
                 for ctx in &args.contexts {
                     if let Value::Object(obj) = ctx {
@@ -358,33 +327,15 @@ impl Logger {
         }
 
         if !args.errors.is_empty() {
-            let error_message = args
-                .errors
-                .iter()
-                .map(|err| err.message.clone())
-                .collect::<Vec<_>>()
-                .join("; ");
-            map.insert(
-                ContextKey::Error.as_str().into(),
-                Value::String(error_message),
-            );
-            let details = args
-                .errors
-                .iter()
-                .map(|err| err.to_value())
-                .collect::<Vec<_>>();
-            map.insert(
-                ContextKey::ErrorDetails.as_str().into(),
-                Value::Array(details),
-            );
+            let error_message = args.errors.iter().map(|err| err.message.clone()).collect::<Vec<_>>().join("; ");
+            map.insert(ContextKey::Error.as_str().into(), Value::String(error_message));
+            let details = args.errors.iter().map(|err| err.to_value()).collect::<Vec<_>>();
+            map.insert(ContextKey::ErrorDetails.as_str().into(), Value::Array(details));
         }
 
         if !map.contains_key(ContextKey::Message.as_str()) {
             if let Some(Value::String(error_msg)) = map.get(ContextKey::Error.as_str()) {
-                map.insert(
-                    ContextKey::Message.as_str().into(),
-                    Value::String(error_msg.clone()),
-                );
+                map.insert(ContextKey::Message.as_str().into(), Value::String(error_msg.clone()));
             }
         }
 
@@ -392,18 +343,12 @@ impl Logger {
             ContextKey::Level.as_str().into(),
             Value::Number(serde_json::Number::from(u64::from(level.code()))),
         );
-        map.insert(
-            ContextKey::LogLevel.as_str().into(),
-            Value::String(level.as_str().into()),
-        );
+        map.insert(ContextKey::LogLevel.as_str().into(), Value::String(level.as_str().into()));
         map.insert(
             ContextKey::Time.as_str().into(),
             Value::String(Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true)),
         );
-        map.insert(
-            ContextKey::Name.as_str().into(),
-            Value::String(self.name.clone()),
-        );
+        map.insert(ContextKey::Name.as_str().into(), Value::String(self.name.clone()));
 
         remove_nulls(&mut payload);
 
@@ -682,10 +627,17 @@ mod tests {
     use super::*;
     use serde_json::json;
     use std::collections::HashMap;
+    use std::sync::Mutex;
+
+    /// Tests that modify the global context or environment variables must hold
+    /// this lock to prevent races (Rust runs tests in parallel by default).
+    static TEST_LOCK: Mutex<()> = Mutex::new(());
 
     #[test]
     fn build_log_object_includes_message_and_context() {
+        let _guard = TEST_LOCK.lock().unwrap();
         let logger = Logger::default();
+        logger.reset_context();
         let args = log_args!("hello", json!({"foo": "bar"}));
         let payload = logger.build_log_object(Level::Info, &args);
         let obj = payload.as_object().unwrap();
@@ -707,6 +659,7 @@ mod tests {
 
     #[test]
     fn build_log_object_collects_error_details() {
+        let _guard = TEST_LOCK.lock().unwrap();
         let logger = Logger::default();
         logger.reset_context();
         let args = log_args!(log_error(SampleError));
@@ -719,6 +672,7 @@ mod tests {
 
     #[test]
     fn add_http_request_sets_namespace_and_correlation() {
+        let _guard = TEST_LOCK.lock().unwrap();
         let logger = Logger::default();
         logger.reset_context();
         let mut headers = HashMap::new();
@@ -745,14 +699,12 @@ mod tests {
             headers: Some(origin_headers),
             ..Default::default()
         });
-        assert_eq!(
-            logger.http_request_origin_domain().as_deref(),
-            Some("example.com")
-        );
+        assert_eq!(logger.http_request_origin_domain().as_deref(), Some("example.com"));
     }
 
     #[test]
     fn context_config_filters_fields() {
+        let _guard = TEST_LOCK.lock().unwrap();
         let mut logger = Logger::default();
         logger.reset_context();
         logger.set_context_config(Some((*CONFIG_MINIMAL).clone()));
@@ -768,15 +720,7 @@ mod tests {
         });
         logger.add_base_context(request);
         let payload = logger.build_log_object(Level::Info, &log_args!());
-        let http = payload
-            .get("http")
-            .unwrap()
-            .as_object()
-            .unwrap()
-            .get("request")
-            .unwrap()
-            .as_object()
-            .unwrap();
+        let http = payload.get("http").unwrap().as_object().unwrap().get("request").unwrap().as_object().unwrap();
         assert!(http.get("body").is_none());
         assert!(http.get("method").is_some());
     }
