@@ -21,7 +21,7 @@ const (
 	KeyDuration      = "duration"
 	KeyError         = "error"
 	KeyErrorDetails  = "errorDetails"
-	KeyContext        = "context"
+	KeyContext       = "context"
 	KeyUser          = "user"
 	KeyHTTP          = "http"
 )
@@ -75,7 +75,7 @@ type TelemetryFields struct {
 // of the TypeScript, Python, and Rust SDKs.
 var (
 	globalContext Map
-	contextMu    sync.RWMutex
+	contextMu     sync.RWMutex
 )
 
 func init() {
