@@ -381,10 +381,11 @@ import { BrowserLogger, Level } from '@smooai/logger/browser/BrowserLogger';
 
 ## Built With
 
-- TypeScript - Full type safety
-- AWS SDK Integration - Native support for Lambda, ECS, EC2, and more
-- Browser Detection - Automatic environment adaptation
-- Rotating File Stream - Smart log rotation
+- **TypeScript** - Core implementation with full type safety, AWS SDK integration, browser detection, and rotating file streams
+- **Python** - Pydantic-based structured logging with rich terminal output and AWS context support
+- **Rust** - High-performance structured logging with serde serialization and colored output
+- **Go** - Native structured logging with JSON output, ANSI pretty-printing, and automatic file rotation
+- **Log Viewer** - Desktop application (Rust/egui) for viewing and analyzing SmooAI logs with filtering and DuckDB-powered queries
 
 <!-- CONTACT -->
 
