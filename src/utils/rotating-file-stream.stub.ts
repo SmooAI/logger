@@ -5,11 +5,11 @@
 
 /** no‐op writable “stream” stub */
 export function createStream(): any {
-    return {
-        write: () => {}, // no‐op
-        end: () => {}, // no‐op
-        // …add any other methods you actually use in Logger.ts
-    };
+  return {
+    write: () => {}, // no‐op
+    end: () => {}, // no‐op
+    // …add any other methods you actually use in Logger.ts
+  };
 }
 
 /** these types exist so your imports still type‐check */

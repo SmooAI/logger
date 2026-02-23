@@ -1,6 +1,6 @@
 {
-    "extends": "./python/pyrightconfig.json",
-    "include": ["python/**/*.py"],
-    "extraPaths": ["python/"],
-    "stubPath": "python/typings"
+  "extends": "./python/pyrightconfig.json",
+  "include": ["python/**/*.py"],
+  "extraPaths": ["python/"],
+  "stubPath": "python/typings"
 }

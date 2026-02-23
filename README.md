@@ -180,14 +180,14 @@ Correlation IDs automatically flow through your entire system:
 ```typescript
 // Service A: API Gateway Handler
 logger.addLambdaContext(event, context);
-logger.info('Request received'); // Correlation ID: abc-123
+logger.info("Request received"); // Correlation ID: abc-123
 
 // Service B: SQS Processor (automatically extracts ID)
 logger.addSQSRecordContext(record);
-logger.info('Processing message'); // Same Correlation ID: abc-123
+logger.info("Processing message"); // Same Correlation ID: abc-123
 
 // Service C: Another Lambda (receives via HTTP header)
-logger.info('Completing workflow'); // Still Correlation ID: abc-123
+logger.info("Completing workflow"); // Still Correlation ID: abc-123
 ```
 
 ### Production-Ready Examples
@@ -195,24 +195,24 @@ logger.info('Completing workflow'); // Still Correlation ID: abc-123
 #### AWS Lambda with API Gateway
 
 ```typescript
-import { AwsServerLogger } from '@smooai/logger/AwsServerLogger';
+import { AwsServerLogger } from "@smooai/logger/AwsServerLogger";
 
-const logger = new AwsServerLogger({ name: 'UserAPI' });
+const logger = new AwsServerLogger({ name: "UserAPI" });
 
 export const handler = async (event, context) => {
-    logger.addLambdaContext(event, context);
+  logger.addLambdaContext(event, context);
 
-    try {
-        const user = await createUser(event.body);
-        logger.info('User created successfully', { userId: user.id });
-        return { statusCode: 201, body: JSON.stringify(user) };
-    } catch (error) {
-        logger.error('Failed to create user', error, {
-            body: event.body,
-            headers: event.headers,
-        });
-        throw error;
-    }
+  try {
+    const user = await createUser(event.body);
+    logger.info("User created successfully", { userId: user.id });
+    return { statusCode: 201, body: JSON.stringify(user) };
+  } catch (error) {
+    logger.error("Failed to create user", error, {
+      body: event.body,
+      headers: event.headers,
+    });
+    throw error;
+  }
 };
 ```
 
@@ -220,21 +220,21 @@ export const handler = async (event, context) => {
 
 ```typescript
 const logger = new AwsServerLogger({
-    name: 'OrderService',
-    level: Level.Info,
+  name: "OrderService",
+  level: Level.Info,
 });
 
 // Automatically captures container metadata
-app.post('/orders', async (req, res) => {
-    logger.addContext({
-        taskArn: process.env.ECS_TASK_ARN,
-        containerName: process.env.ECS_CONTAINER_NAME,
-    });
+app.post("/orders", async (req, res) => {
+  logger.addContext({
+    taskArn: process.env.ECS_TASK_ARN,
+    containerName: process.env.ECS_CONTAINER_NAME,
+  });
 
-    logger.info('Processing order', {
-        orderId: req.body.orderId,
-        amount: req.body.amount,
-    });
+  logger.info("Processing order", {
+    orderId: req.body.orderId,
+    amount: req.body.amount,
+  });
 });
 ```
 
@@ -242,16 +242,16 @@ app.post('/orders', async (req, res) => {
 
 ```typescript
 export const sqsHandler = async (event) => {
-    for (const record of event.Records) {
-        logger.addSQSRecordContext(record);
-        logger.info('Processing order', {
-            messageId: record.messageId,
-            attempt: record.attributes.ApproximateReceiveCount,
-        });
+  for (const record of event.Records) {
+    logger.addSQSRecordContext(record);
+    logger.info("Processing order", {
+      messageId: record.messageId,
+      attempt: record.attributes.ApproximateReceiveCount,
+    });
 
-        // Logger maintains context throughout async operations
-        await processOrder(record.body);
-    }
+    // Logger maintains context throughout async operations
+    await processOrder(record.body);
+  }
 };
 ```
 
@@ -304,10 +304,10 @@ Errors are automatically serialized with full context:
 
 ```typescript
 try {
-    await riskyOperation();
+  await riskyOperation();
 } catch (error) {
-    logger.error('Operation failed', error, { context: 'additional-info' });
-    // Includes: error message, stack trace, error type, and your context
+  logger.error("Operation failed", error, { context: "additional-info" });
+  // Includes: error message, stack trace, error type, and your context
 }
 ```
 
@@ -315,15 +315,15 @@ try {
 
 ```typescript
 // Add user context that persists across logs
-logger.addUserContext({ id: 'user-123', role: 'admin' });
+logger.addUserContext({ id: "user-123", role: "admin" });
 
 // Add telemetry for performance tracking
-logger.addTelemetryFields({ duration: 150, operation: 'db-query' });
+logger.addTelemetryFields({ duration: 150, operation: "db-query" });
 
 // Add custom context for specific logs
-logger.info('Payment processed', {
-    amount: 99.99,
-    currency: 'USD',
+logger.info("Payment processed", {
+  amount: 99.99,
+  currency: "USD",
 });
 ```
 
@@ -333,7 +333,7 @@ logger.info('Payment processed', {
 
 ```typescript
 const logger = new AwsServerLogger({
-    prettyPrint: true, // Readable console output for development
+  prettyPrint: true, // Readable console output for development
 });
 ```
 
@@ -345,11 +345,11 @@ Logs are automatically saved to disk in development with smart rotation:
 // Auto-enabled in local environments
 // Saves to .smooai-logs/ with ANSI colors for easy reading
 const logger = new AwsServerLogger({
-    rotation: {
-        size: '10M', // Rotate at 10MB
-        interval: '1d', // Daily rotation
-        compress: true, // Gzip old logs
-    },
+  rotation: {
+    size: "10M", // Rotate at 10MB
+    interval: "1d", // Daily rotation
+    compress: true, // Gzip old logs
+  },
 });
 ```
 
@@ -357,10 +357,10 @@ const logger = new AwsServerLogger({
 
 ```typescript
 // AWS environments (Lambda, ECS, EC2, etc.)
-import { AwsServerLogger, Level } from '@smooai/logger/AwsServerLogger';
+import { AwsServerLogger, Level } from "@smooai/logger/AwsServerLogger";
 
 // Browser environments
-import { BrowserLogger, Level } from '@smooai/logger/browser/BrowserLogger';
+import { BrowserLogger, Level } from "@smooai/logger/browser/BrowserLogger";
 ```
 
 ## Configuration

@@ -3,24 +3,22 @@ name = "smooai-logger"
 version = "3.1.2"
 description = "Context-aware structured logging utilities for Python that mirror the @smooai/logger toolkit."
 readme = "README.md"
-authors = [
-    { name = "SmooAI", email = "brent@smooai.com" }
-]
+authors = [{ name = "SmooAI", email = "brent@smooai.com" }]
 license = { text = "MIT" }
 requires-python = ">=3.12"
 dependencies = [
-    "colorist>=1.5.2",
-    "pendulum>=3.0.0",
-    "pydantic>=2.7.0",
-    "pydantic-extra-types>=2.0.0",
-    "rich>=13.0.0",
+  "colorist>=1.5.2",
+  "pendulum>=3.0.0",
+  "pydantic>=2.7.0",
+  "pydantic-extra-types>=2.0.0",
+  "rich>=13.0.0",
 ]
 classifiers = [
-    "Programming Language :: Python",
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.12",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.12",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
 ]
 keywords = ["logging", "aws", "structured-logging", "smooai", "observability"]
 
@@ -37,12 +35,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [dependency-groups]
-dev = [
-    "poethepoet>=0.29.0",
-    "pytest>=8.3.0",
-    "ruff>=0.11.6,<0.12",
-    "basedpyright>=1.29.2",
-]
+dev = ["poethepoet>=0.29.0", "pytest>=8.3.0", "ruff>=0.11.6,<0.12", "basedpyright>=1.29.2"]
 
 
 [tool.poe.tasks.install-dev]

@@ -1,14 +1,14 @@
 {
-    "include": ["src/**/*.py", "tests/**/*.py"],
-    "extraPaths": ["./src"],
-    "pythonVersion": "3.12",
-    "typeCheckingMode": "standard",
-    "reportUnusedCallResult": false,
-    "reportExplicitAny": false,
-    "reportAny": false,
-    "reportUnknownMemberType": false,
-    "reportUntypedFunctionDecorator": false,
-    "reportUnnecessaryIsInstance": false,
-    "reportMissingTypeStubs": false,
-    "reportUnnecessaryTypeIgnoreComment": false
+  "include": ["src/**/*.py", "tests/**/*.py"],
+  "extraPaths": ["./src"],
+  "pythonVersion": "3.12",
+  "typeCheckingMode": "standard",
+  "reportUnusedCallResult": false,
+  "reportExplicitAny": false,
+  "reportAny": false,
+  "reportUnknownMemberType": false,
+  "reportUntypedFunctionDecorator": false,
+  "reportUnnecessaryIsInstance": false,
+  "reportMissingTypeStubs": false,
+  "reportUnnecessaryTypeIgnoreComment": false
 }

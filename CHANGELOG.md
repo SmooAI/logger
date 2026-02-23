@@ -24,34 +24,30 @@
 
 - 4f89541: ## Multi-Language Logger Ecosystem
 
-    This release transforms `@smooai/logger` into a comprehensive multi-language logging ecosystem:
+  This release transforms `@smooai/logger` into a comprehensive multi-language logging ecosystem:
 
-    ### 🐍 Python Package (`smooai-logger`)
+  ### 🐍 Python Package (`smooai-logger`)
+  - Available on PyPI as `smooai-logger`
+  - Full Python implementation with identical API to TypeScript version
+  - Synchronized versioning with npm package
 
-    - Available on PyPI as `smooai-logger`
-    - Full Python implementation with identical API to TypeScript version
-    - Synchronized versioning with npm package
+  ### 🦀 Rust Crate (`smooai-logger`)
+  - Available on crates.io as `smooai-logger`
+  - Native Rust logging implementation
+  - Synchronized versioning with npm package
 
-    ### 🦀 Rust Crate (`smooai-logger`)
+  ### 📊 Log Viewer CLI (`smooai-log-viewer`)
+  - Interactive GUI application for viewing `.smooai-logs` files
+  - Available as CLI command when installing npm package: `smooai-log-viewer`
+  - Cross-platform native binaries bundled with package
+  - Features filtering, searching, JSON expansion, and context viewing
 
-    - Available on crates.io as `smooai-logger`
-    - Native Rust logging implementation
-    - Synchronized versioning with npm package
+  ### 🔄 Automated Publishing Pipeline
+  - Single changesets release now publishes to npm, PyPI, and crates.io
+  - Automatic version synchronization across all packages
+  - Enhanced CI/CD workflow for multi-language support
 
-    ### 📊 Log Viewer CLI (`smooai-log-viewer`)
-
-    - Interactive GUI application for viewing `.smooai-logs` files
-    - Available as CLI command when installing npm package: `smooai-log-viewer`
-    - Cross-platform native binaries bundled with package
-    - Features filtering, searching, JSON expansion, and context viewing
-
-    ### 🔄 Automated Publishing Pipeline
-
-    - Single changesets release now publishes to npm, PyPI, and crates.io
-    - Automatic version synchronization across all packages
-    - Enhanced CI/CD workflow for multi-language support
-
-    This creates a unified logging solution across JavaScript/TypeScript, Python, and Rust ecosystems, all with consistent APIs and synchronized versions.
+  This creates a unified logging solution across JavaScript/TypeScript, Python, and Rust ecosystems, all with consistent APIs and synchronized versions.
 
 ## 3.1.2
 
@@ -126,9 +122,9 @@
 
 - ab4347d: Changed how browser was exported so it's in @smooai/logger/browser.
 
-    Prior BrowserLogger was at @smooai/logger/BrowserLogger.
+  Prior BrowserLogger was at @smooai/logger/BrowserLogger.
 
-    This seemed to lead to some issues when building downstream where node based utilities would get picked up from this package when building in browser land.
+  This seemed to lead to some issues when building downstream where node based utilities would get picked up from this package when building in browser land.
 
 ## 2.3.0
 
@@ -169,11 +165,11 @@
 
 - c9d9ad3: Breaking Change: Changed AwsLambdaLogger to AwsServerLogger.
 
-    AwsServerLogger is growing to have functionality beyond just Lambda (to soon include ECS) so it makes sense to change it now to AwsServerLogger.
+  AwsServerLogger is growing to have functionality beyond just Lambda (to soon include ECS) so it makes sense to change it now to AwsServerLogger.
 
-    Fixed ANSI colors in all places.
+  Fixed ANSI colors in all places.
 
-    Added file log output and log rotation enabled by default when running on server locally.
+  Added file log output and log rotation enabled by default when running on server locally.
 
 ## 1.2.4
 
