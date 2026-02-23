@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 3.2.2
+
+### Patch Changes
+
+- 2aae163: Fixed publishing versions and added scripts for rust/logger.
+
 ## 3.2.1
 
 ### Patch Changes
