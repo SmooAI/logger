@@ -90,17 +90,22 @@ jobs:
 
       - name: Publish smooai-logger to PyPI
         if: steps.changesets.outputs.published == 'true'
-        run: uv run poe publish
         working-directory: python
         env:
           UV_PUBLISH_TOKEN: ${{ secrets.SMOOAI_PYPI_TOKEN }}
+        run: |
+          # Clean stale build artifacts to prevent re-uploading old versions
+          rm -rf dist/
+          uv run poe publish
 
       - name: Publish smooai-logger to crates.io
         if: steps.changesets.outputs.published == 'true'
         uses: actions-rs/cargo@v1
         with:
           command: publish
-          args: --locked --manifest-path rust/logger/Cargo.toml
+          # --allow-dirty is needed because version:sync modifies Cargo.toml/Cargo.lock
+          # without committing them during the CI publish flow
+          args: --allow-dirty --manifest-path rust/logger/Cargo.toml
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.SMOOAI_CARGO_REGISTRY_TOKEN }}
 

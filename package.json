@@ -55,7 +55,7 @@
     "aibranch": "pnpm generate-git-branch",
     "build": "pnpm tsup && cp src/decycle.cjs dist/ && pnpm run python:build && pnpm run rust:build && pnpm run go:build && pnpm run log-viewer:bundle",
     "check-all": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run rust:fmt:check && pnpm run rust:lint && pnpm run rust:test && pnpm run go:fmt:check && pnpm run go:lint && pnpm run go:test && pnpm run log-viewer:validate && pnpm run build",
-    "ci:publish": "pnpm build && pnpm changeset publish && pnpm version:sync",
+    "ci:publish": "node scripts/ci-publish.mjs",
     "format": "oxfmt --write . && pnpm run python:format && pnpm run rust:fmt && pnpm run go:fmt && pnpm run log-viewer:format",
     "go:build": "(cd go && go build ./...)",
     "go:fmt": "(cd go && gofmt -w .)",

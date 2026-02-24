@@ -49,6 +49,7 @@ sequence = [{ cmd = "python scripts/bundle-log-viewer.py" }, { cmd = "uv build -
 
 [tool.poe.tasks.publish]
 sequence = [
+  { shell = "rm -rf dist/" },
   { cmd = "python scripts/bundle-log-viewer.py" },
   { cmd = "uv build --wheel --sdist" },
   { cmd = "uv publish" },
