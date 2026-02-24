@@ -20,24 +20,26 @@ import (
 
 // Options configures a new Logger.
 type Options struct {
-	Name        string
-	Level       Level
-	PrettyPrint *bool
-	LogToFile   *bool
-	Rotation    *RotationOptions
-	Context     Map
+	Name          string
+	Level         Level
+	PrettyPrint   *bool
+	LogToFile     *bool
+	Rotation      *RotationOptions
+	Context       Map
+	ContextConfig *ContextConfig
 }
 
 // Logger is a structured JSON logger that writes to stdout and optionally
 // to rotating log files, matching the smooai logging format.
 type Logger struct {
-	name        string
-	level       Level
-	prettyPrint bool
-	logToFile   bool
-	rotation    RotationOptions
-	writer      *rotatingWriter
-	output      io.Writer
+	name          string
+	level         Level
+	prettyPrint   bool
+	logToFile     bool
+	rotation      RotationOptions
+	contextConfig *ContextConfig
+	writer        *rotatingWriter
+	output        io.Writer
 }
 
 // New creates a new Logger with the given options.
@@ -111,13 +113,14 @@ func New(opts Options) (*Logger, error) {
 	}
 
 	return &Logger{
-		name:        name,
-		level:       level,
-		prettyPrint: prettyPrint,
-		logToFile:   logToFile,
-		rotation:    rotation,
-		writer:      rw,
-		output:      os.Stdout,
+		name:          name,
+		level:         level,
+		prettyPrint:   prettyPrint,
+		logToFile:     logToFile,
+		rotation:      rotation,
+		contextConfig: opts.ContextConfig,
+		writer:        rw,
+		output:        os.Stdout,
 	}, nil
 }
 
@@ -235,9 +238,20 @@ func (l *Logger) AddTelemetryFields(fields TelemetryFields) {
 
 // ErrorDetail represents a serialized error for structured logging.
 type ErrorDetail struct {
-	Message string `json:"message"`
-	Name    string `json:"name"`
-	Stack   string `json:"stack,omitempty"`
+	Message string   `json:"message"`
+	Name    string   `json:"name"`
+	Stack   string   `json:"stack,omitempty"`
+	Causes  []string `json:"causes,omitempty"`
+}
+
+// SetContextConfig sets the context config filter on the logger.
+func (l *Logger) SetContextConfig(config *ContextConfig) {
+	l.contextConfig = config
+}
+
+// ContextConfigValue returns the current context config, if any.
+func (l *Logger) ContextConfigValue() *ContextConfig {
+	return l.contextConfig
 }
 
 // buildLogObject constructs the log payload from the current context and args.
@@ -259,6 +273,22 @@ func (l *Logger) buildLogObject(level Level, msg string, args []any) Map {
 			buf := make([]byte, 4096)
 			n := runtime.Stack(buf, false)
 			detail.Stack = string(buf[:n])
+
+			// Walk the error chain to build causes
+			var causes []string
+			current := v
+			for {
+				unwrapped := errors_Unwrap(current)
+				if unwrapped == nil {
+					break
+				}
+				causes = append(causes, unwrapped.Error())
+				current = unwrapped
+			}
+			if len(causes) > 0 {
+				detail.Causes = causes
+			}
+
 			errors = append(errors, detail)
 		case map[string]any:
 			ctx, ok := payload[KeyContext].(Map)
@@ -274,11 +304,15 @@ func (l *Logger) buildLogObject(level Level, msg string, args []any) Map {
 		payload[KeyError] = errors[0].Message
 		details := make([]any, len(errors))
 		for i, e := range errors {
-			details[i] = Map{
+			detailMap := Map{
 				"message": e.Message,
 				"name":    e.Name,
 				"stack":   e.Stack,
 			}
+			if len(e.Causes) > 0 {
+				detailMap["causes"] = e.Causes
+			}
+			details[i] = detailMap
 		}
 		payload[KeyErrorDetails] = details
 	}
@@ -295,8 +329,33 @@ func (l *Logger) buildLogObject(level Level, msg string, args []any) Map {
 	payload[KeyTime] = time.Now().UTC().Format(time.RFC3339Nano)
 	payload[KeyName] = l.name
 
+	// Add caller info
+	caller := getCallerInfo(3) // skip buildLogObject → log method → caller
+	if caller != nil {
+		payload["caller"] = Map{
+			"file":     caller.File,
+			"line":     caller.Line,
+			"function": caller.Function,
+		}
+	}
+
+	// Apply context config filtering
+	if l.contextConfig != nil {
+		payload = ApplyContextConfig(payload, l.contextConfig)
+	}
+
 	removeNils(payload)
 	return payload
+}
+
+// errors_Unwrap is a helper to unwrap errors without importing the errors package
+// at the top level (to avoid name conflict with the local 'errors' variable).
+func errors_Unwrap(err error) error {
+	u, ok := err.(interface{ Unwrap() error })
+	if !ok {
+		return nil
+	}
+	return u.Unwrap()
 }
 
 func (l *Logger) emit(payload Map) error {
