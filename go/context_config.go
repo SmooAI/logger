@@ -18,8 +18,8 @@ const (
 // It forms a tree structure that can recursively filter nested maps.
 type ContextConfig struct {
 	Type     ContextConfigType
-	Keys     []string                   // For ConfigOnlyKeys
-	Children map[string]*ContextConfig  // For ConfigNested
+	Keys     []string                  // For ConfigOnlyKeys
+	Children map[string]*ContextConfig // For ConfigNested
 }
 
 // AllowAll returns a config that includes everything.

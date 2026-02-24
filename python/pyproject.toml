@@ -45,10 +45,7 @@ cmd = "uv sync --locked --group dev"
 cmd = "python scripts/bundle-log-viewer.py"
 
 [tool.poe.tasks.build]
-sequence = [
-  { cmd = "python scripts/bundle-log-viewer.py" },
-  { cmd = "uv build --wheel --sdist" },
-]
+sequence = [{ cmd = "python scripts/bundle-log-viewer.py" }, { cmd = "uv build --wheel --sdist" }]
 
 [tool.poe.tasks.publish]
 sequence = [

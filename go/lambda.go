@@ -84,8 +84,8 @@ func (l *LambdaLogger) AddLambdaEnvironmentContext() {
 // message ID, event source, event source ARN, and receipt handle.
 func (l *LambdaLogger) AddSQSRecordContext(record events.SQSMessage) {
 	sqsCtx := Map{
-		"messageId":     record.MessageId,
-		"eventSource":   record.EventSource,
+		"messageId":      record.MessageId,
+		"eventSource":    record.EventSource,
 		"eventSourceArn": record.EventSourceARN,
 	}
 
