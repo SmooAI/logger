@@ -515,6 +515,149 @@ func TestCloneMapNil(t *testing.T) {
 	}
 }
 
+func TestContextConfigFiltersLogOutput(t *testing.T) {
+	resetGlobalContext()
+	var buf bytes.Buffer
+
+	prettyPrint := false
+	l, err := New(Options{
+		Name:          "ConfigTest",
+		Level:         LevelInfo,
+		PrettyPrint:   &prettyPrint,
+		ContextConfig: PresetConfigMinimal,
+	})
+	if err != nil {
+		t.Fatalf("New failed: %v", err)
+	}
+	l.output = &buf
+
+	l.AddHTTPRequest(HTTPRequest{
+		Method:   "POST",
+		Path:     "/api/users",
+		Hostname: "example.com",
+		Body:     Map{"password": "secret"},
+	})
+	l.AddHTTPResponse(HTTPResponse{
+		StatusCode: 201,
+		Body:       Map{"token": "secret-token"},
+	})
+
+	_ = l.Info("test with config")
+
+	var payload map[string]any
+	if err := json.Unmarshal(buf.Bytes(), &payload); err != nil {
+		t.Fatalf("Failed to parse log output: %v", err)
+	}
+
+	http, ok := payload[KeyHTTP].(map[string]any)
+	if !ok {
+		t.Fatal("http should be present in output")
+	}
+
+	req, ok := http["request"].(map[string]any)
+	if !ok {
+		t.Fatal("http.request should be present")
+	}
+	if req["method"] != "POST" {
+		t.Errorf("request.method = %v, want POST", req["method"])
+	}
+	if _, ok := req["body"]; ok {
+		t.Error("request.body should be filtered out by ConfigMinimal")
+	}
+
+	resp, ok := http["response"].(map[string]any)
+	if !ok {
+		t.Fatal("http.response should be present")
+	}
+	// statusCode is stored as float64 in JSON
+	if resp["statusCode"] != float64(201) {
+		t.Errorf("response.statusCode = %v, want 201", resp["statusCode"])
+	}
+	if _, ok := resp["body"]; ok {
+		t.Error("response.body should be filtered out by ConfigMinimal")
+	}
+}
+
+func TestErrorWithCausesChain(t *testing.T) {
+	resetGlobalContext()
+	var buf bytes.Buffer
+	l := Default()
+	l.output = &buf
+	l.prettyPrint = false
+
+	rootErr := fmt.Errorf("root cause")
+	wrappedErr := fmt.Errorf("middle: %w", rootErr)
+	topErr := fmt.Errorf("top level: %w", wrappedErr)
+
+	_ = l.Error("chain test", topErr)
+
+	var payload map[string]any
+	if err := json.Unmarshal(buf.Bytes(), &payload); err != nil {
+		t.Fatalf("Failed to parse log output: %v", err)
+	}
+
+	details, ok := payload[KeyErrorDetails].([]any)
+	if !ok || len(details) == 0 {
+		t.Fatal("errorDetails should be present")
+	}
+
+	detail, ok := details[0].(map[string]any)
+	if !ok {
+		t.Fatal("errorDetails[0] should be a map")
+	}
+
+	if !strings.Contains(detail["message"].(string), "top level") {
+		t.Errorf("message should contain 'top level', got %v", detail["message"])
+	}
+
+	causes, ok := detail["causes"].([]any)
+	if !ok || len(causes) < 2 {
+		t.Fatalf("causes should have at least 2 entries, got %v", detail["causes"])
+	}
+
+	if !strings.Contains(causes[0].(string), "middle") {
+		t.Errorf("causes[0] should contain 'middle', got %v", causes[0])
+	}
+	if causes[1] != "root cause" {
+		t.Errorf("causes[1] = %v, want %q", causes[1], "root cause")
+	}
+}
+
+func TestCallerInfoInLogOutput(t *testing.T) {
+	resetGlobalContext()
+	var buf bytes.Buffer
+	l := Default()
+	l.output = &buf
+	l.prettyPrint = false
+
+	_ = l.Info("caller test")
+
+	var payload map[string]any
+	if err := json.Unmarshal(buf.Bytes(), &payload); err != nil {
+		t.Fatalf("Failed to parse log output: %v", err)
+	}
+
+	caller, ok := payload["caller"].(map[string]any)
+	if !ok {
+		t.Fatal("caller field should be present in log output")
+	}
+
+	file, ok := caller["file"].(string)
+	if !ok || file == "" {
+		t.Error("caller.file should be a non-empty string")
+	}
+
+	line, ok := caller["line"].(float64)
+	if !ok || line <= 0 {
+		t.Error("caller.line should be a positive number")
+	}
+
+	fn, ok := caller["function"].(string)
+	if !ok || fn == "" {
+		t.Error("caller.function should be a non-empty string")
+	}
+}
+
 func TestSetAndGetLevel(t *testing.T) {
 	l := Default()
 	l.SetLevel(LevelDebug)
