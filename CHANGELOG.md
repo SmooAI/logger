@@ -1,5 +1,17 @@
 # @smooai/logger
 
+## 4.0.0
+
+### Major Changes
+
+- 05cb4d7: Add context config filtering, Lambda adapter, and caller tracking to Go logger
+
+  - Port ContextConfig system from Rust (AllowAll/Deny/OnlyKeys/Nested recursive filtering)
+  - Add PresetConfigMinimal and PresetConfigFull presets
+  - Add CallerInfo with runtime.Caller for file/line/function tracking
+  - Add LambdaLogger with AWS Lambda context, SQS, and API Gateway integration
+  - Add error cause chain walking via errors.Unwrap in ErrorDetail
+
 ## 3.3.0
 
 ### Minor Changes
@@ -38,22 +50,26 @@
   This release transforms `@smooai/logger` into a comprehensive multi-language logging ecosystem:
 
   ### 🐍 Python Package (`smooai-logger`)
+
   - Available on PyPI as `smooai-logger`
   - Full Python implementation with identical API to TypeScript version
   - Synchronized versioning with npm package
 
   ### 🦀 Rust Crate (`smooai-logger`)
+
   - Available on crates.io as `smooai-logger`
   - Native Rust logging implementation
   - Synchronized versioning with npm package
 
   ### 📊 Log Viewer CLI (`smooai-log-viewer`)
+
   - Interactive GUI application for viewing `.smooai-logs` files
   - Available as CLI command when installing npm package: `smooai-log-viewer`
   - Cross-platform native binaries bundled with package
   - Features filtering, searching, JSON expansion, and context viewing
 
   ### 🔄 Automated Publishing Pipeline
+
   - Single changesets release now publishes to npm, PyPI, and crates.io
   - Automatic version synchronization across all packages
   - Enhanced CI/CD workflow for multi-language support
