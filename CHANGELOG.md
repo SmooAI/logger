@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 4.0.2
+
+### Patch Changes
+
+- ba9bd4c: Publish v4.0.1 fixes to PyPI and crates.io (previous release publish was interrupted)
+
 ## 4.0.1
 
 ### Patch Changes
