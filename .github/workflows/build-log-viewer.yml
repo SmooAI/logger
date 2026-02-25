@@ -13,7 +13,7 @@ jobs:
           - os: macos-latest
             asset_name: smooai-log-viewer-darwin-arm64
             binary_name: smooai-log-viewer
-          - os: macos-13
+          - os: macos-15-intel
             asset_name: smooai-log-viewer-darwin-x64
             binary_name: smooai-log-viewer
           - os: ubuntu-latest

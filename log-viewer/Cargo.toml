@@ -20,13 +20,13 @@ rayon = "1.10"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 regex = "1.10"
-chrono = { version = "=0.4.31", features = ["serde"] }
+chrono = { version = "0.4", features = ["serde"] }
 rfd = "0.15"
 eframe = { version = "0.28", features = ["persistence"] }
 egui = "0.28"
 egui_extras = "0.28"
 image = { version = "0.25", default-features = false, features = ["png"] }
-duckdb = { version = "0.9.2", features = ["bundled"] }
+duckdb = { version = "1.4", features = ["bundled"] }
 
 [dependencies.simd-json]
 version = "0.13"
