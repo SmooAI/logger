@@ -1,0 +1,21 @@
+{
+    "$schema": "https://json.schemastore.org/claude-code-settings.json",
+    "hooks": {
+        "PreToolUse": [
+            {
+                "matcher": "Edit|Write",
+                "hooks": [{ "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/enforce-worktree.sh" }]
+            },
+            {
+                "matcher": "Bash",
+                "hooks": [{ "type": "command", "command": "\"$CLAUDE_PROJECT_DIR\"/.claude/hooks/enforce-worktree.sh" }]
+            }
+        ],
+        "SessionStart": [
+            {
+                "matcher": "startup",
+                "hooks": [{ "type": "command", "command": "BRANCH=$(git -C \"$CLAUDE_PROJECT_DIR\" symbolic-ref --short HEAD 2>/dev/null); if [[ \"$BRANCH\" == \"main\" || \"$BRANCH\" == \"master\" ]]; then REPO_NAME=$(basename \"$CLAUDE_PROJECT_DIR\"); echo \"⚠️  You are in the MAIN worktree on the main branch. Do NOT do feature work here. Create a worktree first: git worktree add ../${REPO_NAME}-SMOODEV-XX-desc -b SMOODEV-XX-desc main\"; fi" }]
+            }
+        ]
+    }
+}
