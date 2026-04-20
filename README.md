@@ -29,15 +29,15 @@
 
 <!-- ABOUT THE PROJECT -->
 
-## About SmooAI
+## About Smoo AI
 
-SmooAI is an AI-powered platform for helping businesses multiply their customer, employee, and developer experience.
+**[Smoo AI](https://smoo.ai)** is an AI platform that helps businesses multiply their customer, employee, and developer experience — conversational AI for support and sales, paired with the production-grade developer tooling we use to build it.
 
-Learn more on [smoo.ai](https://smoo.ai)
+This library is part of a small family of open-source packages we maintain to keep our own stack honest: contextual logging, typed HTTP, file storage, and agent orchestration. Use them in your stack, or take them as a reference for how we build.
 
-## SmooAI Packages
-
-Check out other SmooAI packages at [smoo.ai/open-source](https://smoo.ai/open-source)
+- 🌐 [smoo.ai](https://smoo.ai) — the product
+- 📦 [smoo.ai/open-source](https://smoo.ai/open-source) — every open-source package we ship
+- 🐙 [github.com/SmooAI](https://github.com/SmooAI) — the source
 
 ## About @smooai/logger
 
