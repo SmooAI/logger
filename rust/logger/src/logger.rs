@@ -538,7 +538,7 @@ impl FromIterator<LogArgs> for LogArgs {
     fn from_iter<T: IntoIterator<Item = LogArgs>>(iter: T) -> Self {
         let mut args = LogArgs::new();
         for sub in iter {
-            args.extend(sub.into_iter());
+            args.extend(sub);
         }
         args
     }
