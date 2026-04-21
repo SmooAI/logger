@@ -1,5 +1,43 @@
 # @smooai/logger
 
+## 4.1.0
+
+### Minor Changes
+
+- 94daf9b: **Add top-level `browser` export condition + bare `./browser` entry**
+
+  `@smooai/logger` already shipped a browser-safe build under `./browser` (exposing `BrowserLogger`, a browser-native `Logger`, and a full `index`), but the top-level `.` entry had no `browser` condition. Browser bundlers therefore resolved `import { Logger } from '@smooai/logger'` to the Node entry, pulling `rotating-file-stream`, `node:fs`, and related Node-only dependencies into the bundle.
+
+  Adding the `browser` condition on `.` means consumers can now do:
+
+  ```ts
+  import { Logger } from "@smooai/logger";
+  ```
+
+  …and the bundler automatically picks the browser-safe dist when building for a browser target. No aliasing or explicit `/browser` subpath import required.
+
+  Also added a bare `./browser` entry (in addition to the existing `./browser/*` subpath pattern) so `import X from '@smooai/logger/browser'` resolves to `dist/browser/index.*` without needing the explicit `/index` suffix.
+
+### Patch Changes
+
+- d2af83b: **Drop deprecated `baseUrl` from tsconfig**
+
+  The previous attempt used `ignoreDeprecations: "5.0"` which works locally but CI expects `"6.0"` (depends on exact patch version of TypeScript). Nothing in the codebase relies on baseUrl (no `paths`, no imports start with `./src/...` from a module root), so the cleaner fix is to just remove it. This unblocks the Release workflow which has been red since TypeScript began flagging the deprecation.
+
+- c192d42: **Fix Rust clippy `useless_conversion` lint (Rust 1.95)**
+
+  Rust 1.95's clippy flags `args.extend(sub.into_iter())` as useless — `.extend()` already accepts `IntoIterator`. Remove the `.into_iter()` call so the Release workflow's lint step passes on the pinned-stable toolchain.
+
+- cc30c41: **Silence TS5101 deprecation warning for `baseUrl` in tsconfig**
+
+  TypeScript 5.0+ flags the `baseUrl` compiler option as deprecated (to be removed in TS 7.0). The repo's `tsconfig.json` still uses `baseUrl: "./"`; recent Release workflow runs failed during typecheck with:
+
+  ```
+  tsconfig.json: error TS5101: Option 'baseUrl' is deprecated
+  ```
+
+  Adds `"ignoreDeprecations": "5.0"` to quiet the warning until we do a wider tsconfig modernisation. No behavioural change.
+
 ## 4.0.3
 
 ### Patch Changes
@@ -67,22 +105,26 @@
   This release transforms `@smooai/logger` into a comprehensive multi-language logging ecosystem:
 
   ### 🐍 Python Package (`smooai-logger`)
+
   - Available on PyPI as `smooai-logger`
   - Full Python implementation with identical API to TypeScript version
   - Synchronized versioning with npm package
 
   ### 🦀 Rust Crate (`smooai-logger`)
+
   - Available on crates.io as `smooai-logger`
   - Native Rust logging implementation
   - Synchronized versioning with npm package
 
   ### 📊 Log Viewer CLI (`smooai-log-viewer`)
+
   - Interactive GUI application for viewing `.smooai-logs` files
   - Available as CLI command when installing npm package: `smooai-log-viewer`
   - Cross-platform native binaries bundled with package
   - Features filtering, searching, JSON expansion, and context viewing
 
   ### 🔄 Automated Publishing Pipeline
+
   - Single changesets release now publishes to npm, PyPI, and crates.io
   - Automatic version synchronization across all packages
   - Enhanced CI/CD workflow for multi-language support
