@@ -78,12 +78,12 @@ go get github.com/SmooAI/logger/go/v3
 
 The same structured log format works across all your services:
 
-| Language   | Package | Install |
-| ---------- | ------- | ------- |
-| TypeScript | [`@smooai/logger`](https://www.npmjs.com/package/@smooai/logger) | `pnpm add @smooai/logger` |
-| Python     | [`smooai-logger`](https://pypi.org/project/smooai-logger/) | `pip install smooai-logger` |
-| Rust       | [`smooai-logger`](https://crates.io/crates/smooai-logger) | `cargo add smooai-logger` |
-| Go         | `github.com/SmooAI/logger/go/v3` | `go get github.com/SmooAI/logger/go/v3` |
+| Language   | Package                                                          | Install                                 |
+| ---------- | ---------------------------------------------------------------- | --------------------------------------- |
+| TypeScript | [`@smooai/logger`](https://www.npmjs.com/package/@smooai/logger) | `pnpm add @smooai/logger`               |
+| Python     | [`smooai-logger`](https://pypi.org/project/smooai-logger/)       | `pip install smooai-logger`             |
+| Rust       | [`smooai-logger`](https://crates.io/crates/smooai-logger)        | `cargo add smooai-logger`               |
+| Go         | `github.com/SmooAI/logger/go/v3`                                 | `go get github.com/SmooAI/logger/go/v3` |
 
 ## The Power of Automatic Context
 

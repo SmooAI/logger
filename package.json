@@ -33,6 +33,11 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
+      "browser": {
+        "import": "./dist/browser/index.mjs",
+        "require": "./dist/browser/index.js",
+        "default": "./dist/browser/index.js"
+      },
       "import": "./dist/index.mjs",
       "require": "./dist/index.js",
       "default": "./dist/index.js"
@@ -41,6 +46,12 @@
       "types": "./dist/*.d.ts",
       "import": "./dist/*.mjs",
       "require": "./dist/*.js"
+    },
+    "./browser": {
+      "types": "./dist/browser/index.d.ts",
+      "import": "./dist/browser/index.mjs",
+      "require": "./dist/browser/index.js",
+      "default": "./dist/browser/index.js"
     },
     "./browser/*": {
       "types": "./dist/browser/*.d.ts",
