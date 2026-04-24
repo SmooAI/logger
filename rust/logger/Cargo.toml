@@ -7,7 +7,7 @@ license = "MIT"
 repository = "https://github.com/SmooAI/logger"
 homepage = "https://github.com/SmooAI/logger"
 keywords = ["logging", "structured-logging", "smooai", "observability", "context"]
-categories = ["development-tools::debugging", "logging"]
+categories = ["development-tools::debugging"]
 readme = "README.md"
 
 [dependencies]
