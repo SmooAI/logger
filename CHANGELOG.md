@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 4.1.1
+
+### Patch Changes
+
+- 1db237b: SMOODEV-662: Sync SmooAI.Logger NuGet version to package.json + polish NuGet README + wire NuGet publish into release workflow
+
 ## 4.1.0
 
 ### Minor Changes
