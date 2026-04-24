@@ -1,5 +1,12 @@
 # @smooai/logger
 
+## 4.1.3
+
+### Patch Changes
+
+- 3aeac72: SMOODEV-666: Multi-target the SmooAI.Logger NuGet package to `net8.0;net9.0;net10.0` so consumers on every current .NET LTS + STS release get a native framework match in the `lib/` folder. Microsoft.Extensions.Logging.Abstractions 8.0.2 resolves cleanly on all three — no per-TFM conditionals needed.
+- 1fffdde: SMOODEV-667: Drop invalid `logging` crates.io category slug that was aborting the release pipeline before it could reach the NuGet publish step. crates.io only accepts categories from its fixed list (`development-tools::debugging` stays). This unblocks `SmooAI.Logger` NuGet publishes for the first time since the .NET port landed — NuGet was stuck on the 0.1.0 placeholder while npm had advanced to 4.1.2.
+
 ## 4.1.2
 
 ### Patch Changes
