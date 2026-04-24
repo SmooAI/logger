@@ -1,14 +1,26 @@
 # SmooAI.Logger
 
-**Structured, contextual logging for .NET — correlation IDs, typed request/user context, and JSON-line output that plays nicely with CloudWatch, Datadog, and anything that reads JSON.**
+[![NuGet](https://img.shields.io/nuget/v/SmooAI.Logger.svg)](https://www.nuget.org/packages/SmooAI.Logger)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-.NET port of [`@smooai/logger`](https://github.com/SmooAI/logger). Wire-compatible with the TypeScript, Python, Go, and Rust ports — the same JSON shape, the same fields, the same correlation semantics. Wraps `Microsoft.Extensions.Logging.ILogger` so existing sinks (Serilog, AWS.Logger, `ConsoleLoggerProvider`) receive every structured field.
+**Structured logs for .NET that carry the full story — correlation IDs, request + response, user, and caller location on every line.**
+
+.NET port of [`@smooai/logger`](https://github.com/SmooAI/logger). Drop it into a Lambda, ECS service, or worker and every log entry tells you *where* it fired, *who* triggered it, and *which request* it belonged to — without threading context through every method. JSON lines that land in CloudWatch, Datadog, or any `ILogger` sink, and wire-compatible with the TypeScript, Python, Go, and Rust ports.
 
 ## Install
 
 ```bash
 dotnet add package SmooAI.Logger
 ```
+
+## What you get
+
+- **Correlation across services** — a single `correlationId` flows through HTTP calls, SQS records, and background tasks so you can grep one ID and see the whole request.
+- **Typed user + request + response fields** — no more stringly-typed `["user_id"] = user.Id`. Push a `User`, `HttpRequest`, or `HttpResponse` and the logger serializes every relevant field.
+- **Exact caller location** — every line carries file + method + line number. No more hunting for which service logged what.
+- **Structured by default** — strict JSON lines in production, ANSI pretty-print locally.
+- **Wire-compatible with every other SmooAI.Logger port** — the schema is the same in TS, Python, Go, and Rust, so distributed traces stitch together across language boundaries.
+- **Works with `Microsoft.Extensions.Logging`** — forward to Serilog, AWS.Logger, or any `ILogger` sink without losing structure.
 
 ## Quick start
 
@@ -46,15 +58,27 @@ Output (CloudWatch-friendly JSON line):
 }
 ```
 
-## Why SmooAI.Logger?
+## Track a request end-to-end
 
-`Microsoft.Extensions.Logging` gives you levels and scopes but leaves correlation, request context, user context, and AWS-friendly JSON emission up to you. SmooAI.Logger layers those on:
+```csharp
+// Correlation IDs thread through your system automatically
+log.SetCorrelationId(Request.Headers["X-Correlation-Id"]);
+log.SetUser(new User { Id = user.Id, Role = user.Role });
+log.SetRequestContext(Request);
 
-- **Correlation IDs out of the box** — every logger instance gets a `correlationId` / `requestId` / `traceId` at construction; propagate them across service boundaries without re-plumbing.
-- **Typed HTTP + user + AWS context** — `SetRequestContext`, `SetResponseContext`, `SetUser`, `SetLambdaContext` attach strongly-typed metadata that surfaces as first-class fields on every subsequent log line.
-- **Scoped context** — `using (log.BeginScope(new { requestId = "req_789" }))` merges context for the block; thread-safe snapshotting means concurrent `LogInfo` calls don't step on each other.
-- **Forward to any `ILogger`** — set `ForwardTo = factory.CreateLogger(...)` and your structured entry flows through the rest of your logging pipeline unchanged.
-- **Pretty in dev, JSON in prod** — auto-detects `IS_LOCAL` / `SST_DEV` / `GITHUB_ACTIONS`; force with `PrettyPrint = true/false`.
+try
+{
+    var order = await CreateOrderAsync(dto);
+    log.LogInfo("Order created", new { orderId = order.Id });
+    return Ok(order);
+}
+catch (Exception ex)
+{
+    // Error logs carry the full context: correlation ID, user, request, stack
+    log.LogError("Order creation failed", ex);
+    throw;
+}
+```
 
 ## Scopes and correlation
 
@@ -66,7 +90,11 @@ using (log.BeginScope(new Dictionary<string, object?> { ["requestId"] = "req_789
 }
 ```
 
-## Forwarding to Microsoft.Extensions.Logging
+`BeginScope` is thread-safe — concurrent `LogInfo` calls inside the same scope don't step on each other.
+
+## Forwarding to `Microsoft.Extensions.Logging`
+
+Wire the SmooLogger to an upstream `ILogger` (Serilog, AWS.Logger, or whatever your org is standardized on) and every structured field rides through as a scope so downstream sinks still see the full story.
 
 ```csharp
 using Microsoft.Extensions.Logging;
@@ -94,8 +122,8 @@ The SmooLogger still emits JSON to stdout **and** forwards the structured payloa
 ## Related
 
 - [`@smooai/logger`](https://www.npmjs.com/package/@smooai/logger) — TypeScript / Node
-- [`smooai-logger`](https://crates.io/crates/smooai-logger) — Rust
 - [`smooai-logger`](https://pypi.org/project/smooai-logger/) — Python
+- [`smooai-logger`](https://crates.io/crates/smooai-logger) — Rust
 - [`github.com/SmooAI/logger/go`](https://github.com/SmooAI/logger/tree/main/go) — Go
 
 ## License
