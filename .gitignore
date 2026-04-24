@@ -55,3 +55,10 @@ python/**/__pycache__/
 # Rust build artifacts
 log-viewer/target/
 rust/logger/target/
+
+# .NET build artifacts
+dotnet/**/bin/
+dotnet/**/obj/
+dotnet/dist/
+*.nupkg
+*.snupkg
