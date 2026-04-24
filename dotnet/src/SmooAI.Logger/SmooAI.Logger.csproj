@@ -12,7 +12,7 @@
 
   <PropertyGroup>
     <PackageId>SmooAI.Logger</PackageId>
-    <Version>0.1.0</Version>
+    <Version>4.1.0</Version>
     <Authors>SmooAI</Authors>
     <Company>SmooAI</Company>
     <Description>Contextual structured logger for AWS and server environments. .NET port of @smooai/logger — wraps Microsoft.Extensions.Logging.ILogger with correlation IDs, HTTP request/response context, user context, and structured JSON output.</Description>
