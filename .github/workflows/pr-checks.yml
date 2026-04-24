@@ -47,6 +47,11 @@ jobs:
           go-version: "1.22"
           cache-dependency-path: go/go.sum
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
       - name: Install dependencies
         run: pnpm install
 
@@ -65,3 +70,10 @@ jobs:
 
       - name: Build
         run: pnpm build
+
+      - name: .NET build + test
+        run: |
+          dotnet restore SmooAI.Logger.sln
+          dotnet build SmooAI.Logger.sln -c Release --no-restore
+          dotnet test SmooAI.Logger.sln -c Release --no-build --nologo
+        working-directory: dotnet

@@ -1,0 +1,50 @@
+name: Publish NuGet
+
+on:
+  push:
+    tags:
+      - "dotnet-v*"
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: dotnet
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Restore
+        run: dotnet restore SmooAI.Logger.sln
+
+      - name: Build
+        run: dotnet build SmooAI.Logger.sln -c Release --no-restore
+
+      - name: Test
+        run: dotnet test SmooAI.Logger.sln -c Release --no-build --nologo
+
+      - name: Pack
+        run: dotnet pack src/SmooAI.Logger/SmooAI.Logger.csproj -c Release --no-build -o dist
+
+      - name: Push to NuGet
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          dotnet nuget push "dist/*.nupkg" \
+            --api-key "$NUGET_API_KEY" \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: nupkg
+          path: dotnet/dist/*.nupkg
