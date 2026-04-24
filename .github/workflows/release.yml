@@ -62,6 +62,11 @@ jobs:
           go-version: "1.22"
           cache-dependency-path: go/go.sum
 
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
       - name: Install dependencies
         run: pnpm install
 
@@ -124,6 +129,34 @@ jobs:
           git tag "${TAG}"
           git push origin "${TAG}"
           echo "Go module tagged and pushed: ${TAG}"
+
+      - name: Build and test .NET
+        if: steps.changesets.outputs.published == 'true'
+        working-directory: dotnet
+        run: |
+          dotnet restore SmooAI.Logger.sln
+          dotnet build SmooAI.Logger.sln -c Release --no-restore
+          dotnet test SmooAI.Logger.sln -c Release --no-build --nologo
+
+      - name: Pack and publish SmooAI.Logger to NuGet
+        if: steps.changesets.outputs.published == 'true'
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Packing SmooAI.Logger ${VERSION}"
+          dotnet pack dotnet/src/SmooAI.Logger/SmooAI.Logger.csproj \
+            --configuration Release \
+            -p:Version=${VERSION} \
+            -p:PackageVersion=${VERSION} \
+            -o dotnet/artifacts
+          for pkg in dotnet/artifacts/*.nupkg; do
+            echo "Pushing $pkg to NuGet..."
+            dotnet nuget push "$pkg" \
+              --api-key "${NUGET_API_KEY}" \
+              --source https://api.nuget.org/v3/index.json \
+              --skip-duplicate
+          done
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
 
       - name: Auto-Merge Changeset PR
         run: |

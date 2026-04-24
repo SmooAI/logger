@@ -75,6 +75,16 @@ const updates = [
       return content.replace(pattern, `$1${version}$3`);
     },
   },
+  {
+    path: "dotnet/src/SmooAI.Logger/SmooAI.Logger.csproj",
+    apply(content) {
+      const pattern = /(<Version>)([^<]+)(<\/Version>)/;
+      if (!pattern.test(content)) {
+        throw new Error("<Version> element not found in dotnet/src/SmooAI.Logger/SmooAI.Logger.csproj");
+      }
+      return content.replace(pattern, `$1${version}$3`);
+    },
+  },
 ];
 
 let touched = 0;
