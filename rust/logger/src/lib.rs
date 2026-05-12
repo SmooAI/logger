@@ -18,3 +18,14 @@ pub use crate::logger::{Level, LogArgs, Logger, LoggerOptions};
 pub use crate::rotation::RotationOptions;
 
 pub use serde_json::json;
+
+/// Crate-wide test serialization lock. All tests that touch the global
+/// `CONTEXT` (via `reset_global_context`, `add_base_context`, namespace /
+/// correlation setters, env-var writes consumed by AWS context helpers, etc.)
+/// must acquire this same `Mutex<()>` before mutating state, so the three
+/// test modules (`context`, `logger`, `aws`) don't race. `cargo test`
+/// otherwise runs the modules in parallel even though tests inside one
+/// module are serialized by their own lock — which is what blew up the
+/// SMOODEV-942 / SMOODEV-943 release pipeline.
+#[cfg(test)]
+pub(crate) static TEST_GLOBAL_LOCK: std::sync::Mutex<()> = std::sync::Mutex::new(());

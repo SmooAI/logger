@@ -383,14 +383,9 @@ pub fn context_value<T: Serialize>(value: T) -> Value {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::sync::Mutex;
-
-    /// Tests that modify global context must hold this lock.
-    static TEST_LOCK: Mutex<()> = Mutex::new(());
-
     #[test]
     fn default_context_initializes_ids() {
-        let _guard = TEST_LOCK.lock().unwrap();
+        let _guard = crate::TEST_GLOBAL_LOCK.lock().unwrap_or_else(|e| e.into_inner());
         reset_global_context();
         let context = global_context();
         let obj = context.as_object().unwrap();

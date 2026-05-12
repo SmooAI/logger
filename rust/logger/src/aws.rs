@@ -279,15 +279,9 @@ mod tests {
     use super::*;
     use crate::context::reset_global_context;
     use crate::logger::Logger;
-    use std::sync::Mutex;
-
-    /// Env-var-modifying tests must hold this lock; std::env::set_var is not
-    /// thread-safe and Rust tests run in parallel by default.
-    static ENV_LOCK: Mutex<()> = Mutex::new(());
-
     #[test]
     fn add_ecs_context_picks_up_env_vars() {
-        let _guard = ENV_LOCK.lock().unwrap();
+        let _guard = crate::TEST_GLOBAL_LOCK.lock().unwrap_or_else(|e| e.into_inner());
         reset_global_context();
         // SAFETY: protected by ENV_LOCK above.
         unsafe {
@@ -318,7 +312,7 @@ mod tests {
 
     #[test]
     fn add_lambda_environment_context_reads_env() {
-        let _guard = ENV_LOCK.lock().unwrap();
+        let _guard = crate::TEST_GLOBAL_LOCK.lock().unwrap_or_else(|e| e.into_inner());
         reset_global_context();
         // SAFETY: protected by ENV_LOCK above.
         unsafe {
