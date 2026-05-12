@@ -103,6 +103,35 @@ func TestAddLambdaEnvironmentContext(t *testing.T) {
 	}
 }
 
+func TestAddECSContext(t *testing.T) {
+	resetGlobalContext()
+	os.Setenv("ECS_CONTAINER_METADATA_URI_V4", "http://169.254.170.2/v4/abc")
+	os.Setenv("AWS_EXECUTION_ENV", "AWS_ECS_FARGATE")
+	os.Setenv("AWS_REGION", "us-east-1")
+	defer os.Unsetenv("ECS_CONTAINER_METADATA_URI_V4")
+	defer os.Unsetenv("AWS_EXECUTION_ENV")
+	defer os.Unsetenv("AWS_REGION")
+
+	l := Default()
+	ll := NewLambdaLogger(l)
+	ll.AddECSContext()
+
+	logCtx := ll.Context()
+	ecsMap, ok := logCtx["ecs"].(Map)
+	if !ok {
+		t.Fatal("ecs context should be present")
+	}
+	if ecsMap["containerMetadataUriV4"] != "http://169.254.170.2/v4/abc" {
+		t.Errorf("containerMetadataUriV4 = %v", ecsMap["containerMetadataUriV4"])
+	}
+	if ecsMap["executionEnv"] != "AWS_ECS_FARGATE" {
+		t.Errorf("executionEnv = %v", ecsMap["executionEnv"])
+	}
+	if ecsMap["region"] != "us-east-1" {
+		t.Errorf("region = %v", ecsMap["region"])
+	}
+}
+
 func TestAddSQSRecordContext(t *testing.T) {
 	resetGlobalContext()
 	l := Default()

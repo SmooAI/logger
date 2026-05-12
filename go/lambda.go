@@ -80,6 +80,22 @@ func (l *LambdaLogger) AddLambdaEnvironmentContext() {
 	}
 }
 
+// AddECSContext adds ECS task/container metadata to the logger context under
+// the "ecs" key, mirroring Python's aws_logger.add_ecs_context. Reads the
+// standard ECS-on-Fargate / Amazon-ECS-Agent env vars.
+func (l *LambdaLogger) AddECSContext() {
+	ecsCtx := Map{
+		"containerCredentialsRelativeUri": os.Getenv("AWS_CONTAINER_CREDENTIALS_RELATIVE_URI"),
+		"containerMetadataUriV4":          os.Getenv("ECS_CONTAINER_METADATA_URI_V4"),
+		"containerMetadataUri":            os.Getenv("ECS_CONTAINER_METADATA_URI"),
+		"agentUri":                        os.Getenv("ECS_AGENT_URI"),
+		"executionEnv":                    os.Getenv("AWS_EXECUTION_ENV"),
+		"defaultRegion":                   os.Getenv("AWS_DEFAULT_REGION"),
+		"region":                          os.Getenv("AWS_REGION"),
+	}
+	l.AddBaseContext(Map{"ecs": ecsCtx})
+}
+
 // AddSQSRecordContext adds SQS message context to the logger, including
 // message ID, event source, event source ARN, and receipt handle.
 func (l *LambdaLogger) AddSQSRecordContext(record events.SQSMessage) {
