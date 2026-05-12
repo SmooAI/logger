@@ -717,3 +717,94 @@ func TestErrorWithoutMessage(t *testing.T) {
 		t.Errorf("msg = %v, want %q", payload[KeyMessage], "standalone error")
 	}
 }
+
+func TestRedactDefaultAuthHeaders(t *testing.T) {
+	resetGlobalContext()
+	var buf bytes.Buffer
+	l := Default()
+	l.output = &buf
+	l.prettyPrint = false
+
+	l.AddHTTPRequest(HTTPRequest{
+		Method: "POST",
+		Path:   "/api/x",
+		Headers: map[string]string{
+			"Authorization":        "Bearer super-secret",
+			"Cookie":               "session=abc",
+			"X-Api-Key":            "k_xxx",
+			"x-amz-security-token": "AQoDY...",
+			"User-Agent":           "smoo/1.0",
+		},
+	})
+	_ = l.Info("req received")
+
+	var payload map[string]any
+	if err := json.Unmarshal(buf.Bytes(), &payload); err != nil {
+		t.Fatalf("Failed to parse log output: %v", err)
+	}
+	httpCtx, _ := payload[KeyHTTP].(map[string]any)
+	req, _ := httpCtx["request"].(map[string]any)
+	headers, _ := req["headers"].(map[string]any)
+
+	for _, k := range []string{"Authorization", "Cookie", "X-Api-Key", "x-amz-security-token"} {
+		if headers[k] != RedactedValue {
+			t.Errorf("expected %q to be redacted, got %v", k, headers[k])
+		}
+	}
+	if headers["User-Agent"] != "smoo/1.0" {
+		t.Errorf("non-sensitive User-Agent header should be preserved, got %v", headers["User-Agent"])
+	}
+}
+
+func TestRedactSecretFieldNamesCaseInsensitive(t *testing.T) {
+	resetGlobalContext()
+	var buf bytes.Buffer
+	l := Default()
+	l.output = &buf
+	l.prettyPrint = false
+
+	_ = l.Info("ctx", Map{
+		"Password":      "hunter2",
+		"api_key":       "sk_xxx",
+		"refresh_token": "rt-2",
+		"client_secret": "cs",
+		"visible":       "ok",
+	})
+
+	var payload map[string]any
+	if err := json.Unmarshal(buf.Bytes(), &payload); err != nil {
+		t.Fatalf("Failed to parse log output: %v", err)
+	}
+	ctx, _ := payload[KeyContext].(map[string]any)
+	for _, k := range []string{"Password", "api_key", "refresh_token", "client_secret"} {
+		if ctx[k] != RedactedValue {
+			t.Errorf("expected %q to be redacted, got %v", k, ctx[k])
+		}
+	}
+	if ctx["visible"] != "ok" {
+		t.Errorf("visible should not be redacted")
+	}
+}
+
+func TestAddRedactKeysExtendsDefaults(t *testing.T) {
+	resetGlobalContext()
+	var buf bytes.Buffer
+	l := Default()
+	l.output = &buf
+	l.prettyPrint = false
+
+	l.AddRedactKeys("customSecret")
+	_ = l.Info("ctx", Map{"customSecret": "shh", "visible": "ok"})
+
+	var payload map[string]any
+	if err := json.Unmarshal(buf.Bytes(), &payload); err != nil {
+		t.Fatalf("Failed to parse log output: %v", err)
+	}
+	ctx, _ := payload[KeyContext].(map[string]any)
+	if ctx["customSecret"] != RedactedValue {
+		t.Errorf("expected customSecret redacted, got %v", ctx["customSecret"])
+	}
+	if ctx["visible"] != "ok" {
+		t.Errorf("visible should remain, got %v", ctx["visible"])
+	}
+}

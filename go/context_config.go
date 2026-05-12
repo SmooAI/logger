@@ -1,5 +1,76 @@
 package logger
 
+import "strings"
+
+// DefaultRedactKeys returns the default list of context keys whose values
+// will be replaced with [RedactedValue] before logging. Matching is
+// case-insensitive.
+func DefaultRedactKeys() []string {
+	return []string{
+		// Auth-bearing HTTP headers
+		"authorization",
+		"proxy-authorization",
+		"cookie",
+		"set-cookie",
+		"x-api-key",
+		"x-amz-security-token",
+		// Common credential / token field names
+		"password",
+		"passwd",
+		"secret",
+		"apikey",
+		"api_key",
+		"token",
+		"access_token",
+		"refresh_token",
+		"client_secret",
+	}
+}
+
+// RedactedValue is the placeholder string substituted in place of any
+// redacted value.
+const RedactedValue = "[REDACTED]"
+
+// redactSensitiveValues recursively walks `data` and replaces any field whose
+// key matches an entry in `redactSet` (case-insensitive) with [RedactedValue].
+// `redactSet` is keyed by lowercase entries.
+func redactSensitiveValues(data any, redactSet map[string]struct{}) any {
+	if len(redactSet) == 0 || data == nil {
+		return data
+	}
+	switch v := data.(type) {
+	case Map:
+		for k, val := range v {
+			if _, ok := redactSet[strings.ToLower(k)]; ok {
+				v[k] = RedactedValue
+			} else {
+				v[k] = redactSensitiveValues(val, redactSet)
+			}
+		}
+		return v
+	case []any:
+		for i, item := range v {
+			v[i] = redactSensitiveValues(item, redactSet)
+		}
+		return v
+	case map[string]string:
+		// HTTP header maps are commonly stored as map[string]string. Promote
+		// to a Map so we can mutate string values to "[REDACTED]" alongside
+		// the structured payload.
+		promoted := make(Map, len(v))
+		for k, val := range v {
+			if _, ok := redactSet[strings.ToLower(k)]; ok {
+				promoted[k] = RedactedValue
+			} else {
+				promoted[k] = val
+			}
+		}
+		return promoted
+	default:
+		return v
+	}
+}
+
 // ContextConfigType represents the type of context config filter.
 type ContextConfigType int
 

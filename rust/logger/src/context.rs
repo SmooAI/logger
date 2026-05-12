@@ -158,6 +158,58 @@ pub static CONFIG_MINIMAL: Lazy<ContextConfig> = Lazy::new(|| {
 
 pub const CONFIG_FULL: ContextConfig = ContextConfig::AllowAll;
 
+/// Default list of context keys whose values are replaced with `"[REDACTED]"`
+/// before logging. Matching is case-insensitive.
+pub fn default_redact_keys() -> Vec<String> {
+    vec![
+        // Auth-bearing HTTP headers
+        "authorization".into(),
+        "proxy-authorization".into(),
+        "cookie".into(),
+        "set-cookie".into(),
+        "x-api-key".into(),
+        "x-amz-security-token".into(),
+        // Common credential / token field names
+        "password".into(),
+        "passwd".into(),
+        "secret".into(),
+        "apikey".into(),
+        "api_key".into(),
+        "token".into(),
+        "access_token".into(),
+        "refresh_token".into(),
+        "client_secret".into(),
+    ]
+}
+
+/// Placeholder string substituted in place of any redacted value.
+pub const REDACTED_VALUE: &str = "[REDACTED]";
+
+/// Recursively walks `value` and replaces any field whose key matches an entry
+/// in `redact_keys` (case-insensitive) with `REDACTED_VALUE`.
+pub fn redact_sensitive_values(value: &mut Value, redact_keys: &std::collections::HashSet<String>) {
+    if redact_keys.is_empty() {
+        return;
+    }
+    match value {
+        Value::Object(map) => {
+            for (k, v) in map.iter_mut() {
+                if redact_keys.contains(&k.to_lowercase()) {
+                    *v = Value::String(REDACTED_VALUE.to_string());
+                } else {
+                    redact_sensitive_values(v, redact_keys);
+                }
+            }
+        }
+        Value::Array(arr) => {
+            for item in arr.iter_mut() {
+                redact_sensitive_values(item, redact_keys);
+            }
+        }
+        _ => {}
+    }
+}
+
 static GLOBAL_CONTEXT: Lazy<RwLock<ContextValue>> = Lazy::new(|| RwLock::new(Value::Object(default_context_map())));
 
 fn default_context_map() -> ContextMap {

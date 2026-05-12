@@ -278,6 +278,87 @@ public class SmooLoggerTests
     }
 
     [Fact]
+    public void Default_Redacts_Auth_Headers_In_Http_Request()
+    {
+        var (logger, writer) = Build();
+        logger.AddHttpRequest(new SmooHttpRequest
+        {
+            Method = "POST",
+            Path = "/api/x",
+            Headers = new Dictionary<string, string>
+            {
+                ["Authorization"] = "Bearer super-secret",
+                ["Cookie"] = "session=abc",
+                ["X-Api-Key"] = "k_xxx",
+                ["x-amz-security-token"] = "AQoDY...",
+                ["User-Agent"] = "smoo/1.0",
+            }
+        });
+        logger.LogInfo("req received");
+        var entry = ParseSingle(writer.ToString());
+
+        var headers = entry.GetProperty("http").GetProperty("request").GetProperty("headers");
+        Assert.Equal(SmooLogger.RedactedValue, headers.GetProperty("Authorization").GetString());
+        Assert.Equal(SmooLogger.RedactedValue, headers.GetProperty("Cookie").GetString());
+        Assert.Equal(SmooLogger.RedactedValue, headers.GetProperty("X-Api-Key").GetString());
+        Assert.Equal(SmooLogger.RedactedValue, headers.GetProperty("x-amz-security-token").GetString());
+        Assert.Equal("smoo/1.0", headers.GetProperty("User-Agent").GetString());
+    }
+
+    [Fact]
+    public void Default_Redacts_Secret_Field_Names_Case_Insensitive()
+    {
+        var (logger, writer) = Build();
+        logger.LogInfo("ctx", new Dictionary<string, object?>
+        {
+            ["Password"] = "hunter2",
+            ["api_key"] = "sk_xxx",
+            ["refresh_token"] = "rt-2",
+            ["client_secret"] = "cs",
+            ["visible"] = "ok",
+        });
+        var entry = ParseSingle(writer.ToString());
+        var ctx = entry.GetProperty("context");
+        Assert.Equal(SmooLogger.RedactedValue, ctx.GetProperty("Password").GetString());
+        Assert.Equal(SmooLogger.RedactedValue, ctx.GetProperty("api_key").GetString());
+        Assert.Equal(SmooLogger.RedactedValue, ctx.GetProperty("refresh_token").GetString());
+        Assert.Equal(SmooLogger.RedactedValue, ctx.GetProperty("client_secret").GetString());
+        Assert.Equal("ok", ctx.GetProperty("visible").GetString());
+    }
+
+    [Fact]
+    public void AddRedactKeys_Extends_Default_List()
+    {
+        var (logger, writer) = Build();
+        logger.AddRedactKeys(new[] { "customSecret" });
+        logger.LogInfo("ctx", new Dictionary<string, object?>
+        {
+            ["customSecret"] = "shh",
+            ["visible"] = "ok",
+        });
+        var entry = ParseSingle(writer.ToString());
+        var ctx = entry.GetProperty("context");
+        Assert.Equal(SmooLogger.RedactedValue, ctx.GetProperty("customSecret").GetString());
+        Assert.Equal("ok", ctx.GetProperty("visible").GetString());
+    }
+
+    [Fact]
+    public void RedactKeys_Constructor_Override_Disables_Defaults()
+    {
+        var (logger, writer) = Build(o => o.RedactKeys = new[] { "onlyThis" });
+        logger.LogInfo("ctx", new Dictionary<string, object?>
+        {
+            ["onlyThis"] = "x",
+            ["authorization"] = "Bearer plaintext-leak",
+        });
+        var entry = ParseSingle(writer.ToString());
+        var ctx = entry.GetProperty("context");
+        Assert.Equal(SmooLogger.RedactedValue, ctx.GetProperty("onlyThis").GetString());
+        // Default `authorization` was overridden — should NOT be redacted
+        Assert.Equal("Bearer plaintext-leak", ctx.GetProperty("authorization").GetString());
+    }
+
+    [Fact]
     public void Concurrent_Logging_Does_Not_Throw()
     {
         var (logger, writer) = Build();

@@ -280,6 +280,31 @@ def reset_global_context() -> None:
 
 
 # --------------------------------------------------------------------------------
+# Sensitive-field redaction defaults
+# --------------------------------------------------------------------------------
+DEFAULT_REDACT_KEYS: list[str] = [
+    # Auth-bearing HTTP headers
+    "authorization",
+    "proxy-authorization",
+    "cookie",
+    "set-cookie",
+    "x-api-key",
+    "x-amz-security-token",
+    # Common credential / token field names
+    "password",
+    "passwd",
+    "secret",
+    "apikey",
+    "api_key",
+    "token",
+    "access_token",
+    "refresh_token",
+    "client_secret",
+]
+REDACTED_VALUE: str = "[REDACTED]"
+
+
+# --------------------------------------------------------------------------------
 class Level(str, Enum):
     TRACE = "trace"
     DEBUG = "debug"
@@ -303,6 +328,7 @@ class Logger:
         pretty_print: bool | None = None,
         log_to_file: bool | None = None,
         rotation_options: RotationOptions | None = None,
+        redact_keys: list[str] | None = None,
     ) -> None:
         # Initialize global context if provided
         if context:
@@ -318,9 +344,46 @@ class Logger:
         self._file_handler: RotatingFileHandler | TimedRotatingFileHandler | None = None
         self._rotation_config: RotationConfig | None = None
 
+        # Redaction config — keys are stored lowercase for case-insensitive matching
+        seed = redact_keys if redact_keys is not None else DEFAULT_REDACT_KEYS
+        self._redact_keys: set[str] = {k.lower() for k in seed}
+
         # Set up rotating file if requested
         if self.log_to_file:
             self._setup_rotation_handler(rotation_options)
+
+    @property
+    def redact_keys(self) -> list[str]:
+        """Return the current redact-keys list (lowercased)."""
+        return sorted(self._redact_keys)
+
+    @redact_keys.setter
+    def redact_keys(self, keys: list[str]) -> None:
+        """Replace the redact-keys list (stored lowercased)."""
+        self._redact_keys = {k.lower() for k in keys}
+
+    def add_redact_keys(self, keys: list[str]) -> None:
+        """Add keys to the redact list. Existing entries are preserved."""
+        for k in keys:
+            self._redact_keys.add(k.lower())
+
+    def _redact_sensitive_values(self, obj: Any) -> Any:
+        """Recursively replace values for any key (case-insensitive) matching the redact list."""
+        if not self._redact_keys:
+            return obj
+        if isinstance(obj, dict):
+            out: dict[str, Any] = {}
+            for k, v in obj.items():  # pyright: ignore[reportUnknownVariableType]
+                if isinstance(k, str) and k.lower() in self._redact_keys:
+                    out[k] = REDACTED_VALUE
+                else:
+                    out[k] = self._redact_sensitive_values(v)
+            return out
+        if isinstance(obj, list):
+            return [self._redact_sensitive_values(v) for v in obj]  # pyright: ignore[reportUnknownVariableType]
+        if isinstance(obj, tuple):
+            return tuple(self._redact_sensitive_values(v) for v in obj)  # pyright: ignore[reportUnknownVariableType]
+        return obj
 
     def reset_context(self) -> None:
         """Reset the global context to its initial state."""
@@ -572,7 +635,8 @@ class Logger:
             if key in rec:
                 ordered[key] = rec.pop(key)
         ordered.update(rec)  # pyright: ignore[reportUnknownMemberType]
-        return self._remove_none(self._apply_context_config(cast(Context, cast(object, ordered))))
+        cleaned = self._remove_none(self._apply_context_config(cast(Context, cast(object, ordered))))
+        return cast(Context, cast(object, self._redact_sensitive_values(cleaned)))
 
     def _pretty_emit(self, record: Context) -> None:
         sep = "-" * 100

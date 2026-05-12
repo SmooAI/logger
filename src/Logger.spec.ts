@@ -354,4 +354,88 @@ describe("Test Logger", () => {
     expect(loggedObject[ContextKey.ErrorDetails]).toHaveLength(2);
     expect(loggedObject[ContextKey.Message]).toBe("Additional message");
   });
+
+  describe("redaction", () => {
+    test("redacts default sensitive HTTP headers in request context", () => {
+      logger.resetContext();
+      const mockRequest = {
+        url: "https://example.com/api/resource",
+        method: "POST",
+        headers: new Headers({
+          authorization: "Bearer super-secret-token",
+          cookie: "session=abc123",
+          "x-api-key": "k_xxxxxxxxxxxx",
+          "x-amz-security-token": "AQoDY...",
+          "user-agent": "smoo-test/1.0",
+        }),
+      } as any;
+
+      logger.addRequestContext(mockRequest);
+
+      const logSpy = vi.spyOn(logger as any, "logFunc") as any;
+      logger.info("request received");
+
+      const loggedObject = logSpy.mock.calls[0][0][0] as any;
+      const headers = loggedObject[ContextKey.Http]?.request?.headers;
+      expect(headers).toBeDefined();
+      expect(headers.authorization).toBe("[REDACTED]");
+      expect(headers.cookie).toBe("[REDACTED]");
+      expect(headers["x-api-key"]).toBe("[REDACTED]");
+      expect(headers["x-amz-security-token"]).toBe("[REDACTED]");
+      // Non-sensitive headers preserved
+      expect(headers["user-agent"]).toBe("smoo-test/1.0");
+    });
+
+    test("redacts password/secret-like field names case-insensitively", () => {
+      logger.resetContext();
+      const logSpy = vi.spyOn(logger as any, "logFunc") as any;
+      logger.info({
+        Password: "hunter2",
+        api_key: "sk_xxxxxxxx",
+        refreshToken: "rt-1",
+        refresh_token: "rt-2",
+        client_secret: "cs_xxx",
+        normalField: "ok",
+      });
+
+      const loggedObject = logSpy.mock.calls[0][0][0] as any;
+      const ctx = loggedObject[ContextKey.Context];
+      expect(ctx.Password).toBe("[REDACTED]");
+      expect(ctx.api_key).toBe("[REDACTED]");
+      expect(ctx.refresh_token).toBe("[REDACTED]");
+      expect(ctx.client_secret).toBe("[REDACTED]");
+      expect(ctx.normalField).toBe("ok");
+      // `refreshToken` (camelCase) is NOT in the default list — only `refresh_token`
+      // and `access_token`. Validate that camelCase isn't redacted by default.
+      expect(ctx.refreshToken).toBe("rt-1");
+    });
+
+    test("addRedactKeys extends the redact list", () => {
+      logger.resetContext();
+      logger.addRedactKeys(["customSecret"]);
+      const logSpy = vi.spyOn(logger as any, "logFunc") as any;
+      logger.info({ customSecret: "shh", visible: "ok" });
+
+      const loggedObject = logSpy.mock.calls[0][0][0] as any;
+      const ctx = loggedObject[ContextKey.Context];
+      expect(ctx.customSecret).toBe("[REDACTED]");
+      expect(ctx.visible).toBe("ok");
+    });
+
+    test("redactKeys constructor option overrides defaults", () => {
+      const customLogger = new TestLogger({
+        context: {},
+        level: Level.Info,
+        redactKeys: ["onlyThis"],
+      });
+      const logSpy = vi.spyOn(customLogger as any, "logFunc") as any;
+      customLogger.info({ onlyThis: "x", authorization: "Bearer plaintext-leak" });
+
+      const loggedObject = logSpy.mock.calls[0][0][0] as any;
+      const ctx = loggedObject[ContextKey.Context];
+      expect(ctx.onlyThis).toBe("[REDACTED]");
+      // With overridden list, default `authorization` is NOT redacted
+      expect(ctx.authorization).toBe("Bearer plaintext-leak");
+    });
+  });
 });

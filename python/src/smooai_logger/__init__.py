@@ -2,6 +2,8 @@
 
 from .aws_logger import AwsServerLogger
 from .logger import (
+    DEFAULT_REDACT_KEYS,
+    REDACTED_VALUE,
     Context,
     HttpContext,
     HttpRequestContext,
@@ -26,6 +28,8 @@ from .uvicorn_logger_adapter import UvicornLoggerAdapter, configure_uvicorn_logg
 __all__ = [
     "AwsServerLogger",
     "Context",
+    "DEFAULT_REDACT_KEYS",
+    "REDACTED_VALUE",
     "HttpContext",
     "HttpRequestContext",
     "HttpResponseContext",

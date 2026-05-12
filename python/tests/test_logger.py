@@ -461,3 +461,88 @@ class TestLoggerIntegration:
         assert "errorDetails" in parsed
         assert "callerContext" in parsed
         assert "time" in parsed
+
+
+class TestLoggerRedaction:
+    """Sensitive-field redaction (SMOODEV-942)."""
+
+    def setup_method(self):
+        reset_global_context()
+
+    def test_default_redacts_auth_headers_in_request_context(self):
+        from smooai_logger import REDACTED_VALUE
+
+        logger = Logger(name="RedactTest", level=Level.INFO, pretty_print=False)
+        request: HttpRequestContext = {
+            "method": "POST",
+            "path": "/api/x",
+            "headers": {
+                "Authorization": "Bearer super-secret-token",
+                "Cookie": "session=abc123",
+                "X-Api-Key": "k_xxx",
+                "x-amz-security-token": "AQoDY...",
+                "User-Agent": "smoo/1.0",
+            },
+        }
+        logger.add_request_context(request)
+
+        record = logger._build_record(Level.INFO, ["hello"])
+        http = record.get("http") or {}
+        req = http.get("request") or {}
+        headers = req.get("headers") or {}
+
+        assert headers["Authorization"] == REDACTED_VALUE
+        assert headers["Cookie"] == REDACTED_VALUE
+        assert headers["X-Api-Key"] == REDACTED_VALUE
+        assert headers["x-amz-security-token"] == REDACTED_VALUE
+        # Non-sensitive header preserved
+        assert headers["User-Agent"] == "smoo/1.0"
+
+    def test_default_redacts_password_secret_token_in_context(self):
+        from smooai_logger import REDACTED_VALUE
+
+        logger = Logger(name="RedactTest", level=Level.INFO, pretty_print=False)
+        record = logger._build_record(
+            Level.INFO,
+            [
+                {
+                    "Password": "hunter2",
+                    "api_key": "sk_xxx",
+                    "refresh_token": "rt-2",
+                    "client_secret": "cs_xxx",
+                    "visible": "ok",
+                }
+            ],
+        )
+        ctx = record.get("context") or {}
+        assert ctx["Password"] == REDACTED_VALUE
+        assert ctx["api_key"] == REDACTED_VALUE
+        assert ctx["refresh_token"] == REDACTED_VALUE
+        assert ctx["client_secret"] == REDACTED_VALUE
+        assert ctx["visible"] == "ok"
+
+    def test_add_redact_keys_extends_list(self):
+        from smooai_logger import REDACTED_VALUE
+
+        logger = Logger(name="RedactTest", level=Level.INFO, pretty_print=False)
+        logger.add_redact_keys(["customSecret"])
+        record = logger._build_record(Level.INFO, [{"customSecret": "shh", "ok": 1}])
+        ctx = record.get("context") or {}
+        assert ctx["customSecret"] == REDACTED_VALUE
+        assert ctx["ok"] == 1
+
+    def test_redact_keys_constructor_override(self):
+        logger = Logger(
+            name="RedactTest",
+            level=Level.INFO,
+            pretty_print=False,
+            redact_keys=["onlyThis"],
+        )
+        record = logger._build_record(
+            Level.INFO,
+            [{"onlyThis": "x", "authorization": "Bearer plaintext"}],
+        )
+        ctx = record.get("context") or {}
+        assert ctx["onlyThis"] == "[REDACTED]"
+        # Default `authorization` was overridden away, so still visible
+        assert ctx["authorization"] == "Bearer plaintext"

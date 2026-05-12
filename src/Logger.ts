@@ -228,7 +228,39 @@ export const CONFIG_MINIMAL: ContextConfig = {
 
 export const CONFIG_FULL: ContextConfig = null;
 
+/**
+ * Default list of context keys whose values should be redacted before logging.
+ * Matches case-insensitively against any key in the serialized log object —
+ * including HTTP request/response headers, body fields, query params, etc.
+ *
+ * The redacted value is replaced with the string `"[REDACTED]"`.
+ */
+export const DEFAULT_REDACT_KEYS: string[] = [
+  // Auth-bearing HTTP headers
+  "authorization",
+  "proxy-authorization",
+  "cookie",
+  "set-cookie",
+  "x-api-key",
+  "x-amz-security-token",
+  // Common credential / token field names
+  "password",
+  "passwd",
+  "secret",
+  "apikey",
+  "api_key",
+  "token",
+  "access_token",
+  "refresh_token",
+  "client_secret",
+];
+
+export const REDACTED_VALUE = "[REDACTED]";
+
 export default class Logger {
+  public static DEFAULT_REDACT_KEYS: string[] = DEFAULT_REDACT_KEYS;
+  public static REDACTED_VALUE: string = REDACTED_VALUE;
+
   private _name = "Logger";
   private _level: Level = Level.Info;
   private _contextConfig!: ContextConfig;
@@ -240,6 +272,9 @@ export default class Logger {
   private prettyPrint = false;
   private rotation!: RotationOptions;
   private logToFile = false;
+  private _redactKeys: Set<string> = new Set(
+    Logger.DEFAULT_REDACT_KEYS.map((k) => k.toLowerCase()),
+  );
 
   public get name(): string {
     return this._name;
@@ -317,6 +352,56 @@ export default class Logger {
     return this.levelToCode(limit) >= this.levelToCode(this.level);
   }
 
+  /**
+   * Returns the current list of redact keys (lowercased).
+   */
+  public get redactKeys(): string[] {
+    return Array.from(this._redactKeys);
+  }
+
+  /**
+   * Replaces the redact-keys list. Keys are stored lowercased and matched
+   * case-insensitively against any field in the serialized log object.
+   */
+  public set redactKeys(keys: string[]) {
+    this._redactKeys = new Set(keys.map((k) => k.toLowerCase()));
+  }
+
+  /**
+   * Adds keys to the redact list. Existing entries are preserved.
+   * @param keys Keys to redact. Matching is case-insensitive.
+   */
+  public addRedactKeys(keys: string[]): void {
+    for (const key of keys) {
+      this._redactKeys.add(key.toLowerCase());
+    }
+  }
+
+  /**
+   * Recursively walks an object and replaces values for any key matching the
+   * redact list (case-insensitive) with `"[REDACTED]"`.
+   */
+  protected redactSensitiveValues(obj: any): any {
+    if (this._redactKeys.size === 0) return obj;
+    if (obj === null || obj === undefined) return obj;
+    if (Array.isArray(obj)) {
+      return obj.map((v) => this.redactSensitiveValues(v));
+    }
+    if (typeof obj !== "object") return obj;
+
+    const out: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      if (this._redactKeys.has(key.toLowerCase())) {
+        out[key] = REDACTED_VALUE;
+      } else if (value && typeof value === "object") {
+        out[key] = this.redactSensitiveValues(value);
+      } else {
+        out[key] = value;
+      }
+    }
+    return out;
+  }
+
   protected removeUndefinedValuesRecursively(obj: any): any {
     if (!obj) return obj;
 
@@ -348,9 +433,13 @@ export default class Logger {
       prettyPrint?: boolean;
       logToFile?: boolean;
       rotation?: RotationOptions;
+      redactKeys?: string[];
     } = {},
   ) {
     options.name = options.name ?? this.name;
+    if (options.redactKeys) {
+      this.redactKeys = options.redactKeys;
+    }
     options.level = options.level ?? this.parseLevel(process.env.LOG_LEVEL);
     this.level = options.level;
     options.prettyPrint = options.prettyPrint ?? (isLocal() || isBuild());
@@ -731,7 +820,11 @@ export default class Logger {
     object[ContextKey.LogLevel] = level;
     object[ContextKey.Time] = dayjs().toISOString();
     object[ContextKey.Name] = this.name;
-    return [this.removeUndefinedValuesRecursively(this.applyContextConfig(object))];
+    return [
+      this.redactSensitiveValues(
+        this.removeUndefinedValuesRecursively(this.applyContextConfig(object)),
+      ),
+    ];
   }
 
   private prettyStringify(object: any): string {
