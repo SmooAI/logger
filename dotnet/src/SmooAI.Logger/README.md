@@ -5,7 +5,7 @@
 
 **Structured logs for .NET that carry the full story — correlation IDs, request + response, user, and caller location on every line.**
 
-.NET port of [`@smooai/logger`](https://github.com/SmooAI/logger). Drop it into a Lambda, ECS service, or worker and every log entry tells you *where* it fired, *who* triggered it, and *which request* it belonged to — without threading context through every method. JSON lines that land in CloudWatch, Datadog, or any `ILogger` sink, and wire-compatible with the TypeScript, Python, Go, and Rust ports.
+.NET port of [`@smooai/logger`](https://github.com/SmooAI/logger). Drop it into a Lambda, ECS service, or worker and every log entry tells you _where_ it fired, _who_ triggered it, and _which request_ it belonged to — without threading context through every method. JSON lines that land in CloudWatch, Datadog, or any `ILogger` sink, and wire-compatible with the TypeScript, Python, Go, and Rust ports.
 
 ## Install
 
@@ -54,7 +54,7 @@ Output (CloudWatch-friendly JSON line):
   "msg": "Order placed",
   "orderId": "ord_123",
   "userId": "u_456",
-  "total": 42.00
+  "total": 42.0
 }
 ```
 
@@ -114,10 +114,10 @@ The SmooLogger still emits JSON to stdout **and** forwards the structured payloa
 
 ## Environment
 
-| Variable | Values | Default | Effect |
-|----------|--------|---------|--------|
-| `LOG_LEVEL` | `trace` `debug` `info` `warn` `error` `fatal` | `info` | Minimum level emitted |
-| `IS_LOCAL`, `SST_DEV`, `GITHUB_ACTIONS` | `"true"` | — | Enables pretty-print |
+| Variable                                | Values                                        | Default | Effect                |
+| --------------------------------------- | --------------------------------------------- | ------- | --------------------- |
+| `LOG_LEVEL`                             | `trace` `debug` `info` `warn` `error` `fatal` | `info`  | Minimum level emitted |
+| `IS_LOCAL`, `SST_DEV`, `GITHUB_ACTIONS` | `"true"`                                      | —       | Enables pretty-print  |
 
 ## Related
 
