@@ -4,6 +4,7 @@
 //! `@smooai/logger`, offering structured contextual logging, correlation tracking, and
 //! optional file rotation with pretty-printed output.
 
+pub mod aws;
 pub mod context;
 pub mod env;
 pub mod error;

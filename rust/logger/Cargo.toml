@@ -10,6 +10,15 @@ keywords = ["logging", "structured-logging", "smooai", "observability", "context
 categories = ["development-tools::debugging"]
 readme = "README.md"
 
+[features]
+default = []
+# Enables the AWS Lambda / SQS / API Gateway / ECS context helpers in
+# [`crate::aws`]. Pulls in `lambda_runtime` and `aws_lambda_events` and is
+# off by default so consumers that don't need AWS bindings aren't forced
+# to compile them. `ecs` context helpers also work without this feature
+# enabled — they read env vars only.
+aws-lambda = ["dep:lambda_runtime", "dep:aws_lambda_events"]
+
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["preserve_order"] }
@@ -19,6 +28,11 @@ uuid = { version = "1", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde", "clock"] }
 colored = "2"
 url = "2"
+lambda_runtime = { version = "0.13", optional = true }
+aws_lambda_events = { version = "0.16", default-features = false, features = [
+  "apigw",
+  "sqs",
+], optional = true }
 
 [dev-dependencies]
 tempfile = "3"
