@@ -27,11 +27,15 @@ export type SQSBatchMessageAttributes = Record<string, MessageAttributeValue>;
 sourceMapSupport.install();
 
 if (!global.__dirname || !global.__filename) {
-  const { __dirname, __filename } = import.meta.url
+  // Don't destructure into locals named `__dirname`/`__filename` — when bundlers
+  // transpile this module to CJS they rewrite `import.meta.url` to a shim that
+  // reads the CJS-module-scope `__filename`, and a same-named `const` on the
+  // LHS creates a TDZ for that reference. Use a differently-named holder.
+  const esmPaths = import.meta.url
     ? createEsmUtils({ url: import.meta.url, resolve: import.meta.resolve } as any)
     : { __dirname: "", __filename: "" };
-  global.__dirname = global.__dirname ? global.__dirname : __dirname;
-  global.__filename = global.__filename ? global.__filename : __filename;
+  global.__dirname = global.__dirname ? global.__dirname : esmPaths.__dirname;
+  global.__filename = global.__filename ? global.__filename : esmPaths.__filename;
 }
 
 type AnyFunction = (...args: any[]) => any;
