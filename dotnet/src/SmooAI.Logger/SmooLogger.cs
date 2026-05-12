@@ -13,7 +13,7 @@ namespace SmooAI.Logger;
 /// Thread-safety: all public mutators lock on an internal gate; <c>Log*</c> calls take a
 /// snapshot of the context under the lock, so concurrent logging is safe.
 /// </summary>
-public class SmooLogger
+public class SmooLogger : IDisposable
 {
     /// <summary>
     /// Default list of context keys whose values are replaced with
@@ -59,6 +59,7 @@ public class SmooLogger
     private readonly object _gate = new();
     private readonly Dictionary<string, object?> _context = new(StringComparer.Ordinal);
     private readonly TextWriter _output;
+    private readonly RotatingFileOutput? _rotation;
     private readonly ILogger? _forwardTo;
     private readonly bool _prettyPrint;
     private readonly HashSet<string> _redactKeys;
@@ -99,6 +100,7 @@ public class SmooLogger
         _name = options.Name;
         _level = options.Level ?? LevelExtensions.FromString(Environment.GetEnvironmentVariable("LOG_LEVEL"));
         _output = options.Output ?? Console.Out;
+        _rotation = options.Rotation != null ? new RotatingFileOutput(options.Rotation) : null;
         _forwardTo = options.ForwardTo;
         _prettyPrint = options.PrettyPrint ?? IsLocalEnv();
         _redactKeys = new HashSet<string>(
@@ -611,6 +613,18 @@ public class SmooLogger
             _output.Flush();
         }
 
+        if (_rotation != null)
+        {
+            try
+            {
+                _rotation.Write(payload);
+            }
+            catch
+            {
+                // best-effort: never let rotation failures take down the caller.
+            }
+        }
+
         if (_forwardTo != null && _forwardTo.IsEnabled(level.ToMsLogLevel()))
         {
             _forwardTo.Log(
@@ -662,5 +676,15 @@ public class SmooLogger
         public KeyValuePair<string, object?> this[int index] => _fields[index];
         public IEnumerator<KeyValuePair<string, object?>> GetEnumerator() => _fields.GetEnumerator();
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+    }
+
+    /// <summary>
+    /// Disposes the rotating file sink (if configured). The <see cref="SmooLoggerOptions.Output"/>
+    /// writer is not disposed — its lifetime belongs to the caller.
+    /// </summary>
+    public void Dispose()
+    {
+        _rotation?.Dispose();
+        GC.SuppressFinalize(this);
     }
 }

@@ -36,4 +36,12 @@ public sealed class SmooLoggerOptions
     /// enumerable to disable redaction entirely. Matching is case-insensitive.
     /// </summary>
     public IEnumerable<string>? RedactKeys { get; set; }
+
+    /// <summary>
+    /// Enables size-based rotating file output. When set, log lines are written to a rotating
+    /// file in addition to <see cref="Output"/> (which still defaults to <see cref="Console.Out"/>
+    /// unless explicitly overridden). Mirrors the TS <c>logToFile</c> + <c>RotationOptions</c>
+    /// surface and the Rust <c>RotationOptions</c> struct.
+    /// </summary>
+    public RotationOptions? Rotation { get; set; }
 }
