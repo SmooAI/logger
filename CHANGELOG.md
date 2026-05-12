@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 4.1.5
+
+### Patch Changes
+
+- 5de1e66: SMOODEV-945: Go port — add `LambdaLogger.AddECSContext()` for Fargate/ECS parity with Python. Reads the standard ECS-on-Fargate / Amazon-ECS-Agent env vars (`ECS_CONTAINER_METADATA_URI_V4`, `AWS_EXECUTION_ENV`, `AWS_REGION`, etc.) and attaches them under an `ecs` key in the logger context. Previously the Go port had Lambda / SQS / API Gateway / LambdaEnvironment context helpers but no ECS counterpart.
+
 ## 4.1.4
 
 ### Patch Changes
@@ -130,22 +136,26 @@
   This release transforms `@smooai/logger` into a comprehensive multi-language logging ecosystem:
 
   ### 🐍 Python Package (`smooai-logger`)
+
   - Available on PyPI as `smooai-logger`
   - Full Python implementation with identical API to TypeScript version
   - Synchronized versioning with npm package
 
   ### 🦀 Rust Crate (`smooai-logger`)
+
   - Available on crates.io as `smooai-logger`
   - Native Rust logging implementation
   - Synchronized versioning with npm package
 
   ### 📊 Log Viewer CLI (`smooai-log-viewer`)
+
   - Interactive GUI application for viewing `.smooai-logs` files
   - Available as CLI command when installing npm package: `smooai-log-viewer`
   - Cross-platform native binaries bundled with package
   - Features filtering, searching, JSON expansion, and context viewing
 
   ### 🔄 Automated Publishing Pipeline
+
   - Single changesets release now publishes to npm, PyPI, and crates.io
   - Automatic version synchronization across all packages
   - Enhanced CI/CD workflow for multi-language support
