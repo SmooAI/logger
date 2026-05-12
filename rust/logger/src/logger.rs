@@ -666,15 +666,9 @@ mod tests {
     use super::*;
     use serde_json::json;
     use std::collections::HashMap;
-    use std::sync::Mutex;
-
-    /// Tests that modify the global context or environment variables must hold
-    /// this lock to prevent races (Rust runs tests in parallel by default).
-    static TEST_LOCK: Mutex<()> = Mutex::new(());
-
     #[test]
     fn build_log_object_includes_message_and_context() {
-        let _guard = TEST_LOCK.lock().unwrap();
+        let _guard = crate::TEST_GLOBAL_LOCK.lock().unwrap_or_else(|e| e.into_inner());
         let logger = Logger::default();
         logger.reset_context();
         let args = log_args!("hello", json!({"foo": "bar"}));
@@ -698,7 +692,7 @@ mod tests {
 
     #[test]
     fn build_log_object_collects_error_details() {
-        let _guard = TEST_LOCK.lock().unwrap();
+        let _guard = crate::TEST_GLOBAL_LOCK.lock().unwrap_or_else(|e| e.into_inner());
         let logger = Logger::default();
         logger.reset_context();
         let args = log_args!(log_error(SampleError));
@@ -711,7 +705,7 @@ mod tests {
 
     #[test]
     fn add_http_request_sets_namespace_and_correlation() {
-        let _guard = TEST_LOCK.lock().unwrap();
+        let _guard = crate::TEST_GLOBAL_LOCK.lock().unwrap_or_else(|e| e.into_inner());
         let logger = Logger::default();
         logger.reset_context();
         let mut headers = HashMap::new();
@@ -743,7 +737,7 @@ mod tests {
 
     #[test]
     fn context_config_filters_fields() {
-        let _guard = TEST_LOCK.lock().unwrap();
+        let _guard = crate::TEST_GLOBAL_LOCK.lock().unwrap_or_else(|e| e.into_inner());
         let mut logger = Logger::default();
         logger.reset_context();
         logger.set_context_config(Some((*CONFIG_MINIMAL).clone()));
@@ -766,7 +760,7 @@ mod tests {
 
     #[test]
     fn redact_default_keys_strips_auth_headers_and_secret_fields() {
-        let _guard = TEST_LOCK.lock().unwrap();
+        let _guard = crate::TEST_GLOBAL_LOCK.lock().unwrap_or_else(|e| e.into_inner());
         let logger = Logger::default();
         logger.reset_context();
         logger.add_base_context(json!({
@@ -801,7 +795,7 @@ mod tests {
 
     #[test]
     fn add_redact_keys_extends_default_list() {
-        let _guard = TEST_LOCK.lock().unwrap();
+        let _guard = crate::TEST_GLOBAL_LOCK.lock().unwrap_or_else(|e| e.into_inner());
         let mut logger = Logger::default();
         logger.reset_context();
         logger.add_redact_keys(["customSecret".to_string()]);
