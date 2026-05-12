@@ -1,5 +1,12 @@
 # @smooai/logger
 
+## 4.1.6
+
+### Patch Changes
+
+- d22a7ce: SMOODEV-942: Add sensitive-field redaction across all 5 ports (TS, Python, Rust, Go, .NET). Logger now redacts a default set of auth-bearing HTTP headers (`Authorization`, `Cookie`, `Set-Cookie`, `X-Api-Key`, `x-amz-security-token`, `proxy-authorization`) and credential-shaped field names (`password`, `passwd`, `secret`, `apiKey`, `api_key`, `token`, `access_token`, `refresh_token`, `client_secret`) before logs are emitted — replacing values with `"[REDACTED]"`. Matching is case-insensitive. Each port exposes `addRedactKeys()` / `AddRedactKeys()` / `add_redact_keys()` to extend the list, plus a constructor option to override the defaults entirely (pass an empty list to disable). Previously every port logged HTTP request headers and request bodies as-is, leaking Bearer tokens and cookies into CloudWatch / log shipping pipelines.
+- e5cf073: SMOODEV-943: Rust port — implement AWS Lambda/SQS/API Gateway/ECS context helpers. Adds a new `aws` module with an `AwsContextLogger` trait that mirrors the Go `LambdaLogger` and Python `AwsServerLogger` surfaces — `add_lambda_context`, `add_lambda_environment_context`, `add_sqs_record_context`, `add_api_gateway_context`, `add_ecs_context`. Lambda/SQS/API Gateway methods are gated behind an opt-in `aws-lambda` cargo feature (which pulls in `lambda_runtime` and `aws_lambda_events`) so consumers that don't need the AWS bindings aren't forced to compile them. ECS context (`add_ecs_context`, `ecs_environment_context`) is env-var-only and always available. Previously `rust/logger/src/lib.rs` only exposed the base `Logger` — the README marketed Lambda + SQS + API Gateway support but the implementation was missing.
+
 ## 4.1.5
 
 ### Patch Changes
