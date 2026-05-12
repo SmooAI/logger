@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 4.1.4
+
+### Patch Changes
+
+- d8f0487: Fix `ReferenceError: Cannot access '__filename' before initialization` (TDZ) when `AwsServerLogger` is loaded under tsx CJS interop. The old code destructured `import.meta.url` into locals named `__dirname` / `__filename` — when bundlers compile this to CJS they rewrite `import.meta.url` to a shim that reads the module-scope `__filename`, and a same-named `const` on the LHS creates a TDZ for that reference. Use a differently-named holder (`esmPaths`) so the compiled CJS doesn't self-reference a not-yet-initialized binding. This bit any tsx-run script that transitively imported `@smooai/fetch` → `@smooai/logger` (SMOODEV-908 inspect-runs, SMOODEV-918 ghl-import).
+
 ## 4.1.3
 
 ### Patch Changes
@@ -124,22 +130,26 @@
   This release transforms `@smooai/logger` into a comprehensive multi-language logging ecosystem:
 
   ### 🐍 Python Package (`smooai-logger`)
+
   - Available on PyPI as `smooai-logger`
   - Full Python implementation with identical API to TypeScript version
   - Synchronized versioning with npm package
 
   ### 🦀 Rust Crate (`smooai-logger`)
+
   - Available on crates.io as `smooai-logger`
   - Native Rust logging implementation
   - Synchronized versioning with npm package
 
   ### 📊 Log Viewer CLI (`smooai-log-viewer`)
+
   - Interactive GUI application for viewing `.smooai-logs` files
   - Available as CLI command when installing npm package: `smooai-log-viewer`
   - Cross-platform native binaries bundled with package
   - Features filtering, searching, JSON expansion, and context viewing
 
   ### 🔄 Automated Publishing Pipeline
+
   - Single changesets release now publishes to npm, PyPI, and crates.io
   - Automatic version synchronization across all packages
   - Enhanced CI/CD workflow for multi-language support
