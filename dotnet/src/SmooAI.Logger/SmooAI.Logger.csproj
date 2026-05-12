@@ -31,6 +31,15 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
+    <!--
+      AWS Lambda event types — used by AwsServerLogger.cs. These are small,
+      version-stable interface packages widely used by .NET Lambda projects.
+      Adding them here means SmooAI.Logger consumers get Lambda/SQS/API
+      Gateway context helpers without an extra package install.
+    -->
+    <PackageReference Include="Amazon.Lambda.Core" Version="2.5.0" />
+    <PackageReference Include="Amazon.Lambda.SQSEvents" Version="2.2.0" />
+    <PackageReference Include="Amazon.Lambda.APIGatewayEvents" Version="2.7.1" />
   </ItemGroup>
 
   <ItemGroup>
