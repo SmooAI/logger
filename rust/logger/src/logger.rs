@@ -10,8 +10,9 @@ use url::Url;
 use uuid::Uuid;
 
 use crate::context::{
-    self, add_base_context, add_nested_context, apply_context_config, base_context_key, context_value, remove_nulls, reset_global_context, set_correlation_id,
-    ContextConfig, ContextKey, HttpRequest, HttpResponse, TelemetryFields, User, CONFIG_FULL, CONFIG_MINIMAL,
+    self, add_base_context, add_nested_context, apply_context_config, base_context_key, context_value, default_redact_keys, redact_sensitive_values,
+    remove_nulls, reset_global_context, set_correlation_id, ContextConfig, ContextKey, HttpRequest, HttpResponse, TelemetryFields, User, CONFIG_FULL,
+    CONFIG_MINIMAL,
 };
 use crate::env::{is_build, is_local};
 use crate::error::{log_error, LoggedError};
@@ -80,6 +81,9 @@ pub struct LoggerOptions {
     pub log_to_file: Option<bool>,
     pub rotation: Option<RotationOptions>,
     pub config_settings: Option<HashMap<String, ContextConfig>>,
+    /// Optional override for the redact-keys list. When `None`, defaults from
+    /// [`default_redact_keys`] are used.
+    pub redact_keys: Option<Vec<String>>,
 }
 
 fn default_config_settings() -> HashMap<String, ContextConfig> {
@@ -99,6 +103,7 @@ pub struct Logger {
     log_to_file: bool,
     rotation: RotationOptions,
     file_writer: Option<Arc<RotatingFileWriter>>,
+    redact_keys: std::collections::HashSet<String>,
 }
 
 impl Default for Logger {
@@ -149,6 +154,13 @@ impl Logger {
             }
         }
 
+        let redact_keys = options
+            .redact_keys
+            .unwrap_or_else(default_redact_keys)
+            .into_iter()
+            .map(|k| k.to_lowercase())
+            .collect();
+
         Self {
             name,
             level,
@@ -158,6 +170,31 @@ impl Logger {
             log_to_file: file_writer.is_some(),
             rotation,
             file_writer,
+            redact_keys,
+        }
+    }
+
+    /// Returns the current redact-keys list (lowercased).
+    pub fn redact_keys(&self) -> Vec<String> {
+        let mut keys: Vec<String> = self.redact_keys.iter().cloned().collect();
+        keys.sort();
+        keys
+    }
+
+    /// Replaces the redact-keys list. Keys are stored lowercased; matching is
+    /// case-insensitive.
+    pub fn set_redact_keys(&mut self, keys: Vec<String>) {
+        self.redact_keys = keys.into_iter().map(|k| k.to_lowercase()).collect();
+    }
+
+    /// Adds keys to the existing redact list.
+    pub fn add_redact_keys<I, S>(&mut self, keys: I)
+    where
+        I: IntoIterator<Item = S>,
+        S: Into<String>,
+    {
+        for key in keys {
+            self.redact_keys.insert(key.into().to_lowercase());
         }
     }
 
@@ -355,6 +392,8 @@ impl Logger {
         if let Some(config) = &self.context_config {
             payload = apply_context_config(&payload, config);
         }
+
+        redact_sensitive_values(&mut payload, &self.redact_keys);
 
         payload
     }
@@ -723,5 +762,55 @@ mod tests {
         let http = payload.get("http").unwrap().as_object().unwrap().get("request").unwrap().as_object().unwrap();
         assert!(http.get("body").is_none());
         assert!(http.get("method").is_some());
+    }
+
+    #[test]
+    fn redact_default_keys_strips_auth_headers_and_secret_fields() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        let logger = Logger::default();
+        logger.reset_context();
+        logger.add_base_context(json!({
+            "http": {
+                "request": {
+                    "headers": {
+                        "Authorization": "Bearer super-secret",
+                        "Cookie": "session=abc",
+                        "x-api-key": "k_xxx",
+                        "User-Agent": "smoo/1.0"
+                    }
+                }
+            },
+            "user": {
+                "password": "hunter2",
+                "client_secret": "cs",
+                "visible": "ok"
+            }
+        }));
+        let payload = logger.build_log_object(Level::Info, &log_args!("hi"));
+        let headers = payload.pointer("/http/request/headers").and_then(|v| v.as_object()).unwrap();
+        assert_eq!(headers.get("Authorization").unwrap(), "[REDACTED]");
+        assert_eq!(headers.get("Cookie").unwrap(), "[REDACTED]");
+        assert_eq!(headers.get("x-api-key").unwrap(), "[REDACTED]");
+        assert_eq!(headers.get("User-Agent").unwrap(), "smoo/1.0");
+
+        let user = payload.pointer("/user").and_then(|v| v.as_object()).unwrap();
+        assert_eq!(user.get("password").unwrap(), "[REDACTED]");
+        assert_eq!(user.get("client_secret").unwrap(), "[REDACTED]");
+        assert_eq!(user.get("visible").unwrap(), "ok");
+    }
+
+    #[test]
+    fn add_redact_keys_extends_default_list() {
+        let _guard = TEST_LOCK.lock().unwrap();
+        let mut logger = Logger::default();
+        logger.reset_context();
+        logger.add_redact_keys(["customSecret".to_string()]);
+        logger.add_base_context(json!({
+            "context": {"customSecret": "shh", "visible": "ok"}
+        }));
+        let payload = logger.build_log_object(Level::Info, &log_args!());
+        let ctx = payload.pointer("/context").and_then(|v| v.as_object()).unwrap();
+        assert_eq!(ctx.get("customSecret").unwrap(), "[REDACTED]");
+        assert_eq!(ctx.get("visible").unwrap(), "ok");
     }
 }

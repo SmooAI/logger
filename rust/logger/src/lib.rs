@@ -11,7 +11,7 @@ pub mod logger;
 pub mod pretty;
 pub mod rotation;
 
-pub use crate::context::{ContextConfig, ContextKey, ContextValue, CONFIG_FULL, CONFIG_MINIMAL};
+pub use crate::context::{default_redact_keys, ContextConfig, ContextKey, ContextValue, CONFIG_FULL, CONFIG_MINIMAL, REDACTED_VALUE};
 pub use crate::error::{log_error, LoggedError};
 pub use crate::logger::{Level, LogArgs, Logger, LoggerOptions};
 pub use crate::rotation::RotationOptions;

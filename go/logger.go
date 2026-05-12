@@ -27,6 +27,10 @@ type Options struct {
 	Rotation      *RotationOptions
 	Context       Map
 	ContextConfig *ContextConfig
+	// RedactKeys overrides the default redact-keys list. If nil, [DefaultRedactKeys]
+	// is used. Matching is case-insensitive. Set to a non-nil empty slice to disable
+	// redaction entirely.
+	RedactKeys []string
 }
 
 // Logger is a structured JSON logger that writes to stdout and optionally
@@ -40,6 +44,7 @@ type Logger struct {
 	contextConfig *ContextConfig
 	writer        *rotatingWriter
 	output        io.Writer
+	redactKeys    map[string]struct{} // lowercased
 }
 
 // New creates a new Logger with the given options.
@@ -112,6 +117,15 @@ func New(opts Options) (*Logger, error) {
 		}
 	}
 
+	redactSeed := opts.RedactKeys
+	if redactSeed == nil {
+		redactSeed = DefaultRedactKeys()
+	}
+	redactKeys := make(map[string]struct{}, len(redactSeed))
+	for _, k := range redactSeed {
+		redactKeys[strings.ToLower(k)] = struct{}{}
+	}
+
 	return &Logger{
 		name:          name,
 		level:         level,
@@ -121,7 +135,41 @@ func New(opts Options) (*Logger, error) {
 		contextConfig: opts.ContextConfig,
 		writer:        rw,
 		output:        os.Stdout,
+		redactKeys:    redactKeys,
 	}, nil
+}
+
+// RedactKeys returns the current redact-keys list (lowercased, sorted).
+func (l *Logger) RedactKeys() []string {
+	out := make([]string, 0, len(l.redactKeys))
+	for k := range l.redactKeys {
+		out = append(out, k)
+	}
+	// sort for stable output
+	for i := 1; i < len(out); i++ {
+		for j := i; j > 0 && out[j-1] > out[j]; j-- {
+			out[j-1], out[j] = out[j], out[j-1]
+		}
+	}
+	return out
+}
+
+// SetRedactKeys replaces the redact-keys list. Keys are stored lowercased.
+func (l *Logger) SetRedactKeys(keys []string) {
+	l.redactKeys = make(map[string]struct{}, len(keys))
+	for _, k := range keys {
+		l.redactKeys[strings.ToLower(k)] = struct{}{}
+	}
+}
+
+// AddRedactKeys adds keys to the redact-keys list. Existing entries are preserved.
+func (l *Logger) AddRedactKeys(keys ...string) {
+	if l.redactKeys == nil {
+		l.redactKeys = make(map[string]struct{}, len(keys))
+	}
+	for _, k := range keys {
+		l.redactKeys[strings.ToLower(k)] = struct{}{}
+	}
 }
 
 // Default creates a Logger with default settings.
@@ -345,6 +393,9 @@ func (l *Logger) buildLogObject(level Level, msg string, args []any) Map {
 	}
 
 	removeNils(payload)
+	if v, ok := redactSensitiveValues(payload, l.redactKeys).(Map); ok {
+		payload = v
+	}
 	return payload
 }
 

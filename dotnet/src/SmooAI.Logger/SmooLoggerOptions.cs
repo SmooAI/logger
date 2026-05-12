@@ -29,4 +29,11 @@ public sealed class SmooLoggerOptions
     /// sinks wired through <c>ILoggerFactory</c> continue to receive the entry.
     /// </summary>
     public Microsoft.Extensions.Logging.ILogger? ForwardTo { get; set; }
+
+    /// <summary>
+    /// Overrides the redact-keys list. When <c>null</c>, defaults from
+    /// <see cref="SmooLogger.DefaultRedactKeys"/> are used. Pass an empty
+    /// enumerable to disable redaction entirely. Matching is case-insensitive.
+    /// </summary>
+    public IEnumerable<string>? RedactKeys { get; set; }
 }

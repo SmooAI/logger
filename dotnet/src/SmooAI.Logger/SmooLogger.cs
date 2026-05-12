@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
 using Microsoft.Extensions.Logging;
 
@@ -14,6 +15,34 @@ namespace SmooAI.Logger;
 /// </summary>
 public class SmooLogger
 {
+    /// <summary>
+    /// Default list of context keys whose values are replaced with
+    /// <see cref="RedactedValue"/> before logging. Matching is case-insensitive.
+    /// </summary>
+    public static readonly IReadOnlyList<string> DefaultRedactKeys = new[]
+    {
+        // Auth-bearing HTTP headers
+        "authorization",
+        "proxy-authorization",
+        "cookie",
+        "set-cookie",
+        "x-api-key",
+        "x-amz-security-token",
+        // Common credential / token field names
+        "password",
+        "passwd",
+        "secret",
+        "apikey",
+        "api_key",
+        "token",
+        "access_token",
+        "refresh_token",
+        "client_secret",
+    };
+
+    /// <summary>Placeholder substituted for any redacted value.</summary>
+    public const string RedactedValue = "[REDACTED]";
+
     private static readonly JsonSerializerOptions CompactJson = new()
     {
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull,
@@ -32,6 +61,7 @@ public class SmooLogger
     private readonly TextWriter _output;
     private readonly ILogger? _forwardTo;
     private readonly bool _prettyPrint;
+    private readonly HashSet<string> _redactKeys;
     private string _name;
     private Level _level;
 
@@ -71,6 +101,9 @@ public class SmooLogger
         _output = options.Output ?? Console.Out;
         _forwardTo = options.ForwardTo;
         _prettyPrint = options.PrettyPrint ?? IsLocalEnv();
+        _redactKeys = new HashSet<string>(
+            (options.RedactKeys ?? DefaultRedactKeys).Select(k => k.ToLowerInvariant()),
+            StringComparer.Ordinal);
 
         var correlationId = Guid.NewGuid().ToString();
         _context[ContextKey.CorrelationId] = correlationId;
@@ -96,6 +129,58 @@ public class SmooLogger
         var opts = new SmooLoggerOptions { Name = typeof(T).Name };
         configure?.Invoke(opts);
         return new SmooLogger(opts);
+    }
+
+    /// <summary>
+    /// Returns a snapshot of the current redact-keys list (lowercased).
+    /// </summary>
+    public IReadOnlyCollection<string> RedactKeys
+    {
+        get
+        {
+            lock (_gate)
+            {
+                return _redactKeys.ToArray();
+            }
+        }
+    }
+
+    /// <summary>
+    /// Adds keys to the redact-keys list. Existing entries are preserved.
+    /// Matching is case-insensitive (stored lowercased).
+    /// </summary>
+    public void AddRedactKeys(IEnumerable<string> keys)
+    {
+        ArgumentNullException.ThrowIfNull(keys);
+        lock (_gate)
+        {
+            foreach (var key in keys)
+            {
+                if (!string.IsNullOrEmpty(key))
+                {
+                    _redactKeys.Add(key.ToLowerInvariant());
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Replaces the redact-keys list. Pass an empty enumerable to disable redaction.
+    /// </summary>
+    public void SetRedactKeys(IEnumerable<string> keys)
+    {
+        ArgumentNullException.ThrowIfNull(keys);
+        lock (_gate)
+        {
+            _redactKeys.Clear();
+            foreach (var key in keys)
+            {
+                if (!string.IsNullOrEmpty(key))
+                {
+                    _redactKeys.Add(key.ToLowerInvariant());
+                }
+            }
+        }
     }
 
     // ------------- Context mutators -------------
@@ -431,6 +516,58 @@ public class SmooLogger
         entry[ContextKey.Context] = nested;
     }
 
+    private string ApplyRedaction(string json, JsonSerializerOptions serializerOpts)
+    {
+        HashSet<string> redactSnapshot;
+        lock (_gate)
+        {
+            if (_redactKeys.Count == 0) return json;
+            redactSnapshot = new HashSet<string>(_redactKeys, StringComparer.Ordinal);
+        }
+
+        JsonNode? node;
+        try
+        {
+            node = JsonNode.Parse(json);
+        }
+        catch
+        {
+            return json;
+        }
+        if (node == null) return json;
+
+        RedactNode(node, redactSnapshot);
+        return node.ToJsonString(serializerOpts);
+    }
+
+    private static void RedactNode(JsonNode node, HashSet<string> redactSet)
+    {
+        if (node is JsonObject obj)
+        {
+            var keys = obj.Select(kv => kv.Key).ToArray();
+            foreach (var key in keys)
+            {
+                if (redactSet.Contains(key.ToLowerInvariant()))
+                {
+                    obj[key] = JsonValue.Create(RedactedValue);
+                }
+                else
+                {
+                    var child = obj[key];
+                    if (child != null) RedactNode(child, redactSet);
+                }
+            }
+        }
+        else if (node is JsonArray arr)
+        {
+            for (int i = 0; i < arr.Count; i++)
+            {
+                var child = arr[i];
+                if (child != null) RedactNode(child, redactSet);
+            }
+        }
+    }
+
     private void WriteEntry(Dictionary<string, object?> entry, Level level, string message, Exception? error)
     {
         var opts = _prettyPrint ? PrettyJson : CompactJson;
@@ -438,6 +575,7 @@ public class SmooLogger
         try
         {
             json = JsonSerializer.Serialize(entry, opts);
+            json = ApplyRedaction(json, opts);
         }
         catch (Exception serializeEx)
         {
