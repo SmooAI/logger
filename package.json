@@ -17,7 +17,7 @@
     "url": "https://github.com/SmooAI/logger.git"
   },
   "bin": {
-    "smooai-log-viewer": "./dist/cli/log-viewer.js"
+    "smooai-log-viewer": "./dist/cli/log-viewer.cjs"
   },
   "files": [
     "dist/**",
@@ -27,36 +27,62 @@
     "log-viewer/README.md",
     "log-viewer/src/**"
   ],
-  "main": "./dist/index.js",
+  "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/index.d.mts",
   "exports": {
     ".": {
-      "types": "./dist/index.d.ts",
       "browser": {
-        "import": "./dist/browser/index.mjs",
-        "require": "./dist/browser/index.js",
-        "default": "./dist/browser/index.js"
+        "import": {
+          "types": "./dist/browser/index.d.mts",
+          "default": "./dist/browser/index.mjs"
+        },
+        "require": {
+          "types": "./dist/browser/index.d.cts",
+          "default": "./dist/browser/index.cjs"
+        },
+        "default": "./dist/browser/index.cjs"
       },
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
-      "default": "./dist/index.js"
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "default": "./dist/index.cjs"
     },
     "./*": {
-      "types": "./dist/*.d.ts",
-      "import": "./dist/*.mjs",
-      "require": "./dist/*.js"
+      "import": {
+        "types": "./dist/*.d.mts",
+        "default": "./dist/*.mjs"
+      },
+      "require": {
+        "types": "./dist/*.d.cts",
+        "default": "./dist/*.cjs"
+      }
     },
     "./browser": {
-      "types": "./dist/browser/index.d.ts",
-      "import": "./dist/browser/index.mjs",
-      "require": "./dist/browser/index.js",
-      "default": "./dist/browser/index.js"
+      "import": {
+        "types": "./dist/browser/index.d.mts",
+        "default": "./dist/browser/index.mjs"
+      },
+      "require": {
+        "types": "./dist/browser/index.d.cts",
+        "default": "./dist/browser/index.cjs"
+      },
+      "default": "./dist/browser/index.cjs"
     },
     "./browser/*": {
-      "types": "./dist/browser/*.d.ts",
-      "import": "./dist/browser/*.mjs",
-      "require": "./dist/browser/*.js"
+      "import": {
+        "types": "./dist/browser/*.d.mts",
+        "default": "./dist/browser/*.mjs"
+      },
+      "require": {
+        "types": "./dist/browser/*.d.cts",
+        "default": "./dist/browser/*.cjs"
+      }
     }
   },
   "publishConfig": {
@@ -64,7 +90,7 @@
   },
   "scripts": {
     "aibranch": "pnpm generate-git-branch",
-    "build": "pnpm tsup && cp src/decycle.cjs dist/ && pnpm run python:build && pnpm run rust:build && pnpm run go:build && pnpm run log-viewer:bundle",
+    "build": "pnpm tsdown && cp src/decycle.cjs dist/ && pnpm run python:build && pnpm run rust:build && pnpm run go:build && pnpm run log-viewer:bundle",
     "check-all": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run rust:fmt:check && pnpm run rust:lint && pnpm run rust:test && pnpm run go:fmt:check && pnpm run go:lint && pnpm run go:test && pnpm run log-viewer:validate && pnpm run build",
     "ci:publish": "node scripts/ci-publish.mjs",
     "format": "oxfmt --write . && pnpm run python:format && pnpm run rust:fmt && pnpm run go:fmt && pnpm run log-viewer:format",
@@ -107,7 +133,7 @@
     "test": "vitest run --passWithNoTests && pnpm python:test && pnpm rust:test && pnpm go:test && pnpm log-viewer:test",
     "typecheck": "tsc --noEmit --skipLibCheck && pnpm run python:typecheck:errors && pnpm run rust:check && pnpm run go:build && pnpm run log-viewer:typecheck",
     "version:sync": "node scripts/sync-versions.mjs",
-    "watch": "tsup --watch"
+    "watch": "tsdown --watch"
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.504.0",
@@ -127,6 +153,7 @@
   "devDependencies": {
     "@changesets/cli": "^2.28.1",
     "@oclif/core": "^4.2.9",
+    "@rollup/plugin-alias": "latest",
     "@smooai/config-typescript": "^1.0.16",
     "@smooai/utils": "^1.3.0",
     "@types/aws-lambda": "^8.10.119",
@@ -137,7 +164,8 @@
     "glob": "^11.0.1",
     "oxfmt": "^0.28.0",
     "oxlint": "^0.16.0",
-    "tsup": "^8.4.0",
+    "tsdown": "latest",
+    "unrun": "latest",
     "vite": "^6.2.4",
     "vite-node": "^3.1.1",
     "vite-tsconfig-paths": "^5.1.4",
