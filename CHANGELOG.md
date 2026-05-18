@@ -1,5 +1,11 @@
 # @smooai/logger
 
+## 4.1.10
+
+### Patch Changes
+
+- 627bda0: Migrate build tooling from tsup to tsdown — faster, oxc-based, drop-in replacement. The `esbuild-plugin-alias` shim used to swap `rotating-file-stream` for a no-op stub in the browser build is replaced with `@rollup/plugin-alias` (rolldown-compatible). `src/decycle.cjs` (a side-effect CJS file that patches global `JSON`) is marked external so rolldown leaves it alone. Output extensions shift from `.js`/`.mjs`/`.d.ts` to `.cjs`/`.mjs`/`.d.cts`/`.d.mts` (tsdown defaults); the `exports` map + the CLI bin path are updated to match. No public API change.
+
 ## 4.1.9
 
 ### Patch Changes
@@ -163,22 +169,26 @@
   This release transforms `@smooai/logger` into a comprehensive multi-language logging ecosystem:
 
   ### 🐍 Python Package (`smooai-logger`)
+
   - Available on PyPI as `smooai-logger`
   - Full Python implementation with identical API to TypeScript version
   - Synchronized versioning with npm package
 
   ### 🦀 Rust Crate (`smooai-logger`)
+
   - Available on crates.io as `smooai-logger`
   - Native Rust logging implementation
   - Synchronized versioning with npm package
 
   ### 📊 Log Viewer CLI (`smooai-log-viewer`)
+
   - Interactive GUI application for viewing `.smooai-logs` files
   - Available as CLI command when installing npm package: `smooai-log-viewer`
   - Cross-platform native binaries bundled with package
   - Features filtering, searching, JSON expansion, and context viewing
 
   ### 🔄 Automated Publishing Pipeline
+
   - Single changesets release now publishes to npm, PyPI, and crates.io
   - Automatic version synchronization across all packages
   - Enhanced CI/CD workflow for multi-language support
