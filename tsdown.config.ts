@@ -1,6 +1,9 @@
 import path from "path";
-import alias from "esbuild-plugin-alias";
-import { defineConfig, type Options } from "tsup";
+import { fileURLToPath } from "url";
+import alias from "@rollup/plugin-alias";
+import { defineConfig, type Options } from "tsdown";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const coreConfig: Options = {
   entry: ["src/index.ts", "src/env.ts", "src/Logger.ts", "src/AwsServerLogger.ts"],
@@ -10,6 +13,10 @@ const coreConfig: Options = {
   sourcemap: true,
   target: "es2022",
   treeshake: true,
+  // `src/decycle.cjs` patches global JSON for side effects and is shipped
+  // as-is via `cp src/decycle.cjs dist/` post-build. Mark it external so
+  // rolldown doesn't try to parse the CJS file as ESM.
+  external: [/decycle\.cjs$/],
 } satisfies Options;
 
 const browserConfig: Options = {
@@ -18,12 +25,20 @@ const browserConfig: Options = {
   outDir: "dist/browser",
   entry: ["src/index.ts", "src/env.ts", "src/Logger.ts", "src/BrowserLogger.ts"],
   platform: "browser",
+  fixedExtension: true,
   dts: true,
-  noExternal: ["rotating-file-stream"],
-  esbuildPlugins: [
+  // `rotating-file-stream` is Node-only — alias to a no-op stub for the browser build
+  deps: {
+    alwaysBundle: ["rotating-file-stream"],
+  },
+  plugins: [
     alias({
-      // any import of "rotating-file-stream" → your stub
-      "rotating-file-stream": path.resolve(__dirname, "src/utils/rotating-file-stream.stub.ts"),
+      entries: [
+        {
+          find: "rotating-file-stream",
+          replacement: path.resolve(__dirname, "src/utils/rotating-file-stream.stub.ts"),
+        },
+      ],
     }),
   ],
 } satisfies Options;
