@@ -1,5 +1,7 @@
 # smooai-log-viewer
 
+> ⚠️ **DEPRECATED — see [`DEPRECATED.md`](./DEPRECATED.md).** This crate has moved to [`SmooAI/observability`](https://github.com/SmooAI/observability) under `rust/log-viewer/` as part of SMOODEV-1175. The copy here is preserved only to keep the existing release pipeline working during the transition; new work happens in the new location.
+
 `smooai-log-viewer` is a desktop GUI application written in Rust. It loads structured log files from multiple services, normalizes them, and renders them in a responsive table using the `egui` immediate-mode UI toolkit. The following sections walk through the code layout and the main concepts a new Rust developer will encounter while exploring the project.
 
 ---
