@@ -21,7 +21,7 @@ cargo run --release -p smooai-observability-viewer
 
 ## Why the move
 
-The viewer is an observability **consumer**, not a logger feature. Its natural home is alongside the rest of `@smooai/observability` (which already hosts the Rust SDK, JS/TS browser/Node SDKs, Python/Go/.NET scaffolds). See [ADR-012](https://github.com/SmooAI/smooai/blob/main/docs/Decisions/ADR-012-Native-Desktop-Observability-Viewer.md) and the full plan at [docs/Engineering/Rust-Desktop-Observability-Viewer.md](https://github.com/SmooAI/smooai/blob/main/docs/Engineering/Rust-Desktop-Observability-Viewer.md) (private repo).
+The viewer is an observability **consumer**, not a logger feature. Its natural home is alongside the rest of `@smooai/observability` (which already hosts the Rust SDK, JS/TS browser/Node SDKs, Python/Go/.NET scaffolds). See [ADR-013](https://github.com/SmooAI/smooai/blob/main/docs/Decisions/ADR-013-Native-Desktop-Observability-Viewer.md) and the full plan at [docs/Engineering/Rust-Desktop-Observability-Viewer.md](https://github.com/SmooAI/smooai/blob/main/docs/Engineering/Rust-Desktop-Observability-Viewer.md) (private repo).
 
 ## What lives here now (transitional)
 
