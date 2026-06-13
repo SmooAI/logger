@@ -355,11 +355,10 @@ import { BrowserLogger, Level } from "@smooai/logger/browser/BrowserLogger";
 
 ## 🧩 Part of Smoo AI
 
-`@smooai/logger` is part of the [Smoo AI](https://smoo.ai) platform — an AI-powered business platform with AI built into every product. It's one of a family of open-source packages we maintain to keep our own stack honest:
+`@smooai/logger` is built and open-sourced by **[Smoo AI](https://smoo.ai)** — the AI-powered business platform with AI built into every product: CRM, customer support, campaigns, field service, observability, and developer tools.
 
-- [@smooai/fetch](https://github.com/SmooAI/fetch) — resilient, type-safe HTTP client
-- [@smooai/config](https://github.com/SmooAI/config) — type-safe config, secrets, and feature flags
-- [smooth](https://github.com/SmooAI/smooth) — the SmooAI developer toolchain
+- 🧰 **More open source from Smoo AI** — [smoo.ai/open-source](https://smoo.ai/open-source)
+- 🧩 **Sibling packages** — [@smooai/fetch](https://github.com/SmooAI/fetch), [@smooai/config](https://github.com/SmooAI/config), [smooth](https://github.com/SmooAI/smooth)
 
 Use them in your stack, or take them as a reference for how we build.
 
