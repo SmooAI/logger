@@ -1,17 +1,14 @@
 <p align="center">
-  <a href="https://smoo.ai"><img src="https://smoo.ai/images/logo/logo.svg" alt="Smoo AI" width="220" /></a>
-</p>
-
-<h1 align="center">@smooai/logger</h1>
-
-<p align="center">
-  <strong>Contextual logging for AWS and the browser — the full execution story, captured automatically.</strong>
+  <a href="https://smoo.ai"><img src=".github/banner.png" alt="@smooai/logger — Contextual logging for AWS and the browser" width="100%" /></a>
 </p>
 
 <p align="center">
-  <a href="https://www.npmjs.com/package/@smooai/logger"><img src="https://img.shields.io/npm/v/@smooai/logger?style=flat-square&color=00A6A6&label=npm" alt="npm"></a>
-  <img src="https://img.shields.io/badge/Smoo_AI-platform-00A6A6?style=flat-square" alt="Smoo AI">
-  <img src="https://img.shields.io/badge/license-MIT-F49F0A?style=flat-square" alt="license">
+  <a href="https://www.npmjs.com/package/@smooai/logger"><img src="https://img.shields.io/npm/v/@smooai/logger?style=for-the-badge&color=00A6A6&label=npm&logo=npm&logoColor=white&labelColor=020618" alt="npm"></a>
+  <a href="https://smoo.ai"><img src="https://img.shields.io/badge/Smoo_AI-platform-00A6A6?style=for-the-badge&labelColor=020618" alt="Smoo AI"></a>
+  <img src="https://img.shields.io/badge/license-MIT-F49F0A?style=for-the-badge&labelColor=020618" alt="license">
+</p>
+
+<p align="center">
   <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
   <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python">
   <img src="https://img.shields.io/badge/Rust-000000?style=flat-square&logo=rust&logoColor=white" alt="Rust">
@@ -19,10 +16,10 @@
 </p>
 
 <p align="center">
-  <a href="#-features">Features</a> ·
-  <a href="#-install">Install</a> ·
-  <a href="#-usage">Usage</a> ·
-  <a href="#-part-of-smoo-ai">Platform</a>
+  <a href="#-features"><b>Features</b></a> &nbsp;·&nbsp;
+  <a href="#-install"><b>Install</b></a> &nbsp;·&nbsp;
+  <a href="#-usage"><b>Usage</b></a> &nbsp;·&nbsp;
+  <a href="#-part-of-smoo-ai"><b>Platform</b></a>
 </p>
 
 ---
