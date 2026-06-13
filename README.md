@@ -1,115 +1,87 @@
-<!-- Improved compatibility of back to top link: See: https://github.com/othneildrew/Best-README-Template/pull/73 -->
+<p align="center">
+  <a href="https://smoo.ai"><img src="https://smoo.ai/images/logo/logo.svg" alt="Smoo AI" width="220" /></a>
+</p>
 
-<a name="readme-top"></a>
+<h1 align="center">@smooai/logger</h1>
 
-<!--
-*** Thanks for checking out the Best-README-Template. If you have a suggestion
-*** that would make this better, please fork the repo and create a pull request
-*** or simply open an issue with the tag "enhancement".
-*** Don't forget to give the project a star!
-*** Thanks again! Now go create something AMAZING! :D
--->
+<p align="center">
+  <strong>Contextual logging for AWS and the browser — the full execution story, captured automatically.</strong>
+</p>
 
-<!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
+<p align="center">
+  <a href="https://www.npmjs.com/package/@smooai/logger"><img src="https://img.shields.io/npm/v/@smooai/logger?style=flat-square&color=00A6A6&label=npm" alt="npm"></a>
+  <img src="https://img.shields.io/badge/Smoo_AI-platform-00A6A6?style=flat-square" alt="Smoo AI">
+  <img src="https://img.shields.io/badge/license-MIT-F49F0A?style=flat-square" alt="license">
+  <img src="https://img.shields.io/badge/TypeScript-3178C6?style=flat-square&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white" alt="Python">
+  <img src="https://img.shields.io/badge/Rust-000000?style=flat-square&logo=rust&logoColor=white" alt="Rust">
+  <img src="https://img.shields.io/badge/Go-00ADD8?style=flat-square&logo=go&logoColor=white" alt="Go">
+</p>
 
-<!-- PROJECT LOGO -->
-<br />
-<div align="center">
-  <a href="https://smoo.ai">
-    <img src="images/logo.png" alt="SmooAI Logo" />
-  </a>
-</div>
+<p align="center">
+  <a href="#-features">Features</a> ·
+  <a href="#-install">Install</a> ·
+  <a href="#-usage">Usage</a> ·
+  <a href="#-part-of-smoo-ai">Platform</a>
+</p>
 
-<!-- ABOUT THE PROJECT -->
+---
 
-## About Smoo AI
+> A contextual logging system that captures the full execution context you need to debug production issues — without the manual setup. It's built for AWS services and the browser, and it ships with native implementations in TypeScript, Python, Rust, and Go so every service in your stack logs the same way.
 
-**[Smoo AI](https://smoo.ai)** is an AI platform that helps businesses multiply their customer, employee, and developer experience — conversational AI for support and sales, paired with the production-grade developer tooling we use to build it.
+Traditional loggers give you the message, but not the story. `@smooai/logger` records where the log came from, the request journey that led there, and the runtime around it — so a production failure reads like a trace, not a guess.
 
-This library is part of a small family of open-source packages we maintain to keep our own stack honest: contextual logging, typed HTTP, file storage, and agent orchestration. Use them in your stack, or take them as a reference for how we build.
+## ✨ Features
 
-- 🌐 [smoo.ai](https://smoo.ai) — the product
-- 📦 [smoo.ai/open-source](https://smoo.ai/open-source) — every open-source package we ship
-- 🐙 [github.com/SmooAI](https://github.com/SmooAI) — the source
+**For AWS services**, it captures automatically:
 
-## About @smooai/logger
+- 📍 **Exact code location** — file, line number, and call stack for every log
+- 🔗 **Request journey** — correlation IDs that follow requests across services
+- ⚡ **AWS context** — service-specific metadata and execution details
+- 🌐 **HTTP details** — headers, methods, and status codes from API Gateway
+- 📬 **Message context** — SQS attributes, EventBridge events, SNS messages
+- 🔧 **Service integration** — Lambda, ECS, Fargate, EC2, and more
 
-**The missing piece for AWS & Browser logging** - A contextual logging system that automatically captures the full execution context you need to debug production issues, without the manual setup.
+**For the browser**, it captures automatically:
 
-![NPM Version](https://img.shields.io/npm/v/%40smooai%2Flogger?style=for-the-badge)
-![NPM Downloads](https://img.shields.io/npm/dw/%40smooai%2Flogger?style=for-the-badge)
-![NPM Last Update](https://img.shields.io/npm/last-update/%40smooai%2Flogger?style=for-the-badge)
+- 🖥️ **Device intelligence** — desktop, mobile, or tablet detection
+- 🌏 **Browser context** — name, version, platform, and user agent
+- 📱 **Platform details** — operating system and architecture
+- 🔍 **Request tracking** — correlation across API calls
+- 🚨 **Rich errors** — full stack traces with source map support
 
-![GitHub License](https://img.shields.io/github/license/SmooAI/logger?style=for-the-badge)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/SmooAI/logger/release.yml?style=for-the-badge)
-![GitHub Repo stars](https://img.shields.io/github/stars/SmooAI/logger?style=for-the-badge)
-
-### Why @smooai/logger?
-
-Ever spent hours debugging an AWS service in production, only to realize you're missing critical context? Or tracking down a browser issue without knowing the user's device or browser version? Traditional loggers give you the message, but not the story.
-
-**@smooai/logger automatically captures:**
-
-**For AWS Services:**
-
-- 📍 **Exact code location** - File, line number, and call stack for every log
-- 🔗 **Request journey** - Correlation IDs that follow requests across services
-- ⚡ **AWS context** - Service-specific metadata and execution details
-- 🌐 **HTTP details** - Headers, methods, status codes from API Gateway
-- 📬 **Message context** - SQS attributes, EventBridge events, SNS messages
-- 🔧 **Service integration** - Lambda, ECS, Fargate, EC2, and more
-
-**For Browser:**
-
-- 🖥️ **Device intelligence** - Desktop, mobile, or tablet detection
-- 🌏 **Browser context** - Name, version, platform, and user agent
-- 📱 **Platform details** - Operating system and architecture
-- 🔍 **Request tracking** - Automatic correlation across API calls
-- 🚨 **Rich errors** - Full stack traces with source map support
-
-### Install
+## 📦 Install
 
 ```sh
 pnpm add @smooai/logger
 ```
 
-### Python Package
+### Python
 
-The Python port mirrors the TypeScript API for backend services. Install it from PyPI:
+The Python port mirrors the TypeScript API for backend services.
 
 ```sh
 pip install smooai-logger
-```
-
-or with [uv](https://docs.astral.sh/uv/):
-
-```sh
+# or, with uv:
 uv add smooai-logger
 ```
 
-See `python/README.md` for usage examples aligned with the TypeScript docs below.
+See [`python/README.md`](python/README.md) for usage examples aligned with the TypeScript docs below.
 
-### Rust Crate
+### Rust
 
-Need the same structured logging features in Rust? A parity crate now lives in `rust/logger/`:
+A parity crate lives in [`rust/logger/`](rust/logger/):
 
 ```toml
 [dependencies]
 smooai-logger = { git = "https://github.com/SmooAI/logger", package = "smooai-logger" }
 ```
 
-Usage examples and API notes are documented in `rust/logger/README.md`.
+Usage examples and API notes are documented in [`rust/logger/README.md`](rust/logger/README.md).
 
-### Go Package
+### Go
 
-The Go port provides the same structured logging features for Go services:
+The Go port provides the same structured logging for Go services:
 
 ```sh
 go get github.com/smooai/logger
@@ -129,8 +101,8 @@ defer l.Close()
 
 // Add HTTP request context (auto-sets namespace and extracts correlation ID)
 l.AddHTTPRequest(logger.HTTPRequest{
-    Method: "POST",
-    Path:   "/api/users",
+    Method:  "POST",
+    Path:    "/api/users",
     Headers: map[string]string{"X-Correlation-Id": "abc-123"},
 })
 
@@ -145,13 +117,11 @@ l.AddUserContext(logger.User{ID: "user-456", Role: "admin"})
 l.SetCorrelationID("custom-trace-id")
 ```
 
-Features: all 6 log levels (TRACE through FATAL), structured JSON output, ANSI pretty-printing in local dev, automatic file rotation to `.smooai-logs/`, global context with correlation/request/trace IDs, HTTP request/response context, user context, and telemetry fields.
+The Go port covers all six log levels (TRACE through FATAL), structured JSON output, ANSI pretty-printing in local dev, automatic file rotation to `.smooai-logs/`, global context with correlation/request/trace IDs, HTTP request/response context, user context, and telemetry fields. See [`go/`](go/) for the full source and `go/logger_test.go` for the test suite.
 
-See `go/` for the full source and `go/logger_test.go` for comprehensive test coverage (27 tests).
+## 🚀 Usage
 
-## The Power of Automatic Context
-
-### See Where Your Logs Come From
+### See where your logs come from
 
 Every log entry includes the exact location in your code:
 
@@ -171,26 +141,26 @@ logger.info('User created');
 }
 ```
 
-No more guessing which function logged what - the full execution path is right there.
+The full execution path is right there — no guessing which function logged what.
 
-### Track Requests Across Services
+### Track requests across services
 
-Correlation IDs automatically flow through your entire system:
+Correlation IDs flow through your entire system automatically:
 
 ```typescript
-// Service A: API Gateway Handler
+// Service A: API Gateway handler
 logger.addLambdaContext(event, context);
 logger.info("Request received"); // Correlation ID: abc-123
 
-// Service B: SQS Processor (automatically extracts ID)
+// Service B: SQS processor (automatically extracts the ID)
 logger.addSQSRecordContext(record);
-logger.info("Processing message"); // Same Correlation ID: abc-123
+logger.info("Processing message"); // Same correlation ID: abc-123
 
-// Service C: Another Lambda (receives via HTTP header)
-logger.info("Completing workflow"); // Still Correlation ID: abc-123
+// Service C: another Lambda (receives via HTTP header)
+logger.info("Completing workflow"); // Still correlation ID: abc-123
 ```
 
-### Production-Ready Examples
+### Production-ready examples
 
 #### AWS Lambda with API Gateway
 
@@ -216,7 +186,7 @@ export const handler = async (event, context) => {
 };
 ```
 
-#### AWS ECS/Fargate Services
+#### AWS ECS / Fargate services
 
 ```typescript
 const logger = new AwsServerLogger({
@@ -238,7 +208,7 @@ app.post("/orders", async (req, res) => {
 });
 ```
 
-#### SQS Message Processing
+#### SQS message processing
 
 ```typescript
 export const sqsHandler = async (event) => {
@@ -255,7 +225,7 @@ export const sqsHandler = async (event) => {
 };
 ```
 
-#### Browser Tracking
+#### Browser tracking
 
 ```typescript
 import { BrowserLogger } from '@smooai/logger/browser/BrowserLogger';
@@ -296,11 +266,11 @@ logger.info('Checkout completed', { orderId: data.id });
 }
 ```
 
-## Advanced Features
+## 📖 Advanced features
 
-### Smart Error Handling
+### Smart error handling
 
-Errors are automatically serialized with full context:
+Errors are serialized with full context:
 
 ```typescript
 try {
@@ -311,7 +281,7 @@ try {
 }
 ```
 
-### Flexible Context Management
+### Flexible context management
 
 ```typescript
 // Add user context that persists across logs
@@ -327,9 +297,9 @@ logger.info("Payment processed", {
 });
 ```
 
-### Local Development Features
+### Local development
 
-#### Pretty Printing
+#### Pretty printing
 
 ```typescript
 const logger = new AwsServerLogger({
@@ -337,13 +307,12 @@ const logger = new AwsServerLogger({
 });
 ```
 
-#### Automatic Log Rotation
+#### Automatic log rotation
 
-Logs are automatically saved to disk in development with smart rotation:
+Logs are saved to disk in development with smart rotation:
 
 ```typescript
-// Auto-enabled in local environments
-// Saves to .smooai-logs/ with ANSI colors for easy reading
+// Auto-enabled in local environments — saves to .smooai-logs/ with ANSI colors
 const logger = new AwsServerLogger({
   rotation: {
     size: "10M", // Rotate at 10MB
@@ -353,7 +322,7 @@ const logger = new AwsServerLogger({
 });
 ```
 
-## Import Paths
+### Import paths
 
 ```typescript
 // AWS environments (Lambda, ECS, EC2, etc.)
@@ -363,33 +332,47 @@ import { AwsServerLogger, Level } from "@smooai/logger/AwsServerLogger";
 import { BrowserLogger, Level } from "@smooai/logger/browser/BrowserLogger";
 ```
 
-## Configuration
+### Configuration
 
-### Log Levels
+**Log levels:**
 
-- `TRACE` - Detailed debugging information
-- `DEBUG` - Diagnostic information
-- `INFO` - General operational information
-- `WARN` - Warning conditions
-- `ERROR` - Error conditions
-- `FATAL` - Critical failures
+- `TRACE` — detailed debugging information
+- `DEBUG` — diagnostic information
+- `INFO` — general operational information
+- `WARN` — warning conditions
+- `ERROR` — error conditions
+- `FATAL` — critical failures
 
-### Context Presets
+**Context presets:**
 
-- `MINIMAL` - Essential context only
-- `FULL` - All available context (default)
+- `MINIMAL` — essential context only
+- `FULL` — all available context (default)
 
-## Built With
+### Built with
 
-- **TypeScript** - Core implementation with full type safety, AWS SDK integration, browser detection, and rotating file streams
-- **Python** - Pydantic-based structured logging with rich terminal output and AWS context support
-- **Rust** - High-performance structured logging with serde serialization and colored output
-- **Go** - Native structured logging with JSON output, ANSI pretty-printing, and automatic file rotation
-- **Log Viewer** - Desktop application (Rust/egui) for viewing and analyzing SmooAI logs with filtering and DuckDB-powered queries
+- **TypeScript** — core implementation with full type safety, AWS SDK integration, browser detection, and rotating file streams
+- **Python** — Pydantic-based structured logging with rich terminal output and AWS context support
+- **Rust** — high-performance structured logging with serde serialization and colored output
+- **Go** — native structured logging with JSON output, ANSI pretty-printing, and automatic file rotation
+- **Log Viewer** — desktop application (Rust/egui) for viewing and analyzing SmooAI logs with filtering and DuckDB-powered queries
 
-<!-- CONTACT -->
+## 🧩 Part of Smoo AI
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+`@smooai/logger` is part of the [Smoo AI](https://smoo.ai) platform — an AI-powered business platform with AI built into every product. It's one of a family of open-source packages we maintain to keep our own stack honest:
+
+- [@smooai/fetch](https://github.com/SmooAI/fetch) — resilient, type-safe HTTP client
+- [@smooai/config](https://github.com/SmooAI/config) — type-safe config, secrets, and feature flags
+- [smooth](https://github.com/SmooAI/smooth) — the SmooAI developer toolchain
+
+Use them in your stack, or take them as a reference for how we build.
+
+## 🤝 Contributing
+
+Contributions are welcome. This project uses [changesets](https://github.com/changesets/changesets) to manage versions and releases — add one with `pnpm changeset`, then open a pull request referencing any related issues.
+
+## 📄 License
+
+MIT © SmooAI. See [LICENSE](LICENSE).
 
 ## Contact
 
@@ -401,29 +384,10 @@ Brent Rager
 - [TikTok](https://www.tiktok.com/@brentragertech)
 - [Instagram](https://www.instagram.com/brentragertech/)
 
-Smoo Github: [https://github.com/SmooAI](https://github.com/SmooAI)
+Smoo GitHub: [github.com/SmooAI](https://github.com/SmooAI)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
+---
 
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-
-[sst.dev-url]: https://reactjs.org/
-[sst]: https://img.shields.io/badge/sst-EDE1DA?style=for-the-badge&logo=sst&logoColor=E27152
-[sst-url]: https://sst.dev/
-[next]: https://img.shields.io/badge/next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white
-[next-url]: https://nextjs.org/
-[aws]: https://img.shields.io/badge/aws-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white
-[aws-url]: https://tailwindcss.com/
-[tailwindcss]: https://img.shields.io/badge/tailwind%20css-0B1120?style=for-the-badge&logo=tailwindcss&logoColor=#06B6D4
-[tailwindcss-url]: https://tailwindcss.com/
-[zod]: https://img.shields.io/badge/zod-3E67B1?style=for-the-badge&logoColor=3E67B1
-[zod-url]: https://zod.dev/
-[sanity]: https://img.shields.io/badge/sanity-F36458?style=for-the-badge
-[sanity-url]: https://www.sanity.io/
-[vitest]: https://img.shields.io/badge/vitest-1E1E20?style=for-the-badge&logo=vitest&logoColor=#6E9F18
-[vitest-url]: https://vitest.dev/
-[pnpm]: https://img.shields.io/badge/pnpm-F69220?style=for-the-badge&logo=pnpm&logoColor=white
-[pnpm-url]: https://pnpm.io/
-[turborepo]: https://img.shields.io/badge/turborepo-000000?style=for-the-badge&logo=turborepo&logoColor=#EF4444
-[turborepo-url]: https://turbo.build/
+<p align="center">
+  Built by <a href="https://smoo.ai"><strong>Smoo AI</strong></a> — AI built into every product.
+</p>
