@@ -181,7 +181,8 @@ class TestLogger:
         record = logger._build_record(Level.INFO, ["Test message"])
 
         assert record.get("msg") == "Test message"
-        assert record.get("level") == "info"
+        assert record.get("level") == 30
+        assert record.get("LogLevel") == "info"
         assert record.get("name") == "TestLogger"
         assert "time" in record
         assert "correlationId" in record
@@ -193,7 +194,8 @@ class TestLogger:
         record = logger._build_record(Level.ERROR, [exception])
 
         assert record.get("error") == "Test error"
-        assert record.get("level") == "error"
+        assert record.get("level") == 50
+        assert record.get("LogLevel") == "error"
         error_details = record.get("errorDetails")
         assert error_details is not None
         assert len(error_details) == 1
@@ -283,7 +285,8 @@ class TestLogger:
         assert context is not None
         assert context["key"] == "value"
         assert record.get("error") == "Something went wrong"
-        assert record.get("level") == "warn"
+        assert record.get("level") == 40
+        assert record.get("LogLevel") == "warn"
 
     @patch("sys.stdout", new_callable=StringIO)
     def test_logger_emit_json(self, mock_stdout):
@@ -295,6 +298,9 @@ class TestLogger:
         output = mock_stdout.getvalue()
         parsed = json.loads(output.strip())
         assert parsed["msg"] == "Test message"
+        # _emit is a pure serializer -- it echoes the record it is given verbatim.
+        # The level wire-shape contract is built in _build_record and is asserted
+        # by tests/test_parity_corpus.py against parity-corpus.json.
         assert parsed["level"] == "info"
 
     @patch("sys.stdout", new_callable=StringIO)
@@ -317,7 +323,8 @@ class TestLogger:
         output = mock_stdout.getvalue()
         parsed = json.loads(output.strip())
         assert parsed["msg"] == "Test info message"
-        assert parsed["level"] == "info"
+        assert parsed["level"] == 30
+        assert parsed["LogLevel"] == "info"
 
     @patch("sys.stdout", new_callable=StringIO)
     def test_logger_debug_method_enabled(self, mock_stdout):
@@ -327,7 +334,8 @@ class TestLogger:
         output = mock_stdout.getvalue()
         parsed = json.loads(output.strip())
         assert parsed["msg"] == "Test debug message"
-        assert parsed["level"] == "debug"
+        assert parsed["level"] == 20
+        assert parsed["LogLevel"] == "debug"
 
     @patch("sys.stdout", new_callable=StringIO)
     def test_logger_debug_method_disabled(self, mock_stdout):
@@ -354,7 +362,8 @@ class TestLogger:
         assert len(lines) == 6
         for i, level in enumerate(["trace", "debug", "info", "warn", "error", "fatal"]):
             parsed = json.loads(lines[i])
-            assert parsed["level"] == level
+            assert parsed["LogLevel"] == level
+            assert parsed["level"] == level_to_code(Level(level))
 
     def test_logger_context_merging(self):
         initial_context = cast(Context, cast(object, {"correlationId": "initial", "custom": "value"}))
@@ -444,7 +453,8 @@ class TestLoggerIntegration:
 
         # Verify all components are present
         assert parsed["msg"] == "Integration test failed"
-        assert parsed["level"] == "error"
+        assert parsed["level"] == 50
+        assert parsed["LogLevel"] == "error"
         assert parsed["name"] == "IntegrationTest"
         assert parsed["service"] == "test-service"
         assert parsed["version"] == "1.0.0"

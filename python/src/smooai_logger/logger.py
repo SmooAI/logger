@@ -201,7 +201,13 @@ class LambdaEnvContext(TypedDict, total=False):
 
 
 class Context(TypedDict, total=False):
-    level: str | None
+    # Level wire contract, shared with the TS/Go/Rust/.NET ports (parity-corpus.json):
+    #   level    -> pino-compatible NUMERIC code (int)
+    #   LogLevel -> canonical lowercase STRING
+    # `level` stays `int | str` because _emit() is a pure serializer and callers may
+    # hand it a pre-built record; _build_record always writes the numeric form.
+    level: int | str | None
+    LogLevel: str | None
     msg: str | None
     time: str | None
     name: str | None
@@ -626,7 +632,11 @@ class Logger:
                 ]
         if msgs:
             rec["msg"] = "; ".join(msgs)
-        rec["level"] = lvl.value
+        # Wire contract shared with the TS/Go/Rust/.NET ports (see parity-corpus.json):
+        #   level    -> pino-compatible NUMERIC code
+        #   LogLevel -> canonical lowercase STRING
+        rec["level"] = level_to_code(lvl)
+        rec["LogLevel"] = lvl.value
         rec["time"] = now().isoformat()
         rec["name"] = self._name
         # reorder keys: msg, time, error, errorDetails, errors first
