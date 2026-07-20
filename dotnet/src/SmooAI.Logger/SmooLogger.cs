@@ -428,6 +428,18 @@ public class SmooLogger : IDisposable
             }
         }
 
+        // Correlate with the active distributed trace when one is in scope: stamp the
+        // real W3C trace/span id from Activity.Current instead of the fabricated uuid
+        // seeded at construction. Falls back to the prior traceId (no spanId) when no
+        // W3C activity is active. This is captured at emit time — the span is live at
+        // the log call, not necessarily when the logger was created.
+        var activity = System.Diagnostics.Activity.Current;
+        if (activity is not null && activity.IdFormat == System.Diagnostics.ActivityIdFormat.W3C)
+        {
+            entry[ContextKey.TraceId] = activity.TraceId.ToHexString();
+            entry[ContextKey.SpanId] = activity.SpanId.ToHexString();
+        }
+
         entry[ContextKey.Level] = (int)level;
         entry[ContextKey.LogLevel] = level.ToWireString();
         entry[ContextKey.Time] = DateTimeOffset.UtcNow.ToString("O");
