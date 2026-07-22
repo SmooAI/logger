@@ -8,6 +8,9 @@ license = { text = "MIT" }
 requires-python = ">=3.12"
 dependencies = [
   "colorist>=1.5.2",
+  # opentelemetry-api ONLY — read the active span for trace/span correlation.
+  # NEVER depend on smooai-observability (circular).
+  "opentelemetry-api>=1.27",
   "pendulum>=3.0.0",
   "pydantic>=2.7.0",
   "pydantic-extra-types>=2.0.0",
