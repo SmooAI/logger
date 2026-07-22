@@ -17,6 +17,7 @@ pub enum ContextKey {
     CorrelationId,
     RequestId,
     TraceId,
+    SpanId,
     Namespace,
     Service,
     Duration,
@@ -38,6 +39,7 @@ impl ContextKey {
             ContextKey::CorrelationId => "correlationId",
             ContextKey::RequestId => "requestId",
             ContextKey::TraceId => "traceId",
+            ContextKey::SpanId => "spanId",
             ContextKey::Namespace => "namespace",
             ContextKey::Service => "service",
             ContextKey::Duration => "duration",
@@ -217,8 +219,32 @@ fn default_context_map() -> ContextMap {
     let id = Uuid::new_v4().to_string();
     map.insert(ContextKey::CorrelationId.as_str().to_string(), Value::String(id.clone()));
     map.insert(ContextKey::RequestId.as_str().to_string(), Value::String(id.clone()));
+    // `traceId` seeds to a fabricated uuid — the FALLBACK. When an OpenTelemetry
+    // span is active at emit time, `Logger::build_log_object` overrides this with
+    // the span's real W3C trace_id (and adds `spanId`) via
+    // [`active_otel_trace_context`], so logs correlate to the trace they belong
+    // to. This uuid only surfaces when no span is active. (th-de3805)
     map.insert(ContextKey::TraceId.as_str().to_string(), Value::String(id));
     map
+}
+
+/// The active OpenTelemetry span's `(trace_id, span_id)` as W3C hex strings, or
+/// `None` when no valid span is on the current [`opentelemetry::Context`].
+///
+/// Depends on the OpenTelemetry **API only** (never `@smooai/observability` —
+/// that would be a circular dependency). When nothing set up an OTel context —
+/// no tracer installed, or no span active — `Context::current()` yields an empty
+/// context whose span is invalid, so callers fall back to prior behavior.
+pub fn active_otel_trace_context() -> Option<(String, String)> {
+    use opentelemetry::trace::TraceContextExt;
+    let context = opentelemetry::Context::current();
+    let span = context.span();
+    let span_context = span.span_context();
+    if span_context.is_valid() {
+        Some((span_context.trace_id().to_string(), span_context.span_id().to_string()))
+    } else {
+        None
+    }
 }
 
 fn with_global_context<F, R>(func: F) -> R

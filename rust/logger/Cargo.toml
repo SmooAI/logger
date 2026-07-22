@@ -28,11 +28,21 @@ uuid = { version = "1", features = ["v4"] }
 chrono = { version = "0.4", features = ["serde", "clock"] }
 colored = "2"
 url = "2"
+# OpenTelemetry **API only** (no SDK, no `@smooai/observability` — that would be
+# circular): read the active span's trace_id/span_id for log↔trace correlation,
+# and the `tracing` facade to tee lines into the observability OTLP appender.
+tracing = { version = "0.1", default-features = false, features = ["std"] }
 lambda_runtime = { version = "0.13", optional = true }
 aws_lambda_events = { version = "0.16", default-features = false, features = [
   "apigw",
   "sqs",
 ], optional = true }
+opentelemetry = { version = "0.32.0", default-features = false, features = ["trace"] }
 
 [dev-dependencies]
 tempfile = "3"
+# Correlation + tee tests: a real SDK tracer to mint an active span, and a
+# tracing subscriber to capture the teed events (dev-only — the SDK dep is not
+# circular; the crate itself depends on the OTel API only).
+opentelemetry_sdk = { version = "0.32", features = ["trace"] }
+tracing-subscriber = { version = "0.3", default-features = false, features = ["registry", "std"] }
