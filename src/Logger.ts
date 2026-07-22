@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { trace } from "@opentelemetry/api";
+import { logs, SeverityNumber } from "@opentelemetry/api-logs";
 import dayjs from "dayjs";
 import stableStringify from "json-stable-stringify";
 import { merge } from "merge-anything";
@@ -105,6 +107,7 @@ export enum ContextKey {
   RequestId = "requestId",
   Duration = "duration",
   TraceId = "traceId",
+  SpanId = "spanId",
   Error = "error",
   Namespace = "namespace",
   Service = "service",
@@ -820,11 +823,22 @@ export default class Logger {
     object[ContextKey.LogLevel] = level;
     object[ContextKey.Time] = dayjs().toISOString();
     object[ContextKey.Name] = this.name;
-    return [
-      this.redactSensitiveValues(
-        this.removeUndefinedValuesRecursively(this.applyContextConfig(object)),
-      ),
-    ];
+    const processed = this.redactSensitiveValues(
+      this.removeUndefinedValuesRecursively(this.applyContextConfig(object)),
+    );
+    // Stamp the ACTIVE OTel span's real W3C trace_id/span_id so logs correlate
+    // with traces. Falls back to the context traceId (a uuid) only when no
+    // span is active. Stamped after the config/redact transforms so it always
+    // survives regardless of the context-key config. th-de3805.
+    this.applyOtelCorrelation(processed);
+    return [processed];
+  }
+
+  private applyOtelCorrelation(object: any): void {
+    const spanContext = trace.getActiveSpan()?.spanContext();
+    if (!spanContext) return;
+    object[ContextKey.TraceId] = spanContext.traceId;
+    object[ContextKey.SpanId] = spanContext.spanId;
   }
 
   private prettyStringify(object: any): string {
@@ -886,7 +900,54 @@ export default class Logger {
   };
 
   private doLog(level: Level, args: any[]): void {
-    this.logFunc(this.buildLogObject(level, args));
+    const built = this.buildLogObject(level, args);
+    this.logFunc(built);
+    this.emitToOtel(level, built);
+  }
+
+  /**
+   * Bridge each built log record into the standard `@opentelemetry/api-logs`
+   * facade so it becomes an OTLP log record when an observability
+   * LoggerProvider is registered (e.g. @smooai/observability's logs signal).
+   * When none is registered `logs.getLogger(...)` returns the api-logs no-op
+   * logger, so this is a cheap no-op and stdout output is unchanged. The logs
+   * SDK stamps the active span's trace_id/span_id onto the record from context
+   * at emit time, so records stay correlated with traces. th-de3805.
+   */
+  private emitToOtel(level: Level, built: any[]): void {
+    try {
+      const logger = logs.getLogger("@smooai/logger");
+      for (const object of built) {
+        const decycled = JSON.decycle(object);
+        logger.emit({
+          severityNumber: this.levelToSeverityNumber(level),
+          severityText: level,
+          body: object[ContextKey.Message] ?? object[ContextKey.Error] ?? level,
+          attributes: decycled,
+        });
+      }
+    } catch {
+      // Never let telemetry bridging break application logging.
+    }
+  }
+
+  private levelToSeverityNumber(level: Level): SeverityNumber {
+    switch (level) {
+      case Level.Trace:
+        return SeverityNumber.TRACE;
+      case Level.Debug:
+        return SeverityNumber.DEBUG;
+      case Level.Info:
+        return SeverityNumber.INFO;
+      case Level.Warn:
+        return SeverityNumber.WARN;
+      case Level.Error:
+        return SeverityNumber.ERROR;
+      case Level.Fatal:
+        return SeverityNumber.FATAL;
+      default:
+        return SeverityNumber.UNSPECIFIED;
+    }
   }
 
   /**
