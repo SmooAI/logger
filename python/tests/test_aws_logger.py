@@ -406,7 +406,8 @@ class TestAwsLambdaLoggerIntegration:
         # Check the error log entry
         error_log = json.loads(lines[1])
         assert error_log.get("msg") == "Integration test failed"
-        assert error_log.get("level") == "error"
+        assert error_log.get("level") == 50
+        assert error_log.get("LogLevel") == "error"
         assert error_log.get("name") == "IntegrationTest"
         assert error_log.get("service") == "aws-service"
         assert error_log.get("version") == "2.0.0"

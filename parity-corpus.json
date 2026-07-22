@@ -1,0 +1,29 @@
+{
+  "$comment": [
+    "Golden-vector parity corpus for @smooai/logger's five hand-written ports",
+    "(TypeScript, Go, Python, Rust, .NET). Pattern follows ADR-089 (@smooai/audit).",
+    "",
+    "Every port MUST emit BOTH fields on every record:",
+    "  level    -> pino-compatible NUMERIC code",
+    "  LogLevel -> canonical lowercase STRING",
+    "",
+    "Downstream (rust/api-prime observability log ingest) keys off LogLevel because",
+    "it is unambiguous; the numeric `level` is retained for pino-compatible tooling.",
+    "",
+    "This file is the contract. Do NOT edit expected values to make a test pass --",
+    "a failure here means a port has drifted and the PORT is what needs fixing."
+  ],
+  "version": 1,
+  "fields": {
+    "level": "pino-compatible numeric code",
+    "LogLevel": "canonical lowercase string"
+  },
+  "levels": [
+    { "name": "trace", "LogLevel": "trace", "level": 10 },
+    { "name": "debug", "LogLevel": "debug", "level": 20 },
+    { "name": "info", "LogLevel": "info", "level": 30 },
+    { "name": "warn", "LogLevel": "warn", "level": 40 },
+    { "name": "error", "LogLevel": "error", "level": 50 },
+    { "name": "fatal", "LogLevel": "fatal", "level": 60 }
+  ]
+}
