@@ -14,6 +14,21 @@ pub fn environment() -> Option<String> {
     env::var("NODE_ENV").ok().filter(|value| MAIN_ENVIRONMENTS.contains(&value.as_str()))
 }
 
+/// Whether logger lines should be teed to the `tracing` facade so the
+/// `@smooai/observability` OTLP appender turns them into log records.
+///
+/// Gated on the SAME enablement as the observability logs pipeline — no code
+/// dependency on `@smooai/observability` (that would be circular), just the same
+/// env contract: an observability endpoint is configured and the SDK isn't
+/// disabled. When off, `emit` stays stdout-direct with zero `tracing` overhead.
+pub fn otel_bridge_enabled() -> bool {
+    let disabled = matches!(env::var("SMOOAI_OBSERVABILITY_DISABLED"), Ok(v) if v == "1" || v.eq_ignore_ascii_case("true"));
+    if disabled {
+        return false;
+    }
+    env::var("SMOOAI_OBSERVABILITY_ENDPOINT").is_ok() || env::var("OTEL_EXPORTER_OTLP_LOGS_ENDPOINT").is_ok()
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

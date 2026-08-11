@@ -84,6 +84,11 @@ pub struct LoggerOptions {
     /// Optional override for the redact-keys list. When `None`, defaults from
     /// [`default_redact_keys`] are used.
     pub redact_keys: Option<Vec<String>>,
+    /// Tee every emitted line to the `tracing` facade so the
+    /// `@smooai/observability` OTLP appender can turn it into a log record. When
+    /// `None`, defaults to [`crate::env::otel_bridge_enabled`] (the same
+    /// enablement as the observability logs pipeline).
+    pub otel_bridge: Option<bool>,
 }
 
 fn default_config_settings() -> HashMap<String, ContextConfig> {
@@ -104,6 +109,7 @@ pub struct Logger {
     rotation: RotationOptions,
     file_writer: Option<Arc<RotatingFileWriter>>,
     redact_keys: std::collections::HashSet<String>,
+    otel_bridge: bool,
 }
 
 impl Default for Logger {
@@ -161,6 +167,8 @@ impl Logger {
             .map(|k| k.to_lowercase())
             .collect();
 
+        let otel_bridge = options.otel_bridge.unwrap_or_else(crate::env::otel_bridge_enabled);
+
         Self {
             name,
             level,
@@ -171,6 +179,7 @@ impl Logger {
             rotation,
             file_writer,
             redact_keys,
+            otel_bridge,
         }
     }
 
@@ -387,6 +396,15 @@ impl Logger {
         );
         map.insert(ContextKey::Name.as_str().into(), Value::String(self.name.clone()));
 
+        // Correlate this line to the active trace: when an OpenTelemetry span is
+        // active, override the fabricated `traceId` with the span's real W3C
+        // trace_id and attach its `spanId`. No active span → the seeded uuid
+        // (prior behavior) stays. (th-de3805)
+        if let Some((trace_id, span_id)) = context::active_otel_trace_context() {
+            map.insert(ContextKey::TraceId.as_str().into(), Value::String(trace_id));
+            map.insert(ContextKey::SpanId.as_str().into(), Value::String(span_id));
+        }
+
         remove_nulls(&mut payload);
 
         if let Some(config) = &self.context_config {
@@ -418,8 +436,37 @@ impl Logger {
         Ok(())
     }
 
+    /// Tee an already-built payload to the `tracing` facade so the
+    /// `@smooai/observability` OTLP appender (a `tracing_subscriber::Layer`) can
+    /// turn it into a log record — the message becomes the record body, the full
+    /// structured payload rides along as the `log` field (→ log attributes). The
+    /// event fires while the same OTel span is still active, so the appender's
+    /// SDK logger stamps the record's trace_id/span_id from the current context,
+    /// matching the `traceId`/`spanId` this crate already put in the payload.
+    ///
+    /// No-op unless `otel_bridge` is on (see [`crate::env::otel_bridge_enabled`]).
+    /// tracing's level is a compile-time constant, so we dispatch per level.
+    fn tee_to_tracing(&self, level: Level, payload: &Value) {
+        if !self.otel_bridge {
+            return;
+        }
+        let message = payload.get(ContextKey::Message.as_str()).and_then(Value::as_str).unwrap_or_default();
+        let log = payload.to_string();
+        const TARGET: &str = "smooai_logger";
+        match level {
+            Level::Trace => tracing::trace!(target: TARGET, log = %log, "{message}"),
+            Level::Debug => tracing::debug!(target: TARGET, log = %log, "{message}"),
+            Level::Info => tracing::info!(target: TARGET, log = %log, "{message}"),
+            Level::Warn => tracing::warn!(target: TARGET, log = %log, "{message}"),
+            Level::Error => tracing::error!(target: TARGET, log = %log, "{message}"),
+            // tracing has no Fatal — map to ERROR and preserve the fatal level as a field.
+            Level::Fatal => tracing::error!(target: TARGET, log = %log, otel_level = "fatal", "{message}"),
+        }
+    }
+
     fn do_log(&self, level: Level, args: LogArgs) -> io::Result<()> {
         let payload = self.build_log_object(level, &args);
+        self.tee_to_tracing(level, &payload);
         self.emit(payload)
     }
 
