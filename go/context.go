@@ -16,6 +16,7 @@ const (
 	KeyCorrelationID = "correlationId"
 	KeyRequestID     = "requestId"
 	KeyTraceID       = "traceId"
+	KeySpanID        = "spanId"
 	KeyNamespace     = "namespace"
 	KeyService       = "service"
 	KeyDuration      = "duration"

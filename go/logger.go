@@ -7,6 +7,7 @@
 package logger
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -303,7 +304,9 @@ func (l *Logger) ContextConfigValue() *ContextConfig {
 }
 
 // buildLogObject constructs the log payload from the current context and args.
-func (l *Logger) buildLogObject(level Level, msg string, args []any) Map {
+// When ctx carries an active OTel span, the span's real trace_id/span_id
+// replace the fabricated correlation uuid on this line (SMOODEV / th-de3805).
+func (l *Logger) buildLogObject(ctx context.Context, level Level, msg string, args []any) Map {
 	payload := getGlobalContext()
 
 	if msg != "" {
@@ -377,8 +380,14 @@ func (l *Logger) buildLogObject(level Level, msg string, args []any) Map {
 	payload[KeyTime] = time.Now().UTC().Format(time.RFC3339Nano)
 	payload[KeyName] = l.name
 
+	// Prefer the active span's real ids over the fabricated correlation uuid.
+	if traceID, spanID, ok := correlationFromContext(ctx); ok {
+		payload[KeyTraceID] = traceID
+		payload[KeySpanID] = spanID
+	}
+
 	// Add caller info
-	caller := getCallerInfo(3) // skip buildLogObject → log method → caller
+	caller := getCallerInfo(4) // skip buildLogObject → logWith → log method → caller
 	if caller != nil {
 		payload["caller"] = Map{
 			"file":     caller.File,
@@ -434,52 +443,76 @@ func (l *Logger) isEnabled(level Level) bool {
 	return level >= l.level
 }
 
-// Trace logs at TRACE level.
-func (l *Logger) Trace(msg string, args ...any) error {
-	if !l.isEnabled(LevelTrace) {
+// logWith is the single core log path. When ctx carries an active OTel span the
+// line is stamped with its real trace/span id, and the line is mirrored to the
+// installed slog.Handler (if any) so it can become an OTLP log record.
+func (l *Logger) logWith(ctx context.Context, level Level, msg string, args []any) error {
+	if !l.isEnabled(level) {
 		return nil
 	}
-	return l.emit(l.buildLogObject(LevelTrace, msg, args))
+	payload := l.buildLogObject(ctx, level, msg, args)
+	forwardToSlog(ctx, level, msg, payload)
+	return l.emit(payload)
+}
+
+// Trace logs at TRACE level.
+func (l *Logger) Trace(msg string, args ...any) error {
+	return l.logWith(context.Background(), LevelTrace, msg, args)
 }
 
 // Debug logs at DEBUG level.
 func (l *Logger) Debug(msg string, args ...any) error {
-	if !l.isEnabled(LevelDebug) {
-		return nil
-	}
-	return l.emit(l.buildLogObject(LevelDebug, msg, args))
+	return l.logWith(context.Background(), LevelDebug, msg, args)
 }
 
 // Info logs at INFO level.
 func (l *Logger) Info(msg string, args ...any) error {
-	if !l.isEnabled(LevelInfo) {
-		return nil
-	}
-	return l.emit(l.buildLogObject(LevelInfo, msg, args))
+	return l.logWith(context.Background(), LevelInfo, msg, args)
 }
 
 // Warn logs at WARN level.
 func (l *Logger) Warn(msg string, args ...any) error {
-	if !l.isEnabled(LevelWarn) {
-		return nil
-	}
-	return l.emit(l.buildLogObject(LevelWarn, msg, args))
+	return l.logWith(context.Background(), LevelWarn, msg, args)
 }
 
 // Error logs at ERROR level.
 func (l *Logger) Error(msg string, args ...any) error {
-	if !l.isEnabled(LevelError) {
-		return nil
-	}
-	return l.emit(l.buildLogObject(LevelError, msg, args))
+	return l.logWith(context.Background(), LevelError, msg, args)
 }
 
 // Fatal logs at FATAL level.
 func (l *Logger) Fatal(msg string, args ...any) error {
-	if !l.isEnabled(LevelFatal) {
-		return nil
-	}
-	return l.emit(l.buildLogObject(LevelFatal, msg, args))
+	return l.logWith(context.Background(), LevelFatal, msg, args)
+}
+
+// TraceContext logs at TRACE level, correlating to the active span in ctx.
+func (l *Logger) TraceContext(ctx context.Context, msg string, args ...any) error {
+	return l.logWith(ctx, LevelTrace, msg, args)
+}
+
+// DebugContext logs at DEBUG level, correlating to the active span in ctx.
+func (l *Logger) DebugContext(ctx context.Context, msg string, args ...any) error {
+	return l.logWith(ctx, LevelDebug, msg, args)
+}
+
+// InfoContext logs at INFO level, correlating to the active span in ctx.
+func (l *Logger) InfoContext(ctx context.Context, msg string, args ...any) error {
+	return l.logWith(ctx, LevelInfo, msg, args)
+}
+
+// WarnContext logs at WARN level, correlating to the active span in ctx.
+func (l *Logger) WarnContext(ctx context.Context, msg string, args ...any) error {
+	return l.logWith(ctx, LevelWarn, msg, args)
+}
+
+// ErrorContext logs at ERROR level, correlating to the active span in ctx.
+func (l *Logger) ErrorContext(ctx context.Context, msg string, args ...any) error {
+	return l.logWith(ctx, LevelError, msg, args)
+}
+
+// FatalContext logs at FATAL level, correlating to the active span in ctx.
+func (l *Logger) FatalContext(ctx context.Context, msg string, args ...any) error {
+	return l.logWith(ctx, LevelFatal, msg, args)
 }
 
 // Silent is a no-op log method.
