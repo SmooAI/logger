@@ -7,7 +7,13 @@ use serde_json::{json, Map, Value};
 use uuid::Uuid;
 
 /// Context key names shared across logger implementations.
+///
+/// `#[non_exhaustive]`: this enum gains a variant every time the family learns a
+/// new correlation field (`SpanId` arrived with OTel correlation). Without this,
+/// each addition silently breaks any downstream crate that `match`es on it
+/// exhaustively — a source-breaking change smuggled out in a patch release.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[non_exhaustive]
 pub enum ContextKey {
     Level,
     LogLevel,
