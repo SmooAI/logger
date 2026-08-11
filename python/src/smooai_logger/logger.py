@@ -13,12 +13,27 @@ from typing import Any, TypedDict, cast
 
 import pendulum
 from colorist import Color, Effect
+from opentelemetry import trace as _otel_trace
 from rich import pretty
 
 from .utils.date import now
 from .utils.json import JsonEncoder
 
 pretty.install()
+
+
+def _active_span_ids() -> tuple[str, str] | None:
+    """Return ``(trace_id_hex, span_id_hex)`` for the active OTel span, or None.
+
+    W3C hex: 32-char trace id, 16-char span id — the real ids the OTLP pipeline
+    (and @smooai/observability) records, so our logs correlate to the trace.
+    Returns None when no span is active, and the caller falls back to the
+    fabricated correlation id. Depends on ``opentelemetry-api`` only.
+    """
+    ctx = _otel_trace.get_current_span().get_span_context()
+    if not ctx.is_valid:
+        return None
+    return format(ctx.trace_id, "032x"), format(ctx.span_id, "016x")
 
 
 # --------------------------------------------------------------------------------
@@ -214,6 +229,7 @@ class Context(TypedDict, total=False):
     correlationId: str | None
     requestId: str | None
     traceId: str | None
+    spanId: str | None
     namespace: str | None
     service: str | None
     error: str | None
@@ -320,6 +336,60 @@ class Level(str, Enum):
     FATAL = "fatal"
 
 
+# --------------------------------------------------------------------------------
+# stdlib logging bridge → @smooai/observability OTLP logs
+# --------------------------------------------------------------------------------
+_LEVEL_TO_PY: dict[Level, int] = {
+    Level.TRACE: 5,
+    Level.DEBUG: logging.DEBUG,
+    Level.INFO: logging.INFO,
+    Level.WARN: logging.WARNING,
+    Level.ERROR: logging.ERROR,
+    Level.FATAL: logging.CRITICAL,
+}
+
+# Dedicated stdlib logger that forwards each emitted line into the stdlib
+# `logging` facade so @smooai/observability's root LoggingHandler turns it into
+# an OTLP log record (correlated to the active span, which that handler reads).
+# NullHandler suppresses the "no handlers" lastResort noise when observability
+# is NOT installed — a true no-op; propagate=True lets root handlers (the obs
+# handler, when present) see the record.
+_otel_bridge = logging.getLogger("smooai_logger")
+_otel_bridge.addHandler(logging.NullHandler())
+# The smooai Logger already gates by its own level in `_log`; keep this bridge
+# from re-dropping INFO/DEBUG via root's default WARNING effective level.
+_otel_bridge.setLevel(1)
+
+
+def _truthy(value: str | None) -> bool:
+    return (value or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _otel_consumer_present() -> bool:
+    """Is there actually an OTLP consumer for bridged records?
+
+    `propagate=True` sends every bridged line to the ROOT logger's handlers. When
+    observability is installed that is the point — its `LoggingHandler` turns the
+    record into an OTLP log. When it is NOT installed but the app has called
+    `logging.basicConfig()` (Lambda, uvicorn, pytest all do), root has a plain
+    StreamHandler instead, and every smooai line gets printed a SECOND time — once
+    by our own stdout writer, once by root. That is a regression for every existing
+    Python consumer, in exchange for nothing.
+
+    So the bridge is capability-detected rather than always-on: emit only when a
+    real OTel logging handler is attached. This is the same contract the other
+    languages use — enabled means a consumer is actually registered — plus the
+    family-wide `SMOOAI_OBSERVABILITY_DISABLED` kill switch.
+    """
+    if _truthy(os.getenv("SMOOAI_OBSERVABILITY_DISABLED")):
+        return False
+    for handler in logging.getLogger().handlers:
+        cls = type(handler)
+        if (cls.__module__ or "").startswith("opentelemetry") and cls.__name__ == "LoggingHandler":
+            return True
+    return False
+
+
 class Logger:
     """
     Structured JSON logger with context, call-site, HTTP helpers, pretty printing,
@@ -408,6 +478,9 @@ class Logger:
 
         self._file_logger = logging.getLogger(f"{self._name}.file")
         self._file_logger.setLevel(logging.NOTSET)
+        # Don't leak the pretty ANSI file blob up to root handlers (e.g. an
+        # observability LoggingHandler) — the clean OTLP bridge is _bridge_to_otel.
+        self._file_logger.propagate = False
 
         # Determine rotation type and create appropriate handler
         if self._rotation_config.interval and self._rotation_config.size:
@@ -639,6 +712,12 @@ class Logger:
         rec["LogLevel"] = lvl.value
         rec["time"] = now().isoformat()
         rec["name"] = self._name
+        # Correlate to the ACTIVE OTel span when one exists — its real W3C
+        # trace/span ids replace the fabricated uuid so logs line up with traces.
+        # Falls back to the fabricated correlation id when no span is active.
+        span_ids = _active_span_ids()
+        if span_ids is not None:
+            rec["traceId"], rec["spanId"] = span_ids
         # reorder keys: msg, time, error, errorDetails, errors first
         ordered = {}
         for key in ["msg", "time", "error", "errorDetails", "errors"]:
@@ -712,10 +791,28 @@ class Logger:
             # emit via our file-only logger
             self._file_logger.handle(log_rec)
 
+    def _bridge_to_otel(self, lvl: Level, record: Context) -> None:
+        """Forward the line through the stdlib `logging` facade so an installed
+        observability LoggingHandler (on root) can turn it into an OTLP log
+        record. No-op when nothing consumes it (NullHandler + propagate)."""
+        if not _otel_consumer_present():
+            return
+        py_level = _LEVEL_TO_PY.get(lvl, logging.INFO)
+        if not _otel_bridge.isEnabledFor(py_level):
+            return
+        extra: dict[str, Any] = {}
+        cid = record.get("correlationId")
+        if cid:
+            # camelCase on the wire, matching ContextKey across TS/Go/Rust/.NET.
+            # Renaming this after anything queries it would be breaking.
+            extra["correlationId"] = cid
+        _otel_bridge.log(py_level, record.get("msg") or "", extra=extra or None)
+
     def _log(self, lvl: Level, *args: Any) -> None:
         if self._is_enabled(lvl):
             rec = self._build_record(lvl, list(args))
             self._emit(rec)
+            self._bridge_to_otel(lvl, rec)
 
     def trace(self, *args: Any) -> None:
         self._log(Level.TRACE, *args)
