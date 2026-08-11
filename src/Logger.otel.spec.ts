@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { context, trace } from "@opentelemetry/api";
+import { INVALID_SPAN_CONTEXT, context, trace } from "@opentelemetry/api";
 import { logs } from "@opentelemetry/api-logs";
 import { AsyncHooksContextManager } from "@opentelemetry/context-async-hooks";
 import {
@@ -80,5 +80,43 @@ describe("Logger OTel correlation", () => {
     const records = memoryExporter.getFinishedLogRecords();
     expect(records).toHaveLength(1);
     expect(records[0]!.spanContext).toBeUndefined();
+  });
+
+  // The regression the guard exists for. An app that imports the OTel API but
+  // registers no TracerProvider gets a NonRecordingSpan carrying
+  // INVALID_SPAN_CONTEXT (all-zero ids) — as does a context propagated from a
+  // sampled-out parent. Stamping those would not merely fail to correlate, it
+  // would OVERWRITE the correlation uuid with zeroes and silently break the
+  // existing correlationId join. Remove `isSpanContextValid` from
+  // `applyOtelCorrelation` and this test fails.
+  test("an invalid span context leaves the correlation uuid intact", () => {
+    const logger = new Logger();
+    logger.setCorrelationId("11111111-2222-3333-4444-555555555555");
+
+    const built = context.with(
+      trace.setSpanContext(context.active(), INVALID_SPAN_CONTEXT),
+      () => (logger as any).buildLogObject(Level.Info, ["hello"])[0],
+    );
+
+    expect(built[ContextKey.TraceId]).toBe("11111111-2222-3333-4444-555555555555");
+    expect(built[ContextKey.TraceId]).not.toBe("00000000000000000000000000000000");
+    expect(built[ContextKey.SpanId]).toBeUndefined();
+  });
+
+  // Negative control: proves the assertion above is not vacuous. The SAME call
+  // shape with a VALID context must stamp — otherwise the test would pass even
+  // if correlation were removed entirely.
+  test("...but a valid span context still stamps", () => {
+    const logger = new Logger();
+    logger.setCorrelationId("11111111-2222-3333-4444-555555555555");
+    const span = tracerProvider.getTracer("test").startSpan("valid");
+
+    const built = context.with(trace.setSpan(context.active(), span), () =>
+      (logger as any).buildLogObject(Level.Info, ["hello"])[0],
+    );
+    span.end();
+
+    expect(built[ContextKey.TraceId]).toBe(span.spanContext().traceId);
+    expect(built[ContextKey.SpanId]).toBe(span.spanContext().spanId);
   });
 });

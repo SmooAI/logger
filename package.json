@@ -137,8 +137,6 @@
   },
   "dependencies": {
     "@aws-sdk/client-sqs": "^3.504.0",
-    "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/api-logs": "^0.55.0",
     "browser-dtector": "^4.1.0",
     "dayjs": "^1.11.13",
     "esbuild-plugin-alias": "^0.2.1",
@@ -174,7 +172,9 @@
     "vite": "^6.2.4",
     "vite-node": "^3.1.1",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.1.1"
+    "vitest": "^3.1.1",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/api-logs": "^0.55.0"
   },
   "engines": {
     "node": ">=20.0.0"
@@ -188,5 +188,9 @@
       "@smooai/config-typescript",
       "esbuild"
     ]
+  },
+  "peerDependencies": {
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/api-logs": "^0.55.0"
   }
 }

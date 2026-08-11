@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { trace } from "@opentelemetry/api";
+import { isSpanContextValid, trace } from "@opentelemetry/api";
 import { logs, SeverityNumber } from "@opentelemetry/api-logs";
 import dayjs from "dayjs";
 import stableStringify from "json-stable-stringify";
@@ -836,7 +836,17 @@ export default class Logger {
 
   private applyOtelCorrelation(object: any): void {
     const spanContext = trace.getActiveSpan()?.spanContext();
-    if (!spanContext) return;
+    // `isSpanContextValid` is load-bearing, not defensive politeness. An app
+    // that imports the OTel API but registers no TracerProvider gets a
+    // NonRecordingSpan carrying INVALID_SPAN_CONTEXT — all-zero ids — and so
+    // does a context propagated from a sampled-out parent. Without this guard
+    // every line is stamped traceId '000…0', which is worse than no correlation
+    // at all: it destroys the uuid fallback that `setCorrelationId` maintains,
+    // so the existing correlationId join silently stops working with no error.
+    // Go (`sc.IsValid()`), Rust (`span_context.is_valid()`) and Python
+    // (`if not ctx.is_valid`) all guard here; TypeScript was the only one that
+    // did not.
+    if (!spanContext || !isSpanContextValid(spanContext)) return;
     object[ContextKey.TraceId] = spanContext.traceId;
     object[ContextKey.SpanId] = spanContext.spanId;
   }
