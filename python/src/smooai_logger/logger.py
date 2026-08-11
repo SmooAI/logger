@@ -355,6 +355,35 @@ _otel_bridge.addHandler(logging.NullHandler())
 _otel_bridge.setLevel(1)
 
 
+def _truthy(value: str | None) -> bool:
+    return (value or "").strip().lower() in {"1", "true", "yes", "on"}
+
+
+def _otel_consumer_present() -> bool:
+    """Is there actually an OTLP consumer for bridged records?
+
+    `propagate=True` sends every bridged line to the ROOT logger's handlers. When
+    observability is installed that is the point — its `LoggingHandler` turns the
+    record into an OTLP log. When it is NOT installed but the app has called
+    `logging.basicConfig()` (Lambda, uvicorn, pytest all do), root has a plain
+    StreamHandler instead, and every smooai line gets printed a SECOND time — once
+    by our own stdout writer, once by root. That is a regression for every existing
+    Python consumer, in exchange for nothing.
+
+    So the bridge is capability-detected rather than always-on: emit only when a
+    real OTel logging handler is attached. This is the same contract the other
+    languages use — enabled means a consumer is actually registered — plus the
+    family-wide `SMOOAI_OBSERVABILITY_DISABLED` kill switch.
+    """
+    if _truthy(os.getenv("SMOOAI_OBSERVABILITY_DISABLED")):
+        return False
+    for handler in logging.getLogger().handlers:
+        cls = type(handler)
+        if (cls.__module__ or "").startswith("opentelemetry") and cls.__name__ == "LoggingHandler":
+            return True
+    return False
+
+
 class Logger:
     """
     Structured JSON logger with context, call-site, HTTP helpers, pretty printing,
@@ -756,13 +785,17 @@ class Logger:
         """Forward the line through the stdlib `logging` facade so an installed
         observability LoggingHandler (on root) can turn it into an OTLP log
         record. No-op when nothing consumes it (NullHandler + propagate)."""
+        if not _otel_consumer_present():
+            return
         py_level = _LEVEL_TO_PY.get(lvl, logging.INFO)
         if not _otel_bridge.isEnabledFor(py_level):
             return
         extra: dict[str, Any] = {}
         cid = record.get("correlationId")
         if cid:
-            extra["correlation_id"] = cid
+            # camelCase on the wire, matching ContextKey across TS/Go/Rust/.NET.
+            # Renaming this after anything queries it would be breaking.
+            extra["correlationId"] = cid
         _otel_bridge.log(py_level, record.get("msg") or "", extra=extra or None)
 
     def _log(self, lvl: Level, *args: Any) -> None:

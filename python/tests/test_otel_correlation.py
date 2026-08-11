@@ -58,9 +58,15 @@ def test_bridge_forwards_to_stdlib_root_logger():
     reset_global_context()
     captured: list[logging.LogRecord] = []
 
+    # Must LOOK like observability's handler: the bridge is capability-gated on a
+    # real OTel consumer being attached, precisely so an app's own root handler
+    # (logging.basicConfig) does not double-print every line.
     class _Capture(logging.Handler):
         def emit(self, record: logging.LogRecord) -> None:
             captured.append(record)
+
+    _Capture.__name__ = "LoggingHandler"
+    _Capture.__module__ = "opentelemetry.sdk._logs"
 
     handler = _Capture()
     root = logging.getLogger()
@@ -82,9 +88,14 @@ def test_bridge_line_carries_span_context_for_obs():
     reset_global_context()
     seen: list[int] = []
 
+    # Same reason as the test above: shaped like observability's handler so the
+    # capability gate lets the record through.
     class _SpanPeek(logging.Handler):
         def emit(self, record: logging.LogRecord) -> None:
             seen.append(trace.get_current_span().get_span_context().trace_id)
+
+    _SpanPeek.__name__ = "LoggingHandler"
+    _SpanPeek.__module__ = "opentelemetry.sdk._logs"
 
     handler = _SpanPeek()
     root = logging.getLogger()
@@ -97,3 +108,102 @@ def test_bridge_line_carries_span_context_for_obs():
         root.removeHandler(handler)
 
     assert _TRACE_ID in seen
+
+
+class _FakeOtelLoggingHandler(logging.Handler):
+    """Stands in for opentelemetry.sdk._logs.LoggingHandler.
+
+    The gate identifies a real consumer by module+class name, so the test has to
+    match on the same thing rather than on an isinstance the test controls.
+    """
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.records: list[logging.LogRecord] = []
+
+    def emit(self, record: logging.LogRecord) -> None:
+        self.records.append(record)
+
+
+_FakeOtelLoggingHandler.__name__ = "LoggingHandler"
+_FakeOtelLoggingHandler.__module__ = "opentelemetry.sdk._logs"
+
+
+class _PlainAppHandler(logging.Handler):
+    """A vanilla root handler, as `logging.basicConfig()` installs."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.records: list[logging.LogRecord] = []
+
+    def emit(self, record: logging.LogRecord) -> None:
+        self.records.append(record)
+
+
+def _with_root_handler(handler: logging.Handler):
+    root = logging.getLogger()
+    root.addHandler(handler)
+    return root
+
+
+def test_no_otel_consumer_means_no_bridged_record(monkeypatch):
+    """The double-emission regression.
+
+    Without the gate, every smooai line propagates to root and an app that called
+    logging.basicConfig() prints it a second time — on top of our own stdout
+    writer. Nothing about that helps a consumer who has not installed
+    observability.
+    """
+    monkeypatch.delenv("SMOOAI_OBSERVABILITY_DISABLED", raising=False)
+    app_handler = _PlainAppHandler()
+    root = _with_root_handler(app_handler)
+    try:
+        Logger().info("hello")
+        assert app_handler.records == [], (
+            "a plain root handler received a bridged record, so every consumer "
+            "with logging.basicConfig() double-prints every line"
+        )
+    finally:
+        root.removeHandler(app_handler)
+
+
+def test_an_otel_consumer_does_receive_the_record(monkeypatch):
+    """Negative control for the test above.
+
+    If this fails, the gate is simply off and the first test proves nothing.
+    """
+    monkeypatch.delenv("SMOOAI_OBSERVABILITY_DISABLED", raising=False)
+    otel_handler = _FakeOtelLoggingHandler()
+    root = _with_root_handler(otel_handler)
+    try:
+        Logger().info("hello")
+        assert len(otel_handler.records) == 1
+        assert otel_handler.records[0].getMessage() == "hello"
+    finally:
+        root.removeHandler(otel_handler)
+
+
+def test_kill_switch_wins_over_a_present_consumer(monkeypatch):
+    monkeypatch.setenv("SMOOAI_OBSERVABILITY_DISABLED", "1")
+    otel_handler = _FakeOtelLoggingHandler()
+    root = _with_root_handler(otel_handler)
+    try:
+        Logger().info("hello")
+        assert otel_handler.records == []
+    finally:
+        root.removeHandler(otel_handler)
+
+
+def test_correlation_id_is_camel_case_on_the_wire(monkeypatch):
+    monkeypatch.delenv("SMOOAI_OBSERVABILITY_DISABLED", raising=False)
+    otel_handler = _FakeOtelLoggingHandler()
+    root = _with_root_handler(otel_handler)
+    try:
+        log = Logger()
+        log.correlation_id = "11111111-2222-3333-4444-555555555555"
+        log.info("hello")
+        rec = otel_handler.records[0]
+        assert getattr(rec, "correlationId", None) == "11111111-2222-3333-4444-555555555555"
+        assert not hasattr(rec, "correlation_id"), "snake_case leaked onto the wire"
+    finally:
+        root.removeHandler(otel_handler)
