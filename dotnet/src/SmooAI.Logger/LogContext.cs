@@ -23,6 +23,7 @@ public static class ContextKey
     public const string RequestId = "requestId";
     public const string Duration = "duration";
     public const string TraceId = "traceId";
+    public const string SpanId = "spanId";
     public const string Error = "error";
     public const string Namespace = "namespace";
     public const string Service = "service";
