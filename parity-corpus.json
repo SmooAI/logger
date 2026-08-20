@@ -1,29 +1,169 @@
 {
   "$comment": [
     "Golden-vector parity corpus for @smooai/logger's five hand-written ports",
-    "(TypeScript, Go, Python, Rust, .NET). Pattern follows ADR-089 (@smooai/audit).",
+    "(TypeScript, Python, Rust, Go, .NET). Pattern follows ADR-089 (@smooai/audit).",
     "",
-    "Every port MUST emit BOTH fields on every record:",
-    "  level    -> pino-compatible NUMERIC code",
-    "  LogLevel -> canonical lowercase STRING",
-    "",
-    "Downstream (rust/api-prime observability log ingest) keys off LogLevel because",
-    "it is unambiguous; the numeric `level` is retained for pino-compatible tooling.",
+    "ALL FIVE ports load THIS file. A port that does not load it is not covered:",
+    "  TypeScript  src/parity-corpus.spec.ts",
+    "  Python      python/tests/test_parity_corpus.py",
+    "  Rust        rust/logger/tests/parity_corpus.rs",
+    "  Go          go/parity_corpus_test.go",
+    "  .NET        dotnet/tests/SmooAI.Logger.Tests/ParityCorpusTests.cs",
     "",
     "This file is the contract. Do NOT edit expected values to make a test pass --",
-    "a failure here means a port has drifted and the PORT is what needs fixing."
+    "a failure here means a port has drifted and the PORT is what needs fixing.",
+    "Adding a language means adding a loader, not copying these values into it."
   ],
-  "version": 1,
-  "fields": {
-    "level": "pino-compatible numeric code",
-    "LogLevel": "canonical lowercase string"
+  "$versionComment": "Bumped when the corpus SHAPE changes. Every loader asserts it, so a loader left behind fails loudly instead of silently reading half a contract.",
+  "version": 2,
+
+  "levels": {
+    "$comment": [
+      "Every port MUST emit BOTH fields on every record:",
+      "  level    -> pino-compatible NUMERIC code",
+      "  LogLevel -> canonical lowercase STRING",
+      "Downstream (rust/api-prime observability log ingest) keys off LogLevel because",
+      "it is unambiguous; numeric `level` is retained for pino-compatible tooling."
+    ],
+    "rows": [
+      { "name": "trace", "LogLevel": "trace", "level": 10 },
+      { "name": "debug", "LogLevel": "debug", "level": 20 },
+      { "name": "info", "LogLevel": "info", "level": 30 },
+      { "name": "warn", "LogLevel": "warn", "level": 40 },
+      { "name": "error", "LogLevel": "error", "level": 50 },
+      { "name": "fatal", "LogLevel": "fatal", "level": 60 }
+    ]
   },
-  "levels": [
-    { "name": "trace", "LogLevel": "trace", "level": 10 },
-    { "name": "debug", "LogLevel": "debug", "level": 20 },
-    { "name": "info", "LogLevel": "info", "level": 30 },
-    { "name": "warn", "LogLevel": "warn", "level": 40 },
-    { "name": "error", "LogLevel": "error", "level": 50 },
-    { "name": "fatal", "LogLevel": "fatal", "level": 60 }
-  ]
+
+  "$fieldNamesComment": [
+    "Canonical wire names. These are what log ingest indexes on, so a port that",
+    "renames one silently drops that column for its whole language.",
+    "`fieldNames` holds no `$comment` key on purpose: strongly-typed loaders decode",
+    "it as a plain string map, and a nested array breaks them."
+  ],
+  "fieldNames": {
+    "level": "level",
+    "logLevel": "LogLevel",
+    "time": "time",
+    "message": "msg",
+    "name": "name",
+    "context": "context",
+    "correlationId": "correlationId",
+    "requestId": "requestId",
+    "traceId": "traceId",
+    "spanId": "spanId",
+    "namespace": "namespace",
+    "service": "service",
+    "duration": "duration",
+    "error": "error",
+    "errorDetails": "errorDetails",
+    "user": "user",
+    "http": "http"
+  },
+
+  "record": {
+    "$comment": [
+      "Emitted with the message below at each level, with no extra context.",
+      "`requiredFields` must be present on EVERY record from EVERY port."
+    ],
+    "message": "parity corpus probe",
+    "requiredFields": ["level", "LogLevel", "time", "msg", "name"]
+  },
+
+  "messageShape": {
+    "$comment": [
+      "A single string argument lands verbatim in `msg` and does NOT leak into",
+      "`context`. A trailing object argument becomes `context`, leaving `msg` alone."
+    ],
+    "cases": [
+      {
+        "name": "bare string message",
+        "message": "hello",
+        "context": null,
+        "expectMsg": "hello"
+      },
+      {
+        "name": "string message plus context object",
+        "message": "hello",
+        "context": { "foo": "bar" },
+        "expectMsg": "hello",
+        "expectContext": { "foo": "bar" }
+      }
+    ]
+  },
+
+  "correlationId": {
+    "$comment": [
+      "Set via each port's set-correlation-id API; must surface on the record under",
+      "`correlationId` verbatim. This is the field that stitches a request together",
+      "across services, so a port that drops it breaks cross-service tracing.",
+      "",
+      "Setting it MUST also overwrite `requestId` and `traceId` with the same value.",
+      "TypeScript, Go, Rust and .NET all do; Python did not until this corpus caught",
+      "it, so a Python service that adopted an inbound correlation id kept emitting",
+      "a locally-generated requestId/traceId and fell out of the correlated view."
+    ],
+    "field": "correlationId",
+    "alsoSets": ["requestId", "traceId"],
+    "value": "corpus-corr-0123456789"
+  },
+
+  "redaction": {
+    "$comment": [
+      "SMOODEV-942. Five ports each carried their own hand-copied literal list of",
+      "these keys -- the exact drift-prone pattern this corpus exists to kill.",
+      "`defaultKeys` is now the single source; each port asserts its default list",
+      "equals this one, IN ORDER, and that redaction actually applies.",
+      "",
+      "Matching is case-INSENSITIVE on the key and EXACT (not substring): `Password`",
+      "redacts, but camelCase `refreshToken` does NOT, because only the snake_case",
+      "`refresh_token` is listed. That asymmetry is deliberate and load-bearing --",
+      "see `cases[].preserved`."
+    ],
+    "placeholder": "[REDACTED]",
+    "defaultKeys": [
+      "authorization",
+      "proxy-authorization",
+      "cookie",
+      "set-cookie",
+      "x-api-key",
+      "x-amz-security-token",
+      "password",
+      "passwd",
+      "secret",
+      "apikey",
+      "api_key",
+      "token",
+      "access_token",
+      "refresh_token",
+      "client_secret"
+    ],
+    "cases": [
+      {
+        "name": "credential-ish field names, mixed case",
+        "context": {
+          "Password": "hunter2",
+          "api_key": "sk_xxxxxxxx",
+          "refresh_token": "rt-2",
+          "client_secret": "cs_xxx",
+          "refreshToken": "rt-1",
+          "normalField": "ok"
+        },
+        "redacted": ["Password", "api_key", "refresh_token", "client_secret"],
+        "preserved": { "refreshToken": "rt-1", "normalField": "ok" }
+      },
+      {
+        "name": "auth-bearing header names",
+        "context": {
+          "Authorization": "Bearer super-secret-token",
+          "Cookie": "session=abc123",
+          "X-Api-Key": "k_xxx",
+          "x-amz-security-token": "AQoDY",
+          "User-Agent": "smoo-test/1.0"
+        },
+        "redacted": ["Authorization", "Cookie", "X-Api-Key", "x-amz-security-token"],
+        "preserved": { "User-Agent": "smoo-test/1.0" }
+      }
+    ]
+  }
 }
