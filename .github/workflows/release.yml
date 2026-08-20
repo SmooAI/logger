@@ -109,8 +109,43 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GH_PAT }}
           NPM_TOKEN: ${{ secrets.SMOOAI_NPM_TOKEN }}
 
+      # Gate each registry on whether IT is behind, not on whether npm published
+      # in THIS run. `steps.changesets.outputs.published` is only true when the
+      # publish command actually shipped something, so a run that died after npm
+      # left PyPI/crates.io/Go/NuGet behind, and the NEXT run had no changesets
+      # left, reported published=false, skipped all four, and went GREEN having
+      # published nothing. That is how 4.5.1 and 4.5.2 stranded three registries
+      # at 4.5.0 here. Asking each registry directly also makes a re-run heal it.
+      - name: Which registries are behind package.json?
+        id: lag
+        run: |
+          set -euo pipefail
+          VERSION=$(node -p "require('./package.json').version")
+          echo "Target version: ${VERSION}"
+
+          # "behind" = this registry does NOT already have ${VERSION}.
+          # A failed/garbled lookup counts as behind, i.e. we try to publish:
+          # every path below is duplicate-tolerant or version-guarded, so a
+          # redundant attempt is cheap and a skipped one loses a release.
+          behind() {
+            if jq -e --arg v "$VERSION" "$2" >/dev/null 2>&1 <<<"$1"; then echo no; else echo yes; fi
+          }
+
+          PYPI=$(behind "$(curl -sfL https://pypi.org/pypi/smooai-logger/json || true)" '.releases | has($v)')
+          CRATES=$(behind "$(curl -sfL -H 'User-Agent: SmooAI-logger-release' https://crates.io/api/v1/crates/smooai-logger/versions || true)" '[.versions[].num] | index($v)')
+          NUGET=$(behind "$(curl -sfL https://api.nuget.org/v3-flatcontainer/smooai.logger/index.json || true)" '.versions | index($v)')
+          if git ls-remote --exit-code --tags origin "refs/tags/go/v${VERSION}" >/dev/null 2>&1; then GOTAG=no; else GOTAG=yes; fi
+
+          echo "behind -> pypi:${PYPI} crates:${CRATES} nuget:${NUGET} go-tag:${GOTAG}"
+          {
+            echo "pypi=${PYPI}"
+            echo "crates=${CRATES}"
+            echo "nuget=${NUGET}"
+            echo "gotag=${GOTAG}"
+          } >> "$GITHUB_OUTPUT"
+
       - name: Publish smooai-logger to PyPI
-        if: steps.changesets.outputs.published == 'true'
+        if: steps.lag.outputs.pypi == 'yes'
         working-directory: python
         env:
           UV_PUBLISH_TOKEN: ${{ secrets.SMOOAI_PYPI_TOKEN }}
@@ -120,13 +155,13 @@ jobs:
           uv run poe publish
 
       - name: Publish smooai-logger to crates.io
-        if: steps.changesets.outputs.published == 'true'
+        if: steps.lag.outputs.crates == 'yes'
         run: cargo publish --locked --manifest-path rust/logger/Cargo.toml
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.SMOOAI_CARGO_REGISTRY_TOKEN }}
 
       - name: Tag and publish Go module
-        if: steps.changesets.outputs.published == 'true'
+        if: steps.lag.outputs.gotag == 'yes'
         run: |
           # Guard here, not just in the pre-flight checks: changesets has
           # bumped package.json by this point, so this is the only place the
@@ -143,7 +178,7 @@ jobs:
           echo "Go module tagged and pushed: ${TAG}"
 
       - name: Build and test .NET
-        if: steps.changesets.outputs.published == 'true'
+        if: steps.lag.outputs.nuget == 'yes'
         working-directory: dotnet
         run: |
           dotnet restore SmooAI.Logger.sln
@@ -151,7 +186,7 @@ jobs:
           dotnet test SmooAI.Logger.sln -c Release --no-build --nologo
 
       - name: Pack and publish SmooAI.Logger to NuGet
-        if: steps.changesets.outputs.published == 'true'
+        if: steps.lag.outputs.nuget == 'yes'
         run: |
           VERSION=$(node -p "require('./package.json').version")
           echo "Packing SmooAI.Logger ${VERSION}"
