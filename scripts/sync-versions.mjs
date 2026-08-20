@@ -1,12 +1,22 @@
 #!/usr/bin/env node
+/**
+ * Rewrite every non-npm manifest to match `package.json`'s version.
+ *
+ * Runs from the changesets `version` lifecycle (`pnpm run version`), NOT from
+ * `ci:publish`. The changesets action commits the working tree after `version`,
+ * so the synced manifests land in the release commit. Running it after publish
+ * — as this repo did until now — mutated manifests that were never committed,
+ * which is why every git tag shipped stale version constants and why
+ * `cargo publish` needed `--allow-dirty`.
+ */
 import { readFileSync, writeFileSync } from "node:fs";
 import { resolve } from "node:path";
 import process from "node:process";
+import { GO_MOD, VERSIONED_FILES, goModulePathFor, writeVersion } from "./versioned-files.mjs";
 
 const root = process.cwd();
 
-const packageJsonPath = resolve(root, "package.json");
-const pkg = JSON.parse(readFileSync(packageJsonPath, "utf8"));
+const pkg = JSON.parse(readFileSync(resolve(root, "package.json"), "utf8"));
 const version = pkg.version;
 
 if (!version) {
@@ -14,83 +24,33 @@ if (!version) {
   process.exit(1);
 }
 
-const updates = [
-  {
-    path: "python/pyproject.toml",
-    apply(content) {
-      const pattern = /^(version\s*=\s*")([^"]+)(")/m;
-      if (!pattern.test(content)) {
-        throw new Error("Version line not found in python/pyproject.toml");
-      }
-      return content.replace(pattern, `$1${version}$3`);
-    },
-  },
-  {
-    path: "rust/logger/Cargo.toml",
-    apply(content) {
-      const pattern = /^(version\s*=\s*")([^"]+)(")/m;
-      if (!pattern.test(content)) {
-        throw new Error("Version line not found in rust/logger/Cargo.toml");
-      }
-      return content.replace(pattern, `$1${version}$3`);
-    },
-  },
-  {
-    path: "rust/logger/Cargo.lock",
-    apply(content) {
-      const pattern = /(name\s*=\s*"smooai-logger"\s*\nversion\s*=\s*")([^"]+)(")/;
-      if (!pattern.test(content)) {
-        throw new Error("Version block not found in rust/logger/Cargo.lock");
-      }
-      return content.replace(pattern, `$1${version}$3`);
-    },
-  },
-  {
-    path: "go/version.go",
-    apply(content) {
-      const pattern = /(const Version = ")([^"]+)(")/;
-      if (!pattern.test(content)) {
-        throw new Error("Version line not found in go/version.go");
-      }
-      return content.replace(pattern, `$1${version}$3`);
-    },
-  },
-  {
-    path: "dotnet/src/SmooAI.Logger/SmooAI.Logger.csproj",
-    apply(content) {
-      const pattern = /(<Version>)([^<]+)(<\/Version>)/;
-      if (!pattern.test(content)) {
-        throw new Error(
-          "<Version> element not found in dotnet/src/SmooAI.Logger/SmooAI.Logger.csproj",
-        );
-      }
-      return content.replace(pattern, `$1${version}$3`);
-    },
-  },
-];
-
 let touched = 0;
 
-for (const { path, apply } of updates) {
-  const absolutePath = resolve(root, path);
-  let content;
-  try {
-    content = readFileSync(absolutePath, "utf8");
-  } catch (error) {
-    if (error && error.code === "ENOENT") {
-      console.warn(`Skipping ${path} (not found)`);
-      continue;
-    }
-    throw error;
-  }
-  const next = apply(content);
+for (const file of VERSIONED_FILES) {
+  const absolutePath = resolve(root, file.path);
+  const content = readFileSync(absolutePath, "utf8");
+  const next = writeVersion(file, content, version);
   if (next !== content) {
     writeFileSync(absolutePath, next);
     touched += 1;
-    console.log(`Updated version in ${path}`);
+    console.log(`Updated version in ${file.path} -> ${version}`);
   }
 }
 
-if (touched === 0) {
-  console.warn("No files were updated by sync-versions.");
+const goModPath = resolve(root, GO_MOD.path);
+const goMod = readFileSync(goModPath, "utf8");
+const expectedModule = goModulePathFor(version);
+const nextGoMod = goMod.replace(GO_MOD.pattern, `$1${expectedModule}`);
+if (nextGoMod !== goMod) {
+  writeFileSync(goModPath, nextGoMod);
+  touched += 1;
+  console.log(`Updated module path in ${GO_MOD.path} -> ${expectedModule}`);
+  console.warn(
+    "NOTE: a Go major bump also requires updating every `github.com/SmooAI/logger/go/...` import " +
+      "in READMEs and any consumer. This repo's Go package is flat and imports nothing of its own.",
+  );
 }
+
+console.log(
+  touched === 0 ? "sync-versions: already in sync" : `sync-versions: ${touched} file(s) updated`,
+);

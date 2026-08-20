@@ -85,7 +85,7 @@
     "aibranch": "pnpm generate-git-branch",
     "build": "pnpm tsdown && cp src/decycle.cjs dist/ && pnpm run python:build && pnpm run rust:build && pnpm run go:build",
     "check-all": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run rust:fmt:check && pnpm run rust:lint && pnpm run rust:test && pnpm run go:fmt:check && pnpm run go:lint && pnpm run go:test && pnpm run build",
-    "check:go-module": "node scripts/check-go-module.mjs",
+    "check:versions": "node scripts/check-versions.mjs",
     "ci:publish": "node scripts/ci-publish.mjs",
     "format": "oxfmt --write . && pnpm run python:format && pnpm run rust:fmt && pnpm run go:fmt",
     "go:build": "(cd go && go build ./...)",
@@ -113,6 +113,7 @@
     "rust:test": "(cd rust/logger && cargo test)",
     "test": "vitest run --passWithNoTests && pnpm python:test && pnpm rust:test && pnpm go:test",
     "typecheck": "tsc --noEmit --skipLibCheck && pnpm run python:typecheck:errors && pnpm run rust:check && pnpm run go:build",
+    "version": "changeset version && node scripts/sync-versions.mjs",
     "version:sync": "node scripts/sync-versions.mjs",
     "watch": "tsdown --watch"
   },

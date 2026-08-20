@@ -354,7 +354,7 @@ wheels = [
 
 [[package]]
 name = "smooai-logger"
-version = "3.2.3"
+version = "4.5.0"
 source = { editable = "." }
 dependencies = [
     { name = "colorist" },
