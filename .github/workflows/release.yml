@@ -72,6 +72,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Guard — Go module major matches package.json
+        run: pnpm check:go-module
+
       - name: Typecheck
         run: pnpm typecheck
 
@@ -120,6 +123,10 @@ jobs:
       - name: Tag and publish Go module
         if: steps.changesets.outputs.published == 'true'
         run: |
+          # Guard here, not in the pre-flight checks: changesets has already
+          # bumped package.json by this point, so this is the only place the
+          # version that becomes the tag can be compared to the module path.
+          node scripts/check-go-module.mjs
           VERSION=$(node -p "require('./package.json').version")
           TAG="go/v${VERSION}"
           echo "Creating Go module tag: ${TAG}"

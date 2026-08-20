@@ -63,6 +63,9 @@ jobs:
         run: uv sync --group dev
         working-directory: python
 
+      - name: Guard — Go module major matches package.json
+        run: pnpm check:go-module
+
       - name: Typecheck
         run: pnpm typecheck
 
