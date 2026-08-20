@@ -87,8 +87,11 @@ jobs:
       - name: Build
         run: pnpm build
 
-      - name: Format
-        run: pnpm format
+      # Check, never rewrite. `pnpm format` here mutated the working tree without
+      # ever committing the result, which left `cargo publish` staring at a dirty
+      # tree — the reason `--allow-dirty` was needed in the first place.
+      - name: Format check
+        run: pnpm format:check
 
       - name: Version Update 🦋
         id: changesets

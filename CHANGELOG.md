@@ -15,7 +15,6 @@
   of them the published one.
 
   Every consumer of a non-npm port was reading a version constant from a different release.
-
   - The sync moves into the changesets `version` lifecycle (`"version": "changeset version && node scripts/sync-versions.mjs"`, with `version: pnpm run version` on the action), so the bumped manifests are **committed** with the version bump.
   - `cargo publish` drops `--allow-dirty` and gains `--locked`.
   - `python/uv.lock` joins the synced set. It was missed before and is not cosmetic: `poe install-dev` runs `uv sync --locked`, which errors when the lock disagrees with `pyproject.toml`.
@@ -63,7 +62,7 @@
 
   ```jsonc
   {
-    "caller": { "file": "UserService.cs", "line": 42, "function": "CreateUser" }
+    "caller": { "file": "UserService.cs", "line": 42, "function": "CreateUser" },
   }
   ```
 
@@ -119,7 +118,6 @@
   [SmooAI/observability](https://github.com/SmooAI/observability) (`desktop/`).
 
   Removed:
-
   - the `postinstall` hook and both `bundle-log-viewer` scripts (Node + Python)
   - the `smooai-log-viewer` bin (npm) and console script (PyPI) and their wrappers
   - the `log-viewer/` crate source and the `build-log-viewer.yml` release workflow
@@ -372,26 +370,22 @@
   This release transforms `@smooai/logger` into a comprehensive multi-language logging ecosystem:
 
   ### 🐍 Python Package (`smooai-logger`)
-
   - Available on PyPI as `smooai-logger`
   - Full Python implementation with identical API to TypeScript version
   - Synchronized versioning with npm package
 
   ### 🦀 Rust Crate (`smooai-logger`)
-
   - Available on crates.io as `smooai-logger`
   - Native Rust logging implementation
   - Synchronized versioning with npm package
 
   ### 📊 Log Viewer CLI (`smooai-log-viewer`)
-
   - Interactive GUI application for viewing `.smooai-logs` files
   - Available as CLI command when installing npm package: `smooai-log-viewer`
   - Cross-platform native binaries bundled with package
   - Features filtering, searching, JSON expansion, and context viewing
 
   ### 🔄 Automated Publishing Pipeline
-
   - Single changesets release now publishes to npm, PyPI, and crates.io
   - Automatic version synchronization across all packages
   - Enhanced CI/CD workflow for multi-language support

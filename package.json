@@ -88,6 +88,7 @@
     "check:versions": "node scripts/check-versions.mjs",
     "ci:publish": "node scripts/ci-publish.mjs",
     "format": "oxfmt --write . && pnpm run python:format && pnpm run rust:fmt && pnpm run go:fmt",
+    "format:check": "oxfmt --check . && (cd python && uv run ruff format --check) && pnpm run rust:fmt:check && pnpm run go:fmt:check",
     "go:build": "(cd go && go build ./...)",
     "go:fmt": "(cd go && gofmt -w .)",
     "go:fmt:check": "(cd go && test -z \"$(gofmt -l .)\")",
@@ -113,7 +114,7 @@
     "rust:test": "(cd rust/logger && cargo test)",
     "test": "vitest run --passWithNoTests && pnpm python:test && pnpm rust:test && pnpm go:test",
     "typecheck": "tsc --noEmit --skipLibCheck && pnpm run python:typecheck:errors && pnpm run rust:check && pnpm run go:build",
-    "version": "changeset version && node scripts/sync-versions.mjs",
+    "version": "changeset version && node scripts/sync-versions.mjs && oxfmt --write CHANGELOG.md package.json",
     "version:sync": "node scripts/sync-versions.mjs",
     "watch": "tsdown --watch"
   },
@@ -134,6 +135,8 @@
   },
   "devDependencies": {
     "@changesets/cli": "^2.28.1",
+    "@opentelemetry/api": "^1.9.0",
+    "@opentelemetry/api-logs": "^0.55.0",
     "@opentelemetry/context-async-hooks": "^1.30.0",
     "@opentelemetry/sdk-logs": "^0.55.0",
     "@opentelemetry/sdk-trace-base": "^1.30.0",
@@ -153,7 +156,9 @@
     "vite": "^6.2.4",
     "vite-node": "^3.1.1",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.1.1",
+    "vitest": "^3.1.1"
+  },
+  "peerDependencies": {
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/api-logs": "^0.55.0"
   },
@@ -169,9 +174,5 @@
       "@smooai/config-typescript",
       "esbuild"
     ]
-  },
-  "peerDependencies": {
-    "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/api-logs": "^0.55.0"
   }
 }

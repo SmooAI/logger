@@ -84,7 +84,7 @@ cargo add smooai-logger
 > frame inside this crate. Only the file basename is emitted. `function` is absent: `std::panic::Location`
 > carries no symbol name and resolving one would mean capturing a backtrace on every line — Go and .NET
 > do include it. TypeScript and Python emit a multi-frame `callerContext.stack` instead of this
-> single-frame shape. Full stack traces are still serialized for logged *errors*.
+> single-frame shape. Full stack traces are still serialized for logged _errors_.
 
 ### Track Requests Across Services
 

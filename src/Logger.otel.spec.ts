@@ -111,8 +111,9 @@ describe("Logger OTel correlation", () => {
     logger.setCorrelationId("11111111-2222-3333-4444-555555555555");
     const span = tracerProvider.getTracer("test").startSpan("valid");
 
-    const built = context.with(trace.setSpan(context.active(), span), () =>
-      (logger as any).buildLogObject(Level.Info, ["hello"])[0],
+    const built = context.with(
+      trace.setSpan(context.active(), span),
+      () => (logger as any).buildLogObject(Level.Info, ["hello"])[0],
     );
     span.end();
 

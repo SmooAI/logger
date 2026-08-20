@@ -38,7 +38,7 @@
 
 ---
 
-> **A log line that only carries the message is a clue. One that carries the whole story is an answer.** `@smooai/logger` stamps every entry with the request journey (correlation IDs across services), the AWS runtime around it (Lambda, SQS, API Gateway context), and — where an OpenTelemetry span is active — the *real* W3C trace and span IDs, so logs join your traces instead of floating beside them. Native ports in **five languages** — TypeScript, Python, Rust, Go, and .NET — emit the same JSON shape, so a request crossing language boundaries still reads as one story.
+> **A log line that only carries the message is a clue. One that carries the whole story is an answer.** `@smooai/logger` stamps every entry with the request journey (correlation IDs across services), the AWS runtime around it (Lambda, SQS, API Gateway context), and — where an OpenTelemetry span is active — the _real_ W3C trace and span IDs, so logs join your traces instead of floating beside them. Native ports in **five languages** — TypeScript, Python, Rust, Go, and .NET — emit the same JSON shape, so a request crossing language boundaries still reads as one story.
 
 Traditional loggers give you the message, but not the story. `@smooai/logger` records where the log came from, the request journey that led there, and the runtime around it — so a production failure reads like a trace, not a guess.
 
@@ -60,15 +60,15 @@ The ports are **not** all identical — the honest capability matrix is [below](
 
 ## Feature tour
 
-| | Capability | Where |
-| --- | --- | --- |
-| 🔗 | [**Correlation across services**](#-correlation-across-services) | All 5 languages |
-| ⚡ | [**AWS context, captured automatically**](#-aws-context-captured-automatically) | All 5 languages |
-| 🔭 | [**Logs that join your traces**](#-logs-that-join-your-traces) | TS · Python · Rust · Go (+ .NET via `Activity`) |
-| 📍 | [**Exact caller location**](#-exact-caller-location) | All 5 languages |
-| 🎨 | [**Pretty local output + rotating file logs**](#-pretty-local-output--rotating-file-logs) | All 5 languages |
-| 🕶️ | [**Sensitive-key redaction**](#-sensitive-key-redaction) | All 5 languages |
-| 🖥️ | [**Browser logging**](#-browser-logging) | TypeScript only |
+|     | Capability                                                                                | Where                                           |
+| --- | ----------------------------------------------------------------------------------------- | ----------------------------------------------- |
+| 🔗  | [**Correlation across services**](#-correlation-across-services)                          | All 5 languages                                 |
+| ⚡  | [**AWS context, captured automatically**](#-aws-context-captured-automatically)           | All 5 languages                                 |
+| 🔭  | [**Logs that join your traces**](#-logs-that-join-your-traces)                            | TS · Python · Rust · Go (+ .NET via `Activity`) |
+| 📍  | [**Exact caller location**](#-exact-caller-location)                                      | All 5 languages                                 |
+| 🎨  | [**Pretty local output + rotating file logs**](#-pretty-local-output--rotating-file-logs) | All 5 languages                                 |
+| 🕶️  | [**Sensitive-key redaction**](#-sensitive-key-redaction)                                  | All 5 languages                                 |
+| 🖥️  | [**Browser logging**](#-browser-logging)                                                  | TypeScript only                                 |
 
 ### 🔗 Correlation across services
 
@@ -157,18 +157,18 @@ Every entry includes where in the code it was emitted, in all five languages:
   "callerContext": {
     "stack": [
       "at UserService.createUser (/src/services/UserService.ts:42:16)",
-      "at processRequest (/src/handlers/userHandler.ts:15:23)"
-    ]
-  }
+      "at processRequest (/src/handlers/userHandler.ts:15:23)",
+    ],
+  },
 }
 ```
 
 Two shapes are in play, and the difference is deliberate:
 
-| shape | ports | how |
-| --- | --- | --- |
-| `callerContext.stack` — multiple frames | TypeScript, Python | walks the runtime stack |
-| `caller: { file, line, function }` — one frame | Go, Rust, .NET | zero-cost compile-time / `runtime.Caller` |
+| shape                                          | ports              | how                                       |
+| ---------------------------------------------- | ------------------ | ----------------------------------------- |
+| `callerContext.stack` — multiple frames        | TypeScript, Python | walks the runtime stack                   |
+| `caller: { file, line, function }` — one frame | Go, Rust, .NET     | zero-cost compile-time / `runtime.Caller` |
 
 ```jsonc
 { "caller": { "file": "UserService.cs", "line": 42, "function": "CreateUser" } }
@@ -200,29 +200,29 @@ Every port scrubs values whose keys match a redaction list (case-insensitive, re
 **TypeScript only.** `BrowserLogger` captures device type, browser name/version, platform, and user agent, and correlates fetches to your backend logs:
 
 ```typescript
-import { BrowserLogger } from '@smooai/logger/browser/BrowserLogger';
+import { BrowserLogger } from "@smooai/logger/browser/BrowserLogger";
 
-const logger = new BrowserLogger({ name: 'CheckoutFlow' });
+const logger = new BrowserLogger({ name: "CheckoutFlow" });
 
-const response = await fetch('/api/checkout', {
-  method: 'POST',
-  headers: { 'X-Correlation-Id': logger.correlationId() },
+const response = await fetch("/api/checkout", {
+  method: "POST",
+  headers: { "X-Correlation-Id": logger.correlationId() },
 });
 logger.addResponseContext(response);
-logger.info('Checkout completed', { orderId: data.id });
+logger.info("Checkout completed", { orderId: data.id });
 ```
 
 ---
 
 ## 📦 Install
 
-| Language | Package | Install |
-| --- | --- | --- |
-| **TypeScript** | [`@smooai/logger`](https://www.npmjs.com/package/@smooai/logger) | `pnpm add @smooai/logger` |
-| **Python** | [`smooai-logger`](https://pypi.org/project/smooai-logger/) | `pip install smooai-logger` (or `uv add smooai-logger`) |
-| **Rust** | [`smooai-logger`](https://crates.io/crates/smooai-logger) | `cargo add smooai-logger` |
-| **Go** | [`github.com/SmooAI/logger/go/v4`](https://pkg.go.dev/github.com/SmooAI/logger/go/v4) | `go get github.com/SmooAI/logger/go/v4` |
-| **.NET** | [`SmooAI.Logger`](https://www.nuget.org/packages/SmooAI.Logger) | `dotnet add package SmooAI.Logger` |
+| Language       | Package                                                                               | Install                                                 |
+| -------------- | ------------------------------------------------------------------------------------- | ------------------------------------------------------- |
+| **TypeScript** | [`@smooai/logger`](https://www.npmjs.com/package/@smooai/logger)                      | `pnpm add @smooai/logger`                               |
+| **Python**     | [`smooai-logger`](https://pypi.org/project/smooai-logger/)                            | `pip install smooai-logger` (or `uv add smooai-logger`) |
+| **Rust**       | [`smooai-logger`](https://crates.io/crates/smooai-logger)                             | `cargo add smooai-logger`                               |
+| **Go**         | [`github.com/SmooAI/logger/go/v4`](https://pkg.go.dev/github.com/SmooAI/logger/go/v4) | `go get github.com/SmooAI/logger/go/v4`                 |
+| **.NET**       | [`SmooAI.Logger`](https://www.nuget.org/packages/SmooAI.Logger)                       | `dotnet add package SmooAI.Logger`                      |
 
 ## 🚀 Quickstart
 
@@ -234,7 +234,7 @@ import { AwsServerLogger, Level } from "@smooai/logger/AwsServerLogger";
 
 const logger = new AwsServerLogger({ name: "OrderService", level: Level.Info });
 
-logger.addUserContext({ id: "user-123", role: "admin" });        // persists across logs
+logger.addUserContext({ id: "user-123", role: "admin" }); // persists across logs
 logger.addTelemetryFields({ duration: 150, operation: "db-query" });
 logger.info("Payment processed", { amount: 99.99, currency: "USD" });
 
@@ -261,22 +261,22 @@ Per-language quickstarts, with full API docs:
 
 The wire schema is shared; port depth is not identical. Here's the honest status of each surface:
 
-| Capability | TypeScript | Python | Rust | Go | .NET |
-| --- | :-: | :-: | :-: | :-: | :-: |
-| Structured JSON, 6 levels | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Correlation / request / trace IDs | ✅ | ✅ | ✅ | ✅ | ✅ |
-| HTTP request/response context | ✅ | ✅ | ✅ | ✅ | ✅ |
-| User context + telemetry fields | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Lambda / SQS / API Gateway helpers | ✅ | ✅ | ✅ ¹ | ✅ | ✅ |
-| Pretty local output | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Rotating file logs (`.smooai-logs/`) | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Sensitive-key redaction | ✅ | ✅ | ✅ | ✅ | ✅ |
-| OTel span → `traceId`/`spanId` stamping | ✅ | ✅ | ✅ | ✅ | ➖ ² |
-| Per-line caller location ⁴ | ✅ | ✅ | ✅ | ✅ | ✅ |
-| Browser logger | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Parity corpus enforced in tests ³ | ✅ | ✅ | ✅ | ✅ | ✅ |
+| Capability                              | TypeScript | Python | Rust | Go  | .NET |
+| --------------------------------------- | :--------: | :----: | :--: | :-: | :--: |
+| Structured JSON, 6 levels               |     ✅     |   ✅   |  ✅  | ✅  |  ✅  |
+| Correlation / request / trace IDs       |     ✅     |   ✅   |  ✅  | ✅  |  ✅  |
+| HTTP request/response context           |     ✅     |   ✅   |  ✅  | ✅  |  ✅  |
+| User context + telemetry fields         |     ✅     |   ✅   |  ✅  | ✅  |  ✅  |
+| Lambda / SQS / API Gateway helpers      |     ✅     |   ✅   | ✅ ¹ | ✅  |  ✅  |
+| Pretty local output                     |     ✅     |   ✅   |  ✅  | ✅  |  ✅  |
+| Rotating file logs (`.smooai-logs/`)    |     ✅     |   ✅   |  ✅  | ✅  |  ✅  |
+| Sensitive-key redaction                 |     ✅     |   ✅   |  ✅  | ✅  |  ✅  |
+| OTel span → `traceId`/`spanId` stamping |     ✅     |   ✅   |  ✅  | ✅  | ➖ ² |
+| Per-line caller location ⁴              |     ✅     |   ✅   |  ✅  | ✅  |  ✅  |
+| Browser logger                          |     ✅     |   ❌   |  ❌  | ❌  |  ❌  |
+| Parity corpus enforced in tests ³       |     ✅     |   ✅   |  ✅  | ✅  |  ✅  |
 
-¹ Behind the `aws-lambda` cargo feature; Lambda *environment* context needs no feature.
+¹ Behind the `aws-lambda` cargo feature; Lambda _environment_ context needs no feature.
 ² No OTel dependency — equivalent real W3C trace/span IDs read from `System.Diagnostics.Activity.Current`, which is the API OpenTelemetry .NET itself builds on. Log lines also tee upstream via `SmooLoggerOptions.ForwardTo` (an `ILogger`), the hook OTel's .NET log appender attaches to.
 ³ [`parity-corpus.json`](parity-corpus.json) is the cross-language output contract, and **all five** ports now replay it from that one committed file — TypeScript ([`src/parity-corpus.spec.ts`](src/parity-corpus.spec.ts)), Python ([`python/tests/test_parity_corpus.py`](python/tests/test_parity_corpus.py)), Rust ([`rust/logger/tests/parity_corpus.rs`](rust/logger/tests/parity_corpus.rs)), Go ([`go/parity_corpus_test.go`](go/parity_corpus_test.go)), and .NET ([`dotnet/tests/SmooAI.Logger.Tests/ParityCorpusTests.cs`](dotnet/tests/SmooAI.Logger.Tests/ParityCorpusTests.cs)). It covers level mapping, required field names, message shape, correlation-id propagation, and the default redaction key list. Editing a corpus value turns all five suites red.
 ⁴ Two shapes: TypeScript and Python emit a multi-frame `callerContext.stack`; Go, Rust and .NET emit a single-frame `caller` object. Rust's omits `function` — see [Exact caller location](#-exact-caller-location).
