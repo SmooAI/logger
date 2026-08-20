@@ -171,13 +171,37 @@ jobs:
         run: |
           PR_NUMBER=$(gh pr list --state open --head changeset-release/main --json number --jq '.[0].number')
 
-          if [[ -n "$PR_NUMBER" && "$PR_NUMBER" != "null" ]]; then
-            echo "Found Changeset PR #$PR_NUMBER, attempting to auto-merge..."
-            gh pr merge "$PR_NUMBER" --auto --squash
+          if [[ -z "$PR_NUMBER" || "$PR_NUMBER" == "null" ]]; then
+            echo "No open Changeset PR found, skipping merge."
+            exit 0
+          fi
+
+          echo "Found Changeset PR #$PR_NUMBER, attempting to auto-merge..."
+
+          # `--auto` queues the merge behind pending checks, but GitHub REFUSES to
+          # enable it once a PR is already green:
+          #   GraphQL: Pull request is in clean status (enablePullRequestAutoMerge)
+          # That used to be unreachable because PR checks took ~20 minutes; they now
+          # take ~2, so the changeset PR is routinely green before this step runs and
+          # the whole release run reports failure even though it published fine.
+          # Fall back to merging outright — but only after confirming the checks are
+          # green, so this never merges over a red lane.
+          if gh pr merge "$PR_NUMBER" --auto --squash; then
             # The merge push automatically triggers the Release workflow
             # so no need to manually re-trigger it
-          else
-            echo "No open Changeset PR found, skipping merge."
+            exit 0
           fi
+
+          echo "Auto-merge was refused; checking whether #$PR_NUMBER is already green."
+          # Deliberately NOT `gh pr checks --required`: this repo has no required
+          # checks configured, so that would return an empty list and read as green.
+          # Every lane must be pass/skipping, and there must be at least one.
+          BUCKETS=$(gh pr checks "$PR_NUMBER" --json bucket --jq '[.[].bucket] | join(" ")' || echo "")
+          echo "Check buckets: [$BUCKETS]"
+          if [[ -z "$BUCKETS" ]] || [[ -n "$(tr ' ' '\n' <<<"$BUCKETS" | grep -vx -e pass -e skipping)" ]]; then
+            echo "::error::Changeset PR #$PR_NUMBER is not green ([$BUCKETS]); refusing to merge."
+            exit 1
+          fi
+          gh pr merge "$PR_NUMBER" --squash
         env:
           GH_TOKEN: ${{ secrets.GH_PAT }}
