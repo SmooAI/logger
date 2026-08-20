@@ -30,9 +30,6 @@ Homepage = "https://github.com/SmooAI/logger"
 Repository = "https://github.com/SmooAI/logger"
 Issues = "https://github.com/SmooAI/logger/issues"
 
-[project.scripts]
-smooai-log-viewer = "smooai_logger.cli.log_viewer:main"
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
@@ -44,16 +41,12 @@ dev = ["poethepoet>=0.29.0", "pytest>=8.3.0", "ruff>=0.11.6,<0.12", "basedpyrigh
 [tool.poe.tasks.install-dev]
 cmd = "uv sync --locked --group dev"
 
-[tool.poe.tasks."log-viewer:bundle"]
-cmd = "python scripts/bundle-log-viewer.py"
-
 [tool.poe.tasks.build]
-sequence = [{ cmd = "python scripts/bundle-log-viewer.py" }, { cmd = "uv build --wheel --sdist" }]
+cmd = "uv build --wheel --sdist"
 
 [tool.poe.tasks.publish]
 sequence = [
   { shell = "rm -rf dist/" },
-  { cmd = "python scripts/bundle-log-viewer.py" },
   { cmd = "uv build --wheel --sdist" },
   { cmd = "uv publish" },
 ]

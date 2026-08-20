@@ -38,4 +38,8 @@ The viewer is an observability **consumer**, not a logger feature. Its natural h
 
 The original `smooai-log-viewer` egui crate was deleted in [observability `SMOODEV-1255-rm-egui`](https://github.com/SmooAI/observability/pull/) once the Dioxus port reached parity (logs / errors / metrics views — local-file ingestion was the only feature not ported, and that workflow is better served by running the AWS / CloudWatch source through the new Settings → Add Org flow against `api.smoo.ai`).
 
-If you depended on the old egui binary specifically, pin to a [SmooAI/logger v4.x release](https://github.com/SmooAI/logger/releases) that predates this deprecation note — but expect no further updates on that line.
+The `log-viewer/` crate source, the `smooai-log-viewer` npm/PyPI console scripts, and the
+`build-log-viewer.yml` release workflow have all been removed from this repo. The source is
+still in git history if you need it (`git log -- log-viewer/src`).
+
+If you depended on the old egui binary specifically, pin to a [SmooAI/logger v4.3.0 or earlier release](https://github.com/SmooAI/logger/releases) — the last releases whose assets include it — but expect no further updates on that line.

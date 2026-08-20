@@ -62,3 +62,7 @@ dotnet/**/obj/
 dotnet/dist/
 *.nupkg
 *.snupkg
+
+# Never commit release tarballs or downloaded binaries
+*.tgz
+python/log-viewer/
