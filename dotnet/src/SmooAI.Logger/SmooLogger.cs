@@ -3,6 +3,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Text.Json.Serialization;
+using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 
 namespace SmooAI.Logger;
@@ -374,29 +375,42 @@ public class SmooLogger : IDisposable
 
     public bool IsEnabled(Level level) => level >= MinLevel;
 
-    public void LogTrace(string message, object? data = null, Exception? error = null)
-        => Emit(Level.Trace, message, data, error);
+    // The three `caller*` parameters are filled in by the compiler at each call
+    // site (they are never passed explicitly), so per-line caller location costs
+    // nothing at runtime — no StackTrace walk. They are threaded down to Emit so
+    // the location recorded is the USER's call site, not this one-line forwarder.
 
-    public void LogDebug(string message, object? data = null, Exception? error = null)
-        => Emit(Level.Debug, message, data, error);
+    public void LogTrace(string message, object? data = null, Exception? error = null,
+        [CallerFilePath] string? callerFile = null, [CallerLineNumber] int callerLine = 0, [CallerMemberName] string? callerMember = null)
+        => Emit(Level.Trace, message, data, error, callerFile, callerLine, callerMember);
 
-    public void LogInfo(string message, object? data = null, Exception? error = null)
-        => Emit(Level.Info, message, data, error);
+    public void LogDebug(string message, object? data = null, Exception? error = null,
+        [CallerFilePath] string? callerFile = null, [CallerLineNumber] int callerLine = 0, [CallerMemberName] string? callerMember = null)
+        => Emit(Level.Debug, message, data, error, callerFile, callerLine, callerMember);
 
-    public void LogWarning(string message, object? data = null, Exception? error = null)
-        => Emit(Level.Warn, message, data, error);
+    public void LogInfo(string message, object? data = null, Exception? error = null,
+        [CallerFilePath] string? callerFile = null, [CallerLineNumber] int callerLine = 0, [CallerMemberName] string? callerMember = null)
+        => Emit(Level.Info, message, data, error, callerFile, callerLine, callerMember);
 
-    public void LogError(string message, object? data = null, Exception? error = null)
-        => Emit(Level.Error, message, data, error);
+    public void LogWarning(string message, object? data = null, Exception? error = null,
+        [CallerFilePath] string? callerFile = null, [CallerLineNumber] int callerLine = 0, [CallerMemberName] string? callerMember = null)
+        => Emit(Level.Warn, message, data, error, callerFile, callerLine, callerMember);
 
-    public void LogFatal(string message, object? data = null, Exception? error = null)
-        => Emit(Level.Fatal, message, data, error);
+    public void LogError(string message, object? data = null, Exception? error = null,
+        [CallerFilePath] string? callerFile = null, [CallerLineNumber] int callerLine = 0, [CallerMemberName] string? callerMember = null)
+        => Emit(Level.Error, message, data, error, callerFile, callerLine, callerMember);
+
+    public void LogFatal(string message, object? data = null, Exception? error = null,
+        [CallerFilePath] string? callerFile = null, [CallerLineNumber] int callerLine = 0, [CallerMemberName] string? callerMember = null)
+        => Emit(Level.Fatal, message, data, error, callerFile, callerLine, callerMember);
 
     /// <summary>Primary entry point — emit a structured log at the given level.</summary>
-    public void Log(Level level, string message, object? data = null, Exception? error = null)
-        => Emit(level, message, data, error);
+    public void Log(Level level, string message, object? data = null, Exception? error = null,
+        [CallerFilePath] string? callerFile = null, [CallerLineNumber] int callerLine = 0, [CallerMemberName] string? callerMember = null)
+        => Emit(level, message, data, error, callerFile, callerLine, callerMember);
 
-    private void Emit(Level level, string message, object? data, Exception? error)
+    private void Emit(Level level, string message, object? data, Exception? error,
+        string? callerFile = null, int callerLine = 0, string? callerMember = null)
     {
         if (!IsEnabled(level))
         {
@@ -438,6 +452,19 @@ public class SmooLogger : IDisposable
         {
             entry[ContextKey.TraceId] = activity.TraceId.ToHexString();
             entry[ContextKey.SpanId] = activity.SpanId.ToHexString();
+        }
+
+        // Per-line caller location, matching the Go port's single-frame `caller`
+        // object. Only the file NAME is emitted: [CallerFilePath] expands to the
+        // absolute path on the BUILD machine, which is both noise and a leak.
+        if (!string.IsNullOrEmpty(callerFile))
+        {
+            entry[ContextKey.Caller] = new Dictionary<string, object?>(StringComparer.Ordinal)
+            {
+                ["file"] = Path.GetFileName(callerFile),
+                ["line"] = callerLine,
+                ["function"] = callerMember,
+            };
         }
 
         entry[ContextKey.Level] = (int)level;

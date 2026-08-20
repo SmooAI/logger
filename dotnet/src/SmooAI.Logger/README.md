@@ -17,7 +17,8 @@ dotnet add package SmooAI.Logger
 
 - **Correlation across services** — a single `correlationId` flows through HTTP calls, SQS records, and background tasks so you can grep one ID and see the whole request.
 - **Typed user + request + response fields** — no more stringly-typed `["user_id"] = user.Id`. Push a `User`, `HttpRequest`, or `HttpResponse` and the logger serializes every relevant field.
-- **Full error stack traces** — logged exceptions carry their type, message, and stack trace. (Per-line caller location, present in the TS/Python/Go ports, is not captured by the .NET port today.)
+- **Full error stack traces** — logged exceptions carry their type, message, and stack trace.
+- **Per-line caller location** — every entry carries `caller: { file, line, function }`, filled in by the compiler via `[CallerFilePath]` / `[CallerLineNumber]` / `[CallerMemberName]`. No `StackTrace` walk, so it costs nothing at runtime. Only the file basename is emitted; the full path is build-machine noise. (This is the Go port's single-frame shape; TypeScript and Python emit a multi-frame `callerContext.stack` instead.)
 - **Structured by default** — strict JSON lines in production, ANSI pretty-print locally.
 - **Wire-compatible with every other SmooAI.Logger port** — the schema is the same in TS, Python, Go, and Rust, so distributed traces stitch together across language boundaries.
 - **Works with `Microsoft.Extensions.Logging`** — forward to Serilog, AWS.Logger, or any `ILogger` sink without losing structure.
