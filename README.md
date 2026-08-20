@@ -274,12 +274,12 @@ The wire schema is shared; port depth is not identical. Here's the honest status
 | OTel span → `traceId`/`spanId` stamping | ✅ | ✅ | ✅ | ✅ | ➖ ² |
 | Per-line caller location ⁴ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Browser logger | ✅ | ❌ | ❌ | ❌ | ❌ |
-| Parity corpus enforced in tests ³ | ✅ | ✅ | ❌ | ❌ | ❌ |
+| Parity corpus enforced in tests ³ | ✅ | ✅ | ✅ | ✅ | ✅ |
 
 ¹ Behind the `aws-lambda` cargo feature; Lambda *environment* context needs no feature.
 ² No OTel dependency — equivalent real W3C trace/span IDs read from `System.Diagnostics.Activity.Current`, which is the API OpenTelemetry .NET itself builds on. Log lines also tee upstream via `SmooLoggerOptions.ForwardTo` (an `ILogger`), the hook OTel's .NET log appender attaches to.
+³ [`parity-corpus.json`](parity-corpus.json) is the cross-language output contract, and **all five** ports now replay it from that one committed file — TypeScript ([`src/parity-corpus.spec.ts`](src/parity-corpus.spec.ts)), Python ([`python/tests/test_parity_corpus.py`](python/tests/test_parity_corpus.py)), Rust ([`rust/logger/tests/parity_corpus.rs`](rust/logger/tests/parity_corpus.rs)), Go ([`go/parity_corpus_test.go`](go/parity_corpus_test.go)), and .NET ([`dotnet/tests/SmooAI.Logger.Tests/ParityCorpusTests.cs`](dotnet/tests/SmooAI.Logger.Tests/ParityCorpusTests.cs)). It covers level mapping, required field names, message shape, correlation-id propagation, and the default redaction key list. Editing a corpus value turns all five suites red.
 ⁴ Two shapes: TypeScript and Python emit a multi-frame `callerContext.stack`; Go, Rust and .NET emit a single-frame `caller` object. Rust's omits `function` — see [Exact caller location](#-exact-caller-location).
-³ [`parity-corpus.json`](parity-corpus.json) is the cross-language output contract, but today only the TypeScript ([`src/parity-corpus.spec.ts`](src/parity-corpus.spec.ts)) and Python ([`python/tests/test_parity_corpus.py`](python/tests/test_parity_corpus.py)) suites replay it. The Rust, Go, and .NET ports aim at the same schema and have their own test suites, but their conformance is **not** yet machine-checked against the corpus.
 
 **CI does cover all five languages on every PR** ([`pr-checks.yml`](.github/workflows/pr-checks.yml) typechecks, lints, tests, and builds TS, Python, Rust, Go, and .NET), and [`release.yml`](.github/workflows/release.yml) publishes all five: npm → PyPI → crates.io → Go module tag → NuGet.
 

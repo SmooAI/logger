@@ -41,7 +41,8 @@ opentelemetry = { version = "0.32.0", default-features = false, features = ["tra
 
 [dev-dependencies]
 tempfile = "3"
-# The caller-location test inspects the built record as raw JSON.
+# Used by the parity-corpus and caller-location integration tests, which
+# inspect the built record as raw JSON.
 serde_json = { version = "1", features = ["preserve_order"] }
 # Correlation + tee tests: a real SDK tracer to mint an active span, and a
 # tracing subscriber to capture the teed events (dev-only — the SDK dep is not

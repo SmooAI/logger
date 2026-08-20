@@ -562,11 +562,16 @@ class Logger:
 
     @correlation_id.setter
     def correlation_id(self, v: str | None) -> None:
+        # requestId and traceId mirror correlationId, matching the TypeScript, Go,
+        # Rust and .NET ports. Without this a Python service that adopted an inbound
+        # correlation id kept emitting a locally-generated requestId/traceId and fell
+        # out of the correlated view. Enforced by tests/test_parity_corpus.py.
         context = _get_global_context()
-        if v is None:
-            context.pop("correlationId", None)
-        else:
-            context["correlationId"] = str(v)
+        for key in ("correlationId", "requestId", "traceId"):
+            if v is None:
+                context.pop(key, None)
+            else:
+                context[key] = str(v)
         _set_global_context(context)
 
     def _parse_level(self, lvl: str | None) -> Level:
