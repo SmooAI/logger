@@ -13,7 +13,29 @@ import Logger, { ContextKey, DEFAULT_REDACT_KEYS, Level, REDACTED_VALUE } from "
  * fix the port, not the corpus.
  */
 
-const corpus = JSON.parse(readFileSync(join(__dirname, "..", "parity-corpus.json"), "utf8"));
+type CorpusLevel = { name: string; LogLevel: string; level: number };
+type CorpusCase = {
+  name: string;
+  message?: string;
+  context?: Record<string, unknown> | null;
+  expectMsg?: string;
+  expectContext?: Record<string, unknown>;
+  redacted?: string[];
+  preserved?: Record<string, unknown>;
+};
+type Corpus = {
+  version: number;
+  levels: { rows: CorpusLevel[] };
+  fieldNames: Record<string, string>;
+  record: { message: string; requiredFields: string[] };
+  messageShape: { cases: CorpusCase[] };
+  correlationId: { field: string; alsoSets: string[]; value: string };
+  redaction: { placeholder: string; defaultKeys: string[]; cases: CorpusCase[] };
+};
+
+const corpus: Corpus = JSON.parse(
+  readFileSync(join(__dirname, "..", "parity-corpus.json"), "utf8"),
+);
 
 /** Captures the built log object instead of writing it to stdout. */
 class CapturingLogger extends Logger {
@@ -40,7 +62,7 @@ describe("parity corpus: levels", () => {
   });
 
   test("corpus covers all six levels in order", () => {
-    expect(corpus.levels.rows.map((l: any) => l.name)).toEqual([
+    expect(corpus.levels.rows.map((l) => l.name)).toEqual([
       "trace",
       "debug",
       "info",
@@ -52,7 +74,7 @@ describe("parity corpus: levels", () => {
 
   test.each(corpus.levels.rows)(
     "$name emits level=$level and LogLevel=$LogLevel",
-    ({ name, level, LogLevel }: any) => {
+    ({ name, level, LogLevel }) => {
       const record = emit(name, corpus.record.message);
 
       // level -> pino-compatible NUMERIC code
@@ -67,16 +89,13 @@ describe("parity corpus: levels", () => {
 });
 
 describe("parity corpus: record shape", () => {
-  test.each(corpus.levels.rows.map((l: any) => l.name))(
-    "%s carries every required field",
-    (name: string) => {
-      const record = emit(name, corpus.record.message);
-      for (const field of corpus.record.requiredFields) {
-        expect(record).toHaveProperty(field);
-        expect(record[field]).not.toBeUndefined();
-      }
-    },
-  );
+  test.each(corpus.levels.rows.map((l) => l.name))("%s carries every required field", (name) => {
+    const record = emit(name, corpus.record.message);
+    for (const field of corpus.record.requiredFields) {
+      expect(record).toHaveProperty(field);
+      expect(record[field]).not.toBeUndefined();
+    }
+  });
 
   test("wire field names match the corpus", () => {
     expect(ContextKey.Level).toBe(corpus.fieldNames.level);
@@ -100,8 +119,8 @@ describe("parity corpus: record shape", () => {
 });
 
 describe("parity corpus: message shape", () => {
-  test.each(corpus.messageShape.cases)("$name", (testCase: any) => {
-    const record = emit("info", testCase.message, testCase.context);
+  test.each(corpus.messageShape.cases)("$name", (testCase) => {
+    const record = emit("info", testCase.message!, testCase.context);
     expect(record[corpus.fieldNames.message]).toBe(testCase.expectMsg);
 
     if (testCase.expectContext) {
@@ -136,14 +155,14 @@ describe("parity corpus: redaction", () => {
     expect(REDACTED_VALUE).toBe(corpus.redaction.placeholder);
   });
 
-  test.each(corpus.redaction.cases)("$name", (testCase: any) => {
+  test.each(corpus.redaction.cases)("$name", (testCase) => {
     const record = emit("info", corpus.record.message, testCase.context);
     const context = record[corpus.fieldNames.context];
 
-    for (const key of testCase.redacted) {
+    for (const key of testCase.redacted!) {
       expect(context[key]).toBe(corpus.redaction.placeholder);
     }
-    for (const [key, value] of Object.entries(testCase.preserved)) {
+    for (const [key, value] of Object.entries(testCase.preserved!)) {
       expect(context[key]).toBe(value);
     }
   });
