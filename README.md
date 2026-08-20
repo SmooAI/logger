@@ -273,7 +273,7 @@ The wire schema is shared; port depth is not identical. Here's the honest status
 
 ## 🔎 Looking for the desktop Log Viewer?
 
-It moved. The Rust/egui log viewer that used to live in [`log-viewer/`](log-viewer/) has been rebuilt as **SmooAI Observability Studio** — a Dioxus native desktop client for SmooAI logs, errors, and metrics — and lives in the [SmooAI/observability](https://github.com/SmooAI/observability) repo (`desktop/`), with builds on its [releases page](https://github.com/SmooAI/observability/releases). The egui implementation here is gone as of `studio-v0.1.0`; see [`log-viewer/DEPRECATED.md`](log-viewer/DEPRECATED.md) for the migration story.
+It moved. The Rust/egui log viewer that used to live here has been rebuilt as **SmooAI Observability Studio** — a Dioxus native desktop client for SmooAI logs, errors, and metrics — and lives in the [SmooAI/observability](https://github.com/SmooAI/observability) repo (`desktop/`), with builds on its [releases page](https://github.com/SmooAI/observability/releases). The crate has been deleted from this repo; see [`log-viewer/DEPRECATED.md`](log-viewer/DEPRECATED.md) for the migration story.
 
 ## 🧩 Part of Smoo AI
 

@@ -46,26 +46,6 @@ const updates = [
     },
   },
   {
-    path: "log-viewer/Cargo.toml",
-    apply(content) {
-      const pattern = /^(version\s*=\s*")([^"]+)(")/m;
-      if (!pattern.test(content)) {
-        throw new Error("Version line not found in log-viewer/Cargo.toml");
-      }
-      return content.replace(pattern, `$1${version}$3`);
-    },
-  },
-  {
-    path: "log-viewer/Cargo.lock",
-    apply(content) {
-      const pattern = /(name\s*=\s*"smooai-log-viewer"\s*\nversion\s*=\s*")([^"]+)(")/;
-      if (!pattern.test(content)) {
-        throw new Error("Version block not found in log-viewer/Cargo.lock");
-      }
-      return content.replace(pattern, `$1${version}$3`);
-    },
-  },
-  {
     path: "go/version.go",
     apply(content) {
       const pattern = /(const Version = ")([^"]+)(")/;

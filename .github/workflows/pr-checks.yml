@@ -39,9 +39,7 @@ jobs:
       - name: Cache Rust build artifacts
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: |
-            rust/logger -> rust/logger/target
-            log-viewer -> log-viewer/target
+          workspaces: rust/logger -> rust/logger/target
           cache-on-failure: true
 
       - name: Setup Go
