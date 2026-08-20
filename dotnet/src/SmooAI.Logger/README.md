@@ -3,7 +3,7 @@
 [![NuGet](https://img.shields.io/nuget/v/SmooAI.Logger.svg)](https://www.nuget.org/packages/SmooAI.Logger)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-**Structured logs for .NET that carry the full story — correlation IDs, request + response, user, and caller location on every line.**
+**Structured logs for .NET that carry the full story — correlation IDs, request + response, and user context on every line.**
 
 .NET port of [`@smooai/logger`](https://github.com/SmooAI/logger). Drop it into a Lambda, ECS service, or worker and every log entry tells you _where_ it fired, _who_ triggered it, and _which request_ it belonged to — without threading context through every method. JSON lines that land in CloudWatch, Datadog, or any `ILogger` sink, and wire-compatible with the TypeScript, Python, Go, and Rust ports.
 
@@ -17,7 +17,7 @@ dotnet add package SmooAI.Logger
 
 - **Correlation across services** — a single `correlationId` flows through HTTP calls, SQS records, and background tasks so you can grep one ID and see the whole request.
 - **Typed user + request + response fields** — no more stringly-typed `["user_id"] = user.Id`. Push a `User`, `HttpRequest`, or `HttpResponse` and the logger serializes every relevant field.
-- **Exact caller location** — every line carries file + method + line number. No more hunting for which service logged what.
+- **Full error stack traces** — logged exceptions carry their type, message, and stack trace. (Per-line caller location, present in the TS/Python/Go ports, is not captured by the .NET port today.)
 - **Structured by default** — strict JSON lines in production, ANSI pretty-print locally.
 - **Wire-compatible with every other SmooAI.Logger port** — the schema is the same in TS, Python, Go, and Rust, so distributed traces stitch together across language boundaries.
 - **Works with `Microsoft.Extensions.Logging`** — forward to Serilog, AWS.Logger, or any `ILogger` sink without losing structure.

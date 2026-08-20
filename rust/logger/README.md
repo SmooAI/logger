@@ -63,7 +63,6 @@ Ever spent hours debugging a Rust service in production, only to realize you're 
 
 **For AWS Services:**
 
-- 📍 **Exact code location** - File, line number, and call stack for every log
 - 🔗 **Request journey** - Correlation IDs that follow requests across services
 - ⚡ **AWS context** - Service-specific metadata and execution details
 - 🌐 **HTTP details** - Headers, methods, status codes from API Gateway
@@ -72,38 +71,15 @@ Ever spent hours debugging a Rust service in production, only to realize you're 
 
 ### Install
 
-Add the Git dependency until the crate is published to crates.io:
+The crate is published to [crates.io](https://crates.io/crates/smooai-logger):
 
-```toml
-[dependencies]
-smooai-logger = { git = "https://github.com/SmooAI/logger", package = "smooai-logger" }
+```sh
+cargo add smooai-logger
 ```
 
 ## The Power of Automatic Context
 
-### See Where Your Logs Come From
-
-Every log entry includes the exact location in your code:
-
-```rust
-use smooai_logger::Logger;
-
-let logger = Logger::default();
-logger.info(log_args!["User created"]);
-
-// Output includes:
-{
-  "callerContext": {
-    "stack": [
-      "at UserService::create_user (src/services/user_service.rs:42:16)",
-      "at process_request (src/handlers/user_handler.rs:15:23)",
-      "at handler (src/main.rs:8:10)"
-    ]
-  }
-}
-```
-
-No more guessing which function logged what - the full execution path is right there.
+> **Note:** unlike the TypeScript, Python, and Go ports, the Rust port does **not** capture per-line caller location (`callerContext`) today. Stack traces are serialized for logged *errors*.
 
 ### Track Requests Across Services
 
