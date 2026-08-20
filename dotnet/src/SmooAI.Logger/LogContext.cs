@@ -14,6 +14,8 @@ public static class ContextKey
     public const string Message = "msg";
     public const string ErrorDetails = "errorDetails";
 
+    /// <summary>Single-frame caller location: <c>{ file, line, function }</c>. Matches the Go port.</summary>
+    public const string Caller = "caller";
     public const string Name = "name";
     public const string CorrelationId = "correlationId";
     public const string User = "user";

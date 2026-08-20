@@ -79,7 +79,12 @@ cargo add smooai-logger
 
 ## The Power of Automatic Context
 
-> **Note:** unlike the TypeScript, Python, and Go ports, the Rust port does **not** capture per-line caller location (`callerContext`) today. Stack traces are serialized for logged *errors*.
+> **Note:** every entry carries per-line caller location as `caller: { file, line }`, captured via
+> `#[track_caller]` on the level methods, so it points at your `logger.info(...)` line rather than a
+> frame inside this crate. Only the file basename is emitted. `function` is absent: `std::panic::Location`
+> carries no symbol name and resolving one would mean capturing a backtrace on every line — Go and .NET
+> do include it. TypeScript and Python emit a multi-frame `callerContext.stack` instead of this
+> single-frame shape. Full stack traces are still serialized for logged *errors*.
 
 ### Track Requests Across Services
 

@@ -65,7 +65,7 @@ The ports are **not** all identical — the honest capability matrix is [below](
 | 🔗 | [**Correlation across services**](#-correlation-across-services) | All 5 languages |
 | ⚡ | [**AWS context, captured automatically**](#-aws-context-captured-automatically) | All 5 languages |
 | 🔭 | [**Logs that join your traces**](#-logs-that-join-your-traces) | TS · Python · Rust · Go (+ .NET via `Activity`) |
-| 📍 | [**Exact caller location**](#-exact-caller-location) | TS · Python · Go |
+| 📍 | [**Exact caller location**](#-exact-caller-location) | All 5 languages |
 | 🎨 | [**Pretty local output + rotating file logs**](#-pretty-local-output--rotating-file-logs) | All 5 languages |
 | 🕶️ | [**Sensitive-key redaction**](#-sensitive-key-redaction) | All 5 languages |
 | 🖥️ | [**Browser logging**](#-browser-logging) | TypeScript only |
@@ -150,7 +150,7 @@ Each port depends only on the OTel **API** (no SDK, no exporter). **.NET is the 
 
 ### 📍 Exact caller location
 
-In **TypeScript, Python, and Go**, every entry includes where in the code it was emitted:
+Every entry includes where in the code it was emitted, in all five languages:
 
 ```jsonc
 {
@@ -163,7 +163,22 @@ In **TypeScript, Python, and Go**, every entry includes where in the code it was
 }
 ```
 
-(Go emits a single-frame `caller` object — file, line, function — rather than a stack.) The **Rust and .NET ports do not capture per-line caller location today**; both serialize full stack traces for logged *errors*.
+Two shapes are in play, and the difference is deliberate:
+
+| shape | ports | how |
+| --- | --- | --- |
+| `callerContext.stack` — multiple frames | TypeScript, Python | walks the runtime stack |
+| `caller: { file, line, function }` — one frame | Go, Rust, .NET | zero-cost compile-time / `runtime.Caller` |
+
+```jsonc
+{ "caller": { "file": "UserService.cs", "line": 42, "function": "CreateUser" } }
+```
+
+Rust omits `function`: `#[track_caller]` gives file and line for free, but `std::panic::Location`
+carries no symbol name and resolving one would mean capturing a backtrace on every line. .NET uses
+`[CallerFilePath]`/`[CallerLineNumber]`/`[CallerMemberName]`, which the compiler fills in at each
+call site — no `StackTrace` walk. Both emit the file **basename** only; the full path is
+build-machine noise.
 
 ### 🎨 Pretty local output + rotating file logs
 
@@ -259,12 +274,13 @@ The wire schema is shared; port depth is not identical. Here's the honest status
 | Rotating file logs (`.smooai-logs/`) | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Sensitive-key redaction | ✅ | ✅ | ✅ | ✅ | ✅ |
 | OTel span → `traceId`/`spanId` stamping | ✅ | ✅ | ✅ | ✅ | ➖ ² |
-| Per-line caller location | ✅ | ✅ | ❌ | ✅ | ❌ |
+| Per-line caller location ⁴ | ✅ | ✅ | ✅ | ✅ | ✅ |
 | Browser logger | ✅ | ❌ | ❌ | ❌ | ❌ |
 | Parity corpus enforced in tests ³ | ✅ | ✅ | ❌ | ❌ | ❌ |
 
 ¹ Behind the `aws-lambda` cargo feature; Lambda *environment* context needs no feature.
-² No OTel dependency — equivalent real W3C trace/span IDs read from `System.Diagnostics.Activity.Current`.
+² No OTel dependency — equivalent real W3C trace/span IDs read from `System.Diagnostics.Activity.Current`, which is the API OpenTelemetry .NET itself builds on. Log lines also tee upstream via `SmooLoggerOptions.ForwardTo` (an `ILogger`), the hook OTel's .NET log appender attaches to.
+⁴ Two shapes: TypeScript and Python emit a multi-frame `callerContext.stack`; Go, Rust and .NET emit a single-frame `caller` object. Rust's omits `function` — see [Exact caller location](#-exact-caller-location).
 ³ [`parity-corpus.json`](parity-corpus.json) is the cross-language output contract, but today only the TypeScript ([`src/parity-corpus.spec.ts`](src/parity-corpus.spec.ts)) and Python ([`python/tests/test_parity_corpus.py`](python/tests/test_parity_corpus.py)) suites replay it. The Rust, Go, and .NET ports aim at the same schema and have their own test suites, but their conformance is **not** yet machine-checked against the corpus.
 
 **CI does cover all five languages on every PR** ([`pr-checks.yml`](.github/workflows/pr-checks.yml) typechecks, lints, tests, and builds TS, Python, Rust, Go, and .NET), and [`release.yml`](.github/workflows/release.yml) publishes all five: npm → PyPI → crates.io → Go module tag → NuGet.

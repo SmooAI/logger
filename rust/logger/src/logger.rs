@@ -16,6 +16,11 @@ use crate::context::{
 };
 use crate::env::{is_build, is_local};
 use crate::error::{log_error, LoggedError};
+
+/// Wire key for the single-frame caller location. Matches the Go port's literal;
+/// deliberately not a `ContextKey` variant, since adding one to that public enum
+/// would break downstream exhaustive matches.
+const CALLER_KEY: &str = "caller";
 use crate::pretty;
 use crate::rotation::{RotatingFileWriter, RotationOptions};
 
@@ -350,6 +355,10 @@ impl Logger {
         Url::parse(origin).ok().and_then(|url| url.host_str().map(|host| host.to_string()))
     }
 
+    /// `#[track_caller]` here and on `do_log` / the level methods makes
+    /// `Location::caller()` resolve to the USER's `logger.info(...)` line rather
+    /// than to a frame inside this crate.
+    #[track_caller]
     pub fn build_log_object(&self, level: Level, args: &LogArgs) -> Value {
         let mut payload = context::global_context();
         if !payload.is_object() {
@@ -395,6 +404,17 @@ impl Logger {
             Value::String(Utc::now().to_rfc3339_opts(SecondsFormat::Millis, true)),
         );
         map.insert(ContextKey::Name.as_str().into(), Value::String(self.name.clone()));
+
+        // Per-line caller location, matching the Go port's single-frame `caller`
+        // object. Only the file NAME is emitted (the full path is build-machine
+        // noise). `function` is absent: `Location` carries no symbol name, and
+        // resolving one would mean capturing a backtrace on every line.
+        let location = std::panic::Location::caller();
+        let file = location.file().rsplit(['/', '\\']).next().unwrap_or(location.file());
+        let mut caller = Map::new();
+        caller.insert("file".into(), Value::String(file.to_string()));
+        caller.insert("line".into(), Value::Number(serde_json::Number::from(u64::from(location.line()))));
+        map.insert(CALLER_KEY.into(), Value::Object(caller));
 
         // Correlate this line to the active trace: when an OpenTelemetry span is
         // active, override the fabricated `traceId` with the span's real W3C
@@ -464,6 +484,7 @@ impl Logger {
         }
     }
 
+    #[track_caller]
     fn do_log(&self, level: Level, args: LogArgs) -> io::Result<()> {
         let payload = self.build_log_object(level, &args);
         self.tee_to_tracing(level, &payload);
@@ -474,6 +495,7 @@ impl Logger {
         level.code() >= self.level.code()
     }
 
+    #[track_caller]
     pub fn trace<A: Into<LogArgs>>(&self, args: A) -> io::Result<()> {
         if self.is_enabled(Level::Trace) {
             self.do_log(Level::Trace, args.into())
@@ -482,6 +504,7 @@ impl Logger {
         }
     }
 
+    #[track_caller]
     pub fn debug<A: Into<LogArgs>>(&self, args: A) -> io::Result<()> {
         if self.is_enabled(Level::Debug) {
             self.do_log(Level::Debug, args.into())
@@ -490,6 +513,7 @@ impl Logger {
         }
     }
 
+    #[track_caller]
     pub fn info<A: Into<LogArgs>>(&self, args: A) -> io::Result<()> {
         if self.is_enabled(Level::Info) {
             self.do_log(Level::Info, args.into())
@@ -498,6 +522,7 @@ impl Logger {
         }
     }
 
+    #[track_caller]
     pub fn warn<A: Into<LogArgs>>(&self, args: A) -> io::Result<()> {
         if self.is_enabled(Level::Warn) {
             self.do_log(Level::Warn, args.into())
@@ -506,6 +531,7 @@ impl Logger {
         }
     }
 
+    #[track_caller]
     pub fn error<A: Into<LogArgs>>(&self, args: A) -> io::Result<()> {
         if self.is_enabled(Level::Error) {
             self.do_log(Level::Error, args.into())
@@ -514,6 +540,7 @@ impl Logger {
         }
     }
 
+    #[track_caller]
     pub fn fatal<A: Into<LogArgs>>(&self, args: A) -> io::Result<()> {
         if self.is_enabled(Level::Fatal) {
             self.do_log(Level::Fatal, args.into())
