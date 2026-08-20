@@ -6,14 +6,15 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-`@smooai/logger` is a multi-language contextual structured logging system for AWS and browser environments. It automatically captures execution context (code location, request journey, AWS metadata, HTTP details, browser info). The repo also includes a desktop Log Viewer app built with Rust/egui/DuckDB.
+`@smooai/logger` is a multi-language contextual structured logging system for AWS and browser environments. It automatically captures execution context (code location, request journey, AWS metadata, HTTP details, browser info). The former desktop Log Viewer (Rust/egui/DuckDB) is deprecated and gone from this repo — its successor is SmooAI Observability Studio in [SmooAI/observability](https://github.com/SmooAI/observability) (`desktop/`); see `log-viewer/DEPRECATED.md`.
 
 ### Languages & Toolchains
 
 - **TypeScript** — pnpm, tsup
 - **Python** — uv, poethepoet
-- **Rust** — cargo (logger crate + log-viewer desktop app)
+- **Rust** — cargo (`rust/logger/` crate; `log-viewer/` is deprecated)
 - **Go** — go mod
+- **.NET** — dotnet SDK (`dotnet/` — SmooAI.Logger solution, published to NuGet)
 
 ---
 
