@@ -2,9 +2,12 @@
 /**
  * CI publish script that handles idempotent npm publishing.
  *
- * Runs the build, attempts changeset publish (which publishes to npm),
- * and gracefully handles the case where the version already exists on npm.
- * Then syncs versions to other language packages.
+ * Runs the build and attempts changeset publish (which publishes to npm),
+ * gracefully handling the case where the version already exists on npm.
+ *
+ * Version syncing does NOT happen here. It runs in the changesets `version`
+ * lifecycle (`pnpm run version`), so the bumped manifests are committed with the
+ * version bump instead of being mutated in the publish workspace and discarded.
  */
 import { execSync } from "node:child_process";
 import { readFileSync } from "node:fs";
@@ -75,6 +78,3 @@ if (!npmPublished) {
     }
   }
 }
-
-// Step 3: Sync versions to other language packages
-run("pnpm version:sync");

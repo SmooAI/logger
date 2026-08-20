@@ -1,6 +1,6 @@
 [project]
 name = "smooai-logger"
-version = "3.2.3"
+version = "4.5.0"
 description = "Context-aware structured logging utilities for Python that mirror the @smooai/logger toolkit."
 readme = "README.md"
 authors = [{ name = "SmooAI", email = "brent@smooai.com" }]

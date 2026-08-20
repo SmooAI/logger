@@ -72,8 +72,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Guard — Go module major matches package.json
-        run: pnpm check:go-module
+      - name: Guard — every manifest version matches package.json
+        run: pnpm check:versions
 
       - name: Typecheck
         run: pnpm typecheck
@@ -94,6 +94,10 @@ jobs:
         id: changesets
         uses: changesets/action@v1
         with:
+          # Runs `changeset version && node scripts/sync-versions.mjs`. The action
+          # commits the whole working tree afterwards, so the synced manifests land
+          # in the version-bump commit instead of being discarded at publish time.
+          version: pnpm run version
           commit: "🦋 New version release"
           title: "🦋 New version release"
           publish: pnpm ci:publish
@@ -114,19 +118,18 @@ jobs:
 
       - name: Publish smooai-logger to crates.io
         if: steps.changesets.outputs.published == 'true'
-        # --allow-dirty is needed because version:sync modifies Cargo.toml/Cargo.lock
-        # without committing them during the CI publish flow
-        run: cargo publish --allow-dirty --manifest-path rust/logger/Cargo.toml
+        run: cargo publish --locked --manifest-path rust/logger/Cargo.toml
         env:
           CARGO_REGISTRY_TOKEN: ${{ secrets.SMOOAI_CARGO_REGISTRY_TOKEN }}
 
       - name: Tag and publish Go module
         if: steps.changesets.outputs.published == 'true'
         run: |
-          # Guard here, not in the pre-flight checks: changesets has already
+          # Guard here, not just in the pre-flight checks: changesets has
           # bumped package.json by this point, so this is the only place the
-          # version that becomes the tag can be compared to the module path.
-          node scripts/check-go-module.mjs
+          # version that becomes the tag can be compared to the manifests and
+          # to the Go module path.
+          pnpm check:versions
           VERSION=$(node -p "require('./package.json').version")
           TAG="go/v${VERSION}"
           echo "Creating Go module tag: ${TAG}"
