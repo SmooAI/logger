@@ -160,8 +160,7 @@ def test_no_otel_consumer_means_no_bridged_record(monkeypatch):
     try:
         Logger().info("hello")
         assert app_handler.records == [], (
-            "a plain root handler received a bridged record, so every consumer "
-            "with logging.basicConfig() double-prints every line"
+            "a plain root handler received a bridged record, so every consumer with logging.basicConfig() double-prints every line"
         )
     finally:
         root.removeHandler(app_handler)
