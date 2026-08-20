@@ -43,7 +43,7 @@ Check out other SmooAI packages at [smoo.ai/open-source](https://smoo.ai/open-so
 
 **The missing piece for AWS & Go logging** - A contextual logging system that automatically captures the full execution context you need to debug production issues, without the manual setup.
 
-[![Go Reference](https://pkg.go.dev/badge/github.com/SmooAI/logger/go/v3.svg)](https://pkg.go.dev/github.com/SmooAI/logger/go/v3)
+[![Go Reference](https://pkg.go.dev/badge/github.com/SmooAI/logger/go/v4.svg)](https://pkg.go.dev/github.com/SmooAI/logger/go/v4)
 
 ![GitHub License](https://img.shields.io/github/license/SmooAI/logger?style=for-the-badge)
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/SmooAI/logger/release.yml?style=for-the-badge)
@@ -71,7 +71,7 @@ Ever spent hours debugging a Go service in production, only to realize you're mi
 ### Install
 
 ```bash
-go get github.com/SmooAI/logger/go/v3
+go get github.com/SmooAI/logger/go/v4
 ```
 
 ### Cross-Language Support
@@ -83,7 +83,7 @@ The same structured log format works across all your services:
 | TypeScript | [`@smooai/logger`](https://www.npmjs.com/package/@smooai/logger) | `pnpm add @smooai/logger`               |
 | Python     | [`smooai-logger`](https://pypi.org/project/smooai-logger/)       | `pip install smooai-logger`             |
 | Rust       | [`smooai-logger`](https://crates.io/crates/smooai-logger)        | `cargo add smooai-logger`               |
-| Go         | `github.com/SmooAI/logger/go/v3`                                 | `go get github.com/SmooAI/logger/go/v3` |
+| Go         | `github.com/SmooAI/logger/go/v4`                                 | `go get github.com/SmooAI/logger/go/v4` |
 
 ## The Power of Automatic Context
 
@@ -92,7 +92,7 @@ The same structured log format works across all your services:
 Every log entry includes the exact location in your code:
 
 ```go
-import logger "github.com/SmooAI/logger/go/v3"
+import logger "github.com/SmooAI/logger/go/v4"
 
 log := logger.Default()
 log.Info("User created")
@@ -138,7 +138,7 @@ import (
 
     "github.com/aws/aws-lambda-go/events"
     "github.com/aws/aws-lambda-go/lambda"
-    logger "github.com/SmooAI/logger/go/v3"
+    logger "github.com/SmooAI/logger/go/v4"
 )
 
 var log *logger.LambdaLogger
@@ -175,7 +175,7 @@ func main() {
 ```go
 import (
     "os"
-    logger "github.com/SmooAI/logger/go/v3"
+    logger "github.com/SmooAI/logger/go/v4"
 )
 
 log, _ := logger.New(logger.Options{
@@ -331,7 +331,7 @@ log, _ := logger.New(logger.Options{
 ### Logger Creation
 
 ```go
-import logger "github.com/SmooAI/logger/go/v3"
+import logger "github.com/SmooAI/logger/go/v4"
 
 // With options
 prettyOn := true

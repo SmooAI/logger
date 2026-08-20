@@ -85,6 +85,7 @@
     "aibranch": "pnpm generate-git-branch",
     "build": "pnpm tsdown && cp src/decycle.cjs dist/ && pnpm run python:build && pnpm run rust:build && pnpm run go:build",
     "check-all": "pnpm run typecheck && pnpm run lint && pnpm run test && pnpm run rust:fmt:check && pnpm run rust:lint && pnpm run rust:test && pnpm run go:fmt:check && pnpm run go:lint && pnpm run go:test && pnpm run build",
+    "check:go-module": "node scripts/check-go-module.mjs",
     "ci:publish": "node scripts/ci-publish.mjs",
     "format": "oxfmt --write . && pnpm run python:format && pnpm run rust:fmt && pnpm run go:fmt",
     "go:build": "(cd go && go build ./...)",

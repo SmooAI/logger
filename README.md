@@ -206,10 +206,8 @@ logger.info('Checkout completed', { orderId: data.id });
 | **TypeScript** | [`@smooai/logger`](https://www.npmjs.com/package/@smooai/logger) | `pnpm add @smooai/logger` |
 | **Python** | [`smooai-logger`](https://pypi.org/project/smooai-logger/) | `pip install smooai-logger` (or `uv add smooai-logger`) |
 | **Rust** | [`smooai-logger`](https://crates.io/crates/smooai-logger) | `cargo add smooai-logger` |
-| **Go** | [`github.com/SmooAI/logger/go/v3`](https://pkg.go.dev/github.com/SmooAI/logger/go/v3) | `go get github.com/SmooAI/logger/go/v3` |
+| **Go** | [`github.com/SmooAI/logger/go/v4`](https://pkg.go.dev/github.com/SmooAI/logger/go/v4) | `go get github.com/SmooAI/logger/go/v4` |
 | **.NET** | [`SmooAI.Logger`](https://www.nuget.org/packages/SmooAI.Logger) | `dotnet add package SmooAI.Logger` |
-
-> **Go note:** the module path is `…/go/v3`, so `go get` resolves a pseudo-version tracking `main` rather than a tagged release — the repo's `go/v4.x` release tags don't match the `/v3` module path and are not resolvable. A tag-scheme fix is tracked separately; the pseudo-version install above works today.
 
 ## 🚀 Quickstart
 
